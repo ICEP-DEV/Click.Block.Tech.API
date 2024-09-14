@@ -72,6 +72,7 @@ class Customer {
     this._LoginPin = value;
   }
 
+  //What length is the AlertPin?
   set AlertPin(value) {
     if (typeof value !== 'string' || value.length < 4) {
       throw new Error('AlertPin must be a string with at least 4 characters');
