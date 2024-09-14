@@ -23,5 +23,18 @@ const getCustomer = (req, res) => {
     }
   });
 };
+const  authenticateCustomer =  (req,res)=>{
+const customerAuthData = req.body;
+  CustomerService.authCustomer(customerAuthData,(err, result) => {
+    if(err){
+      return res.status(500).send(err);
+    }
+    if(result){
+      res.status(200).send(result);
+    }else{
+      res.status(404).send('customer not found (Wrong LoginPin or Phone number).');
+    }
+  });
+};
 
-module.exports = { createCustomer, getCustomer };
+module.exports = { createCustomer, getCustomer, authenticateCustomer };
