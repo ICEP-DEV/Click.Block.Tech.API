@@ -6,6 +6,38 @@ const CustomerDAO = {
     const sql = 'INSERT INTO customer SET ?';
     db.query(sql, customerData, callback);
   },
+  getbyPhoneAndPin: (custAuthData, callback)=>{
+    const phoneNumber = custAuthData.PhoneNumber;
+    const loginPin = custAuthData.LoginPin;
+    const sql = 'SELECT * FROM customer WHERE PhoneNumber = ? AND LoginPin = ?';
+    db.query(sql, [phoneNumber,loginPin], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+
+        if (result.length > 0) {
+          const customer = new Customer(
+            result[0].CustID_Nr,
+            result[0].FirstName,
+            result[0].LastName,
+            result[0].PhoneNumber,
+            result[0].Address,
+            result[0].Email,
+            result[0].DateOfBirth,
+            result[0].LoginPin,
+            result[0].AlertPin,
+            result[0].isActive,
+            result[0].PanicButtonStatus,
+            result[0].AdminID
+          );
+    
+          callback(null, customer);
+        } else {
+          callback(null, null);  
+        }
+      }
+    });
+  },
 
   getById: (custID_Nr, callback) => {
     const sql = 'SELECT * FROM customer WHERE CustID_Nr = ?';
