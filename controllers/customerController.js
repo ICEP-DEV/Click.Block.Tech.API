@@ -19,7 +19,7 @@ const getCustomer = (req, res) => {
     if (result) {
       res.status(200).send(result);
     } else {
-      res.status(404).send('Customer not found');
+      res.status(404).send('Customer not found..');
     }
   });
 };
