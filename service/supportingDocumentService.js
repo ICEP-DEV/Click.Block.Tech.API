@@ -1,65 +1,40 @@
-const SupportingDocumentDAO = require('../DAO/supportingDocumentDAO'); // Adjust the path as needed
+// services/SupportingDocumentService.js
+const SupportingDocumentDAO = require('../DAO/supportingDocumentDAO');
+const SupportingDocument = require('../models/supportingDocuments');
 
 class SupportingDocumentService {
-    // Create a new supporting document
-    static createSupportingDocument(newDocument) {
-        return new Promise((resolve, reject) => {
-            SupportingDocumentDAO.createSupportingDocument(newDocument, (err, insertId) => {
-                if (err) {
-                    return reject(new Error('Error creating document'));
-                }
-                resolve(insertId);
-            });
-        });
+    async createSupportingDocument(data) {
+        const supportingDocument = new SupportingDocument(data.custIDNr, data.idDocument, data.selfieWithID);
+
+        // if (!supportingDocument.isValid()) {
+        //     console.log(data.custIDNr + "\t" + data.idDocument+ "\t" + data.selfieWithID)
+        //     throw new Error('Invalid supporting document data');
+        // }
+       
+        return await SupportingDocumentDAO.create(supportingDocument);
     }
 
-    // Get a supporting document by ID
-    static getSupportingDocumentById(docId) {
-        return new Promise((resolve, reject) => {
-            SupportingDocumentDAO.getSupportingDocumentById(docId, (err, document) => {
-                if (err) {
-                    return reject(new Error('Error fetching document'));
-                }
-                resolve(document);
-            });
-        });
+    async getSupportingDocumentById(suppDocsID) {
+        return await SupportingDocumentDAO.getById(suppDocsID);
     }
 
-    // Update a supporting document
-    static updateSupportingDocument(docId, updatedDocument) {
-        return new Promise((resolve, reject) => {
-            SupportingDocumentDAO.updateSupportingDocument(docId, updatedDocument, (err, result) => {
-                if (err) {
-                    return reject(new Error('Error updating document'));
-                }
-                resolve(result);
-            });
-        });
+    async updateSupportingDocument(data) {
+        const supportingDocument = new SupportingDocument(data.suppDocsID, null, data.idDocument, data.selfieWithID);
+
+        if (!supportingDocument.isValid()) {
+            throw new Error('Invalid supporting document data');
+        }
+
+        return await SupportingDocumentDAO.update(supportingDocument);
     }
 
-    // Delete a supporting document
-    static deleteSupportingDocument(docId) {
-        return new Promise((resolve, reject) => {
-            SupportingDocumentDAO.deleteSupportingDocument(docId, (err, result) => {
-                if (err) {
-                    return reject(new Error('Error deleting document'));
-                }
-                resolve(result);
-            });
-        });
+    async deleteSupportingDocument(suppDocsID) {
+        return await SupportingDocumentDAO.delete(suppDocsID);
     }
 
-    // Get all supporting documents
-    static getAllSupportingDocuments() {
-        return new Promise((resolve, reject) => {
-            SupportingDocumentDAO.getAllSupportingDocuments((err, documents) => {
-                if (err) {
-                    return reject(new Error('Error fetching documents'));
-                }
-                resolve(documents);
-            });
-        });
+    async getAllSupportingDocuments() {
+        return await SupportingDocumentDAO.getAll();
     }
 }
 
-module.exports = SupportingDocumentService;
+module.exports = new SupportingDocumentService();

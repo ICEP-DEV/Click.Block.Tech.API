@@ -1,58 +1,56 @@
-const express = require('express');
-const router = express.Router();
-const SupportingDocumentService = require('../services/supportingDocumentService'); // Adjust path as needed
 
-// Get a supporting document by ID
-router.get('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
-    try {
-        const document = await SupportingDocumentService.getSupportingDocumentById(docId);
-        if (!document) {
-            return res.status(404).json({ error: 'Document not found' });
+const SupportingDocumentService = require('../service/supportingDocumentService');
+
+class SupportingDocumentController {
+    async create(req, res) {
+
+        try {
+            const result = await SupportingDocumentService.createSupportingDocument(req.body);
+            res.status(201).json({ message: 'Supporting document created', data: result });
+
+        } catch (err) {
+            res.status(400).json({ message: err.message });
         }
-        res.status(200).json(document);
-    } catch (err) {
-        res.status(500).json({ error: 'Error fetching document' });
-    }
-});
 
-// Update a supporting document
-router.put('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
-    const updatedDocument = req.body; // Assuming the updated document data is sent in the request body
-    try {
-        const result = await SupportingDocumentService.updateSupportingDocument(docId, updatedDocument);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Document not found' });
+    }
+
+    async getById(req, res) {
+
+        try {
+            const result = await SupportingDocumentService.getSupportingDocumentById(req.params.id);
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(404).json({ message: 'Supporting document not found' });
         }
-        res.status(200).json({ message: 'Document updated' });
-    } catch (err) {
-        res.status(500).json({ error: 'Error updating document' });
+        
     }
-});
 
-// Delete a supporting document
-router.delete('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
-    try {
-        const result = await SupportingDocumentService.deleteSupportingDocument(docId);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Document not found' });
+    async update(req, res) {
+        try {
+            const result = await SupportingDocumentService.updateSupportingDocument(req.body);
+            res.status(200).json({ message: 'Supporting document updated', data: result });
+        } catch (err) {
+            res.status(400).json({ message: err.message });
         }
-        res.status(200).json({ message: 'Document deleted' });
-    } catch (err) {
-        res.status(500).json({ error: 'Error deleting document' });
     }
-});
 
-// Get all supporting documents
-router.get('/documents', async (req, res) => {
-    try {
-        const documents = await SupportingDocumentService.getAllSupportingDocuments();
-        res.status(200).json(documents);
-    } catch (err) {
-        res.status(500).json({ error: 'Error fetching documents' });
+    async delete(req, res) {
+        try {
+            await SupportingDocumentService.deleteSupportingDocument(req.params.id);
+            res.status(200).json({ message: 'Supporting document deleted' });
+        } catch (err) {
+            res.status(404).json({ message: 'Supporting document not found' });
+        }
     }
-});
 
-module.exports = router;
+    async getAll(req, res) {
+        try {
+            const result = await SupportingDocumentService.getAllSupportingDocuments();
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+}
+
+module.exports = new SupportingDocumentController();
