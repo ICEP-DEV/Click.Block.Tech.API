@@ -24,4 +24,5 @@ const getCustomer = (req, res) => {
   });
 };
 
+
 module.exports = { createCustomer, getCustomer };
