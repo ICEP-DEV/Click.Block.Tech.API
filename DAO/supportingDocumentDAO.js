@@ -4,9 +4,8 @@ class SupportingDocumentDAO {
     async create(supportingDocument) {
         const { custIDNr, idDocument, selfieWithID } = supportingDocument;
         const query = 'INSERT INTO supportingdocuments(CustID_Nr, ID_Document, Selfie_With_ID) VALUES (?, ?, ?)';
-       
         const result = await db.query(query, [custIDNr, idDocument, selfieWithID]);
-
+        
         return result;
     }
 

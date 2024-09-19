@@ -7,9 +7,9 @@ class SupportingDocument {
         this.selfieWithID = selfieWithID;
     }
 
-    // isValid() {
-    //     return this.custIDNr && this.idDocument && this.selfieWithID;
-    // }
+     isValid() {
+         return this.custIDNr && this.idDocument && this.selfieWithID;
+     }
     
 }
 

@@ -4,15 +4,21 @@ const SupportingDocument = require('../models/supportingDocuments');
 
 class SupportingDocumentService {
     async createSupportingDocument(data) {
-        const supportingDocument = new SupportingDocument(data.custIDNr, data.idDocument, data.selfieWithID);
+        const supportingDocument = new SupportingDocument(
+            null, // suppDocsID is auto-generated
+            data.custIDNr,
+            data.idDocument,
+            data.selfieWithID
+        );
 
-        // if (!supportingDocument.isValid()) {
-        //     console.log(data.custIDNr + "\t" + data.idDocument+ "\t" + data.selfieWithID)
-        //     throw new Error('Invalid supporting document data');
-        // }
-       
+        if (!supportingDocument.isValid()) {
+            console.log(data.custIDNr + "\t" + data.idDocument + "\t" + data.selfieWithID);
+            throw new Error('Invalid supporting document data here');
+        }
+
         return await SupportingDocumentDAO.create(supportingDocument);
     }
+
 
     async getSupportingDocumentById(suppDocsID) {
         return await SupportingDocumentDAO.getById(suppDocsID);
@@ -32,9 +38,9 @@ class SupportingDocumentService {
         return await SupportingDocumentDAO.delete(suppDocsID);
     }
 
-    async getAllSupportingDocuments() {
-        return await SupportingDocumentDAO.getAll();
+   // async getAllSupportingDocuments() {
+       // return await SupportingDocumentDAO.getAll();
     }
-}
+
 
 module.exports = new SupportingDocumentService();
