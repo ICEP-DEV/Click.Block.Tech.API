@@ -1,12 +1,10 @@
-// routes/supportingDocumentRoutes.js
 const express = require('express');
 const router = express.Router();
-const SupportingDocumentController = require('../controllers/supportingDocumentsController');
+const supportingDocumentsController = require('../controllers/supportingDocumentsController');
 
-router.post('/create', SupportingDocumentController.create);
-router.get('/:id', SupportingDocumentController.getById);
-router.put('/update', SupportingDocumentController.update);
-router.delete('/:id', SupportingDocumentController.delete);
-router.get('/getAll', SupportingDocumentController.getAll);
+router.post('/upload', supportingDocumentsController.uploadDocument);
+router.get('/:customerID', supportingDocumentsController.getDocumentsByCustomer);
+router.put('/update', supportingDocumentsController.updateDocument);
+router.delete('/:customerID', supportingDocumentsController.deleteDocumentsByCustomer);
 
 module.exports = router;

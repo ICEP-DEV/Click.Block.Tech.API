@@ -1,56 +1,47 @@
+const SupportingDocumentsService = require('../service/supportingDocumentService');
 
-const SupportingDocumentService = require('../service/supportingDocumentService');
+const uploadDocument = async (req, res) => {
+    const documentData = req.body;
 
-class SupportingDocumentController {
-    async create(req, res) {
-
-        try {
-            const result = await SupportingDocumentService.createSupportingDocument(req.body);
-            res.status(201).json({ message: 'Supporting document created', data: result });
-
-        } catch (err) {
-            res.status(400).json({ message: err.message });
-        }
-
+    try {
+        const result = await SupportingDocumentsService.uploadDocument(documentData);
+        res.status(200).send({ message: 'Document uploaded successfully', data: result });
+    } catch (err) {
+        res.status(500).send({ message: 'Invalid ID' });
     }
+};
 
-    async getById(req, res) {
+const updateDocument = async (req, res) => {
+    const documentData = req.body;
 
-        try {
-            const result = await SupportingDocumentService.getSupportingDocumentById(req.params.id);
-            res.status(200).json(result);
-        } catch (err) {
-            res.status(404).json({ message: 'Supporting document not found' });
-        }
-        
+    try {
+        const result = await SupportingDocumentsService.updateDocument(documentData);
+        res.status(200).send({ message: 'Document updated successfully', data: result });
+    } catch (err) {
+        res.status(500).send({ message: err.message });
     }
+};
 
-    async update(req, res) {
-        try {
-            const result = await SupportingDocumentService.updateSupportingDocument(req.body);
-            res.status(200).json({ message: 'Supporting document updated', data: result });
-        } catch (err) {
-            res.status(400).json({ message: err.message });
-        }
+const getDocumentsByCustomer = async (req, res) => {
+    const customerID = req.params.customerID;
+
+    try {
+        const result = await SupportingDocumentsService.getDocumentsByCustomer(customerID);
+        res.status(200).send({ data: result });
+    } catch (err) {
+        res.status(500).send({ message: err.message });
     }
+};
 
-    async delete(req, res) {
-        try {
-            await SupportingDocumentService.deleteSupportingDocument(req.params.id);
-            res.status(200).json({ message: 'Supporting document deleted' });
-        } catch (err) {
-            res.status(404).json({ message: 'Supporting document not found' });
-        }
+const deleteDocumentsByCustomer = async (req, res) => {
+    const customerID = req.params.customerID;
+
+    try {
+        const result = await SupportingDocumentsService.deleteDocumentsByCustomer(customerID);
+        res.status(200).send({ message: 'Documents deleted successfully', data: result });
+    } catch (err) {
+        res.status(500).send({ message: err.message });
     }
+};
 
-    async getAll(req, res) {
-        try {
-            const result = await SupportingDocumentService.getAllSupportingDocuments();
-            res.status(200).json(result);
-        } catch (err) {
-            res.status(500).json({ message: 'Server error' });
-        }
-    }
-}
-
-module.exports = new SupportingDocumentController();
+module.exports = { uploadDocument, updateDocument, getDocumentsByCustomer, deleteDocumentsByCustomer };

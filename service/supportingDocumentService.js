@@ -1,46 +1,64 @@
-// services/SupportingDocumentService.js
-const SupportingDocumentDAO = require('../DAO/supportingDocumentDAO');
+const SupportingDocumentsDAO = require('../DAO/supportingDocumentDAO');
 const SupportingDocument = require('../models/supportingDocuments');
 
-class SupportingDocumentService {
-    async createSupportingDocument(data) {
-        const supportingDocument = new SupportingDocument(
-            null, // suppDocsID is auto-generated
-            data.custIDNr,
-            data.idDocument,
-            data.selfieWithID
+const uploadDocument = async (documentData) => {
+    try {
+        const existingDocument = await SupportingDocumentsDAO.getByCustomerID(documentData.CustID_Nr);
+
+        if (existingDocument) {
+            return await updateDocument(documentData);
+        } 
+        
+        const newDocument = new SupportingDocument(
+            documentData.SuppDocsID, 
+            documentData.CustID_Nr,
+            documentData.ID_Document,
+            documentData.Selfie_With_ID
         );
 
-        if (!supportingDocument.isValid()) {
-            console.log(data.custIDNr + "\t" + data.idDocument + "\t" + data.selfieWithID);
-            throw new Error('Invalid supporting document data here');
-        }
-
-        return await SupportingDocumentDAO.create(supportingDocument);
-    }
-
-
-    async getSupportingDocumentById(suppDocsID) {
-        return await SupportingDocumentDAO.getById(suppDocsID);
-    }
-
-    async updateSupportingDocument(data) {
-        const supportingDocument = new SupportingDocument(data.suppDocsID, null, data.idDocument, data.selfieWithID);
-
-        if (!supportingDocument.isValid()) {
+        if (!newDocument.isValid()) {
             throw new Error('Invalid supporting document data');
         }
 
-        return await SupportingDocumentDAO.update(supportingDocument);
+        return await SupportingDocumentsDAO.createDocument(newDocument);
+    } catch (err) {
+        throw err; // Handle the error as needed
     }
+};
 
-    async deleteSupportingDocument(suppDocsID) {
-        return await SupportingDocumentDAO.delete(suppDocsID);
+const updateDocument = async (documentData) => {
+    try {
+        const updatedDocument = new SupportingDocument(
+            documentData.SuppDocsID, 
+            documentData.CustID_Nr,
+            documentData.ID_Document,
+            documentData.Selfie_With_ID
+        );
+
+        if (!updatedDocument.isValid()) {
+            throw new Error('Invalid supporting document data');
+        }
+
+        return await SupportingDocumentsDAO.updateDocument(updatedDocument);
+    } catch (err) {
+        throw err; // Handle the error as needed
     }
+};
 
-   // async getAllSupportingDocuments() {
-       // return await SupportingDocumentDAO.getAll();
+const getDocumentsByCustomer = async (customerID) => {
+    try {
+        return await SupportingDocumentsDAO.getByCustomerID(customerID);
+    } catch (err) {
+        throw err; // Handle the error as needed
     }
+};
 
+const deleteDocumentsByCustomer = async (customerID) => {
+    try {
+        return await SupportingDocumentsDAO.deleteDocumentsByCustomer(customerID);
+    } catch (err) {
+        throw err; // Handle the error as needed
+    }
+};
 
-module.exports = new SupportingDocumentService();
+module.exports = { uploadDocument, getDocumentsByCustomer, updateDocument, deleteDocumentsByCustomer };
