@@ -17,6 +17,7 @@ const createCustomer = (req, res) => {
 
 const getCustomer = (req, res) => {
   const custID_Nr = req.params.custID_Nr;
+  
   CustomerService.getCustomerById(custID_Nr, (err, result) => {
 
     if (err) {
@@ -31,4 +32,16 @@ const getCustomer = (req, res) => {
   });
 };
 
-module.exports = { createCustomer, getCustomer };
+
+const verifyPhoneNumber = (req, res) => {
+  const { phoneNumber } = req.body;
+
+  CustomerService.sendVerificationCode(phoneNumber, (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: 'Failed to send verification code', error: err });
+    }
+    res.status(200).send({ message: 'Verification code sent successfully', data: result });
+  });
+};
+
+module.exports = { createCustomer, getCustomer, verifyPhoneNumber };

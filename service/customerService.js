@@ -70,7 +70,21 @@ const CustomerService = {
         callback(null, result);
       });
     });
+  },
+
+  sendVerificationCode :(phoneNumber, callback) => {
+    const params = {
+      Message: 'Your verification code is: 1234', // Generate a dynamic code here
+      PhoneNumber: phoneNumber,
+    };
+  
+    sns.publish(params, (err, data) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, data);
+      }
+    });
   }
 };
-
-module.exports = CustomerService;
+module.exports = { getById, sendVerificationCode };

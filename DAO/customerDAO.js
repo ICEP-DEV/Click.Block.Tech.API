@@ -7,7 +7,7 @@ const CustomerDAO = {
     db.query(sql, customerData, callback);
   },
 
-
+  
   getById: (custID_Nr, callback) => {
     const sql = 'SELECT * FROM customer WHERE CustID_Nr = ?';
     db.query(sql, [custID_Nr], (err, result) => {
