@@ -1,5 +1,5 @@
 class Customer {
-  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AdminID) {
+  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AdminID, AccountID) {
     this._CustID_Nr = CustID_Nr; // this is the id number and serves as the PK
     this._FirstName = FirstName;
     this._LastName = LastName;
@@ -11,7 +11,6 @@ class Customer {
     this._AlertPin = AlertPin;
     this._isActive = isActive;
     this._PanicButtonStatus = PanicButtonStatus;
-    this._AdminID = AdminID;
   }
 
 //_____________________SETTERS_____________________________________
@@ -94,12 +93,7 @@ class Customer {
     this._PanicButtonStatus = value;
   }
 
-  set AdminID(value) {
-    if (typeof value !== 'number') {
-      throw new Error('AdminID must be a number');
-    }
-    this._AdminID = value;
-  }
+ 
 
   //_______________________________GETTERS_________________________________
 
@@ -145,10 +139,6 @@ class Customer {
 
   get PanicButtonStatus() {
     return this._PanicButtonStatus;
-  }
-
-  get AdminID() {
-    return this._AdminID;
   }
 }
 
