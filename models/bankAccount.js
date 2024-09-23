@@ -1,7 +1,7 @@
 class BankAccount {
-  constructor(AccountID, CustID_Nr, ExpirationDate, AccountType, Balance, CreationDate, isActive) {
-    this._AccountID = AccountID;
-    this._CustID_Nr = CustID_Nr;
+  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive) {
+    this._AccountID = AccountID;        // Unique identifier for the account
+    this._AccountNr = AccountNr;        // Account number (9-digit random number)
     this._ExpirationDate = ExpirationDate;
     this._AccountType = AccountType;
     this._Balance = Balance;
@@ -15,11 +15,11 @@ class BankAccount {
     throw new Error('AccountID cannot be modified');
   }
 
-  set CustID_Nr(value) {
+  set AccountNr(value) {
     if (typeof value !== 'string' || value.trim() === '') {
-      throw new Error('CustID_Nr must be a valid string');
+      throw new Error('AccountNr must be a valid string');
     }
-    this._CustID_Nr = value;
+    this._AccountNr = value;
   }
 
   set ExpirationDate(value) {
@@ -64,8 +64,8 @@ class BankAccount {
     return this._AccountID;
   }
 
-  get CustID_Nr() {
-    return this._CustID_Nr;
+  get AccountNr() {
+    return this._AccountNr;
   }
 
   get ExpirationDate() {

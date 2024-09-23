@@ -48,7 +48,9 @@ const BankAccountService = {
   },
 
   getAccountById: (accountID, callback) => {
-    if (!accountID) return callback(new Error('Account ID is required'));
+    if (!accountID) {
+      return callback(new Error('Account ID is required'));
+    }
 
     BankAccountDAO.getById(accountID, (err, result) => {
       if (err) {
@@ -59,27 +61,30 @@ const BankAccountService = {
   },
 
   updateAccount: (accountID, updateData, callback) => {
-    if (!accountID || !updateData) return callback(new Error('Account ID and update data are required'));
+    if (!accountID || !updateData) {
+      return callback(new Error('Account ID and update data are required'));
+    }
 
     BankAccountDAO.update(accountID, updateData, (err, result) => {
       if (err) {
         return callback(new Error('Failed to update account: ' + err.message));
       }
-      callback(null, result);
+      callback(null, result.affectedRows > 0); // Returns true if update was successful
     });
   },
 
   deleteAccount: (accountID, callback) => {
-    if (!accountID) return callback(new Error('Account ID is required'));
+    if (!accountID) {
+      return callback(new Error('Account ID is required'));
+    }
 
     BankAccountDAO.delete(accountID, (err, result) => {
       if (err) {
         return callback(new Error('Failed to delete account: ' + err.message));
       }
-      callback(null, result);
+      callback(null, result.affectedRows > 0); // Returns true if deletion was successful
     });
   }
 };
-
 
 module.exports = BankAccountService;
