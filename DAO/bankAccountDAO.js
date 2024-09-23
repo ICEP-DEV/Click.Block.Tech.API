@@ -16,7 +16,7 @@ const BankAccountDAO = {
         if (result.length > 0) {
           const bankAccount = new BankAccount(
             result[0].AccountID,
-            result[0].CustID_Nr,
+            result[0].AccountNr,
             result[0].ExpirationDate,
             result[0].AccountType,
             result[0].Balance,
@@ -29,6 +29,11 @@ const BankAccountDAO = {
         }
       }
     });
+  },
+
+  getByAccountNr: (accountNr, callback) => {
+    const sql = 'SELECT * FROM bankaccount WHERE AccountNr = ?';
+    db.query(sql, [accountNr], callback);
   },
 
   update: (accountID, updateData, callback) => {
