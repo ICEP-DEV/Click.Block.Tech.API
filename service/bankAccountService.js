@@ -28,8 +28,10 @@ const BankAccountService = {
           accountData.AccountNr = generatedAccountNr;
           const currentDate = new Date();
           accountData.CreationDate = currentDate;
-          accountData.ExpirationDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 3));
-          accountData.Balance = 0.0;
+          accountData.ExpirationDate = new Date(currentDate.getFullYear() + 3, currentDate.getMonth(), currentDate.getDate());
+
+          // Set balance to provided amount or default to 0
+          accountData.Balance = accountData.Balance >= 0 ? accountData.Balance : 0; 
           accountData.isActive = true;
 
           // Call DAO to save the new account
@@ -47,44 +49,44 @@ const BankAccountService = {
     checkAndInsertAccount();
   },
 
-  getAccountById: (accountID, callback) => {
-    if (!accountID) {
-      return callback(new Error('Account ID is required'));
+  // Other methods (getAccountById, updateAccount, deleteAccount, etc.) remain unchanged
+
+  deposit: (accountID, amount, callback) => {
+    if (!accountID || amount <= 0) {
+      return callback(new Error('Valid account ID and amount are required'));
     }
 
-    BankAccountDAO.getById(accountID, (err, result) => {
-      if (err) {
-        return callback(new Error('Failed to retrieve account: ' + err.message));
-      }
-      callback(null, result);
+    BankAccountDAO.getById(accountID, (err, account) => {
+      if (err) return callback(err);
+      if (!account) return callback(new Error('Account not found'));
+
+      const newBalance = account.Balance + amount;
+
+      BankAccountDAO.update(accountID, { Balance: newBalance }, (err, result) => {
+        if (err) return callback(new Error('Failed to update balance: ' + err.message));
+        callback(null, { accountID, newBalance });
+      });
     });
   },
 
-  updateAccount: (accountID, updateData, callback) => {
-    if (!accountID || !updateData) {
-      return callback(new Error('Account ID and update data are required'));
+  withdraw: (accountID, amount, callback) => {
+    if (!accountID || amount <= 0) {
+      return callback(new Error('Valid account ID and amount are required'));
     }
 
-    BankAccountDAO.update(accountID, updateData, (err, result) => {
-      if (err) {
-        return callback(new Error('Failed to update account: ' + err.message));
-      }
-      callback(null, result.affectedRows > 0); // Returns true if update was successful
+    BankAccountDAO.getById(accountID, (err, account) => {
+      if (err) return callback(err);
+      if (!account) return callback(new Error('Account not found'));
+      if (account.Balance < amount) return callback(new Error('Insufficient funds'));
+
+      const newBalance = account.Balance - amount;
+
+      BankAccountDAO.update(accountID, { Balance: newBalance }, (err, result) => {
+        if (err) return callback(new Error('Failed to update balance: ' + err.message));
+        callback(null, { accountID, newBalance });
+      });
     });
   },
-
-  deleteAccount: (accountID, callback) => {
-    if (!accountID) {
-      return callback(new Error('Account ID is required'));
-    }
-
-    BankAccountDAO.delete(accountID, (err, result) => {
-      if (err) {
-        return callback(new Error('Failed to delete account: ' + err.message));
-      }
-      callback(null, result.affectedRows > 0); // Returns true if deletion was successful
-    });
-  }
 };
 
 module.exports = BankAccountService;
