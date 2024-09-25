@@ -66,27 +66,29 @@ const BankAccountService = {
     if (!accountID || !updateData) {
       return callback(new Error('Account ID and update data are required'));
     }
-
+  
     BankAccountDAO.update(accountID, updateData, (err, result) => {
       if (err) {
         return callback(new Error('Failed to update account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); // Returns true if update was successful
+      callback(null, result); // Pass the result directly since it's already a boolean.
     });
   },
+  
 
   deleteAccount: (accountID, callback) => {
     if (!accountID) {
       return callback(new Error('Account ID is required'));
     }
-
+  
     BankAccountDAO.delete(accountID, (err, result) => {
       if (err) {
         return callback(new Error('Failed to delete account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); // Returns true if deletion was successful
+      callback(null, result); // Since `result` is already a boolean (true/false), pass it directly.
     });
   },
+  
 
   deposit: (accountID, amount, callback) => {
     if (!accountID || amount <= 0) {
