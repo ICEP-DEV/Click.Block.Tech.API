@@ -12,6 +12,7 @@ app.use('/api', customerRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', supportingDocumentRoutes);
 
+
 app.listen(5000, () => {
   console.log('Server is running on port 5000');
 });
