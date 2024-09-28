@@ -12,6 +12,7 @@ const createAccount = (req, res) => {
     }
     res.status(201).json(result);
   });
+  
 };
 
 const getAccount = (req, res) => {
