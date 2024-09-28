@@ -1,10 +1,11 @@
 const express = require('express');
-const { createCustomer, getCustomer, verifyOtp } = require('../controllers/customerController');
+const { createCustomer, getCustomer, verifyOtp, updateCustomerStep } = require('../controllers/customerController');
 
 const router = express.Router();
 
-router.post('/customer', createCustomer); 
-router.get('/customer/:custID_Nr', getCustomer);
-router.post('/customer/verifyOtp', verifyOtp);
+router.post('/customers', createCustomer); 
+router.patch('/customers/:custID_Nr', updateCustomerStep);
+router.get('/customers/:custID_Nr', getCustomer);
+router.post('/customers/verify-otp', verifyOtp);
 
 module.exports = router;

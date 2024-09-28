@@ -1,110 +1,107 @@
 const CustomerDAO = require('../DAO/customerDAO');
-const EmailService = require('./emailService'); 
+const EmailService = require('./emailService');
 const crypto = require('crypto');
-const otpMap = new Map(); // Store OTPs temporarily
+const otpMap = new Map();
+const tempCustomerData = new Map(); // Temporary storage for customer data
 
 const CustomerService = {
-  createCustomer: (customerData, callback) => {
-    // Check for required fields
-    if (!customerData.CustID_Nr || !customerData.Email) {
-      return callback(new Error('Customer ID and Email are required'));
-    }
+    createCustomer: (customerData, callback) => {
+        console.log('Creating customer with data:', customerData);
+        
+        // Store temporary customer data using CustID_Nr as the key
+        tempCustomerData.set(customerData.CustID_Nr, { ...customerData });
+        
+        console.log('Temporary customer data after creation:', tempCustomerData);
+        callback(null, { message: 'Customer created successfully, proceed to the next step.' });
+    },
 
-    // Check if the customer already exists
-    CustomerDAO.getById(customerData.CustID_Nr, (err, existingCustomer) => {
-      if (err) return callback(err);
+    updateCustomerStep: (custID_Nr, stepData, callback) => {
+        console.log(`Updating customer step for CustID_Nr: ${custID_Nr} with data:`, stepData);
+        
+        const existingData = tempCustomerData.get(custID_Nr);
 
-      if (existingCustomer) {
-        return callback(new Error('Customer already exists'));
-      }
-
-      // Create the customer in the database
-      CustomerDAO.create(customerData, (createErr, result) => {
-        if (createErr) return callback(createErr);
-
-        // Generate a 6-digit OTP
-        const otp = crypto.randomInt(100000, 999999).toString();
-        otpMap.set(customerData.CustID_Nr, otp); // Store the OTP
-
-        // Prepare the email options
-        const emailOptions = {
-          to: customerData.Email,
-          subject: 'Your OTP for Nexis Bank Account Verification',
-          text: `Your verification code is: ${otp}`,
-        };
-
-        // Send the OTP email
-        EmailService.sendOtpEmail(emailOptions.to, otp)
-          .then(() => {
-            callback(null, { message: 'Customer created successfully. OTP sent to email.' });
-          })
-          .catch((emailErr) => {
-            callback(new Error('Customer created, but failed to send OTP email: ' + emailErr.message));
-          });
-      });
-    });
-  },
-
-  getCustomerById: (custID_Nr, callback) => {
-    CustomerDAO.getById(custID_Nr, (err, customer) => {
-      if (err) return callback(err);
-
-      if (!customer) {
-        return callback(new Error('Customer not found'));
-      }
-
-      callback(null, customer);
-    });
-  },
-
-  verifyOtp: (CustID_Nr, otp, callback) => {
-    const storedOtp = otpMap.get(CustID_Nr);
-
-    if (!storedOtp) {
-      return callback(new Error('OTP not found or expired'));
-    }
-
-    if (storedOtp === otp) {
-      otpMap.delete(CustID_Nr); // Remove the OTP after verification
-      callback(null, { message: 'OTP verified successfully' });
-    } else {
-      callback(new Error('Invalid OTP'));
-    }
-  },
-
-  updateCustomer: (custID_Nr, updateData, callback) => {
-    CustomerDAO.getById(custID_Nr, (err, existingCustomer) => {
-      if (err) return callback(err);
-
-      if (!existingCustomer) {
-        return callback(new Error('Customer not found'));
-      }
-
-      CustomerDAO.update(custID_Nr, updateData, (updateErr, result) => {
-        if (updateErr) {
-          return callback(updateErr);
+        if (!existingData) {
+            console.error(`Customer with CustID_Nr: ${custID_Nr} not found.`);
+            return callback(new Error('Customer ID not found'));
         }
-        callback(null, result);
-      });
-    });
-  },
 
-  deleteCustomer: (custID_Nr, callback) => {
-    CustomerDAO.getById(custID_Nr, (err, existingCustomer) => {
-      if (err) return callback(err);
+        console.log('Existing customer data before update:', existingData);
 
-      if (!existingCustomer) {
-        return callback(new Error('Customer not found'));
-      }
+        // Merge the existing data with the new step data
+        const updatedData = { ...existingData, ...stepData };
+        
+        // Store updated data back using CustID_Nr
+        tempCustomerData.set(custID_Nr, updatedData);
 
-      CustomerDAO.delete(custID_Nr, (deleteErr, result) => {
-        if (deleteErr) {
-          return callback(deleteErr);
+        console.log('Updated customer data after step update:', updatedData);
+
+        // If the email is provided, send OTP
+        if (stepData.Email) {
+            console.log('Email provided, generating OTP...');
+            const otp = crypto.randomInt(100000, 999999).toString();
+            otpMap.set(stepData.Email, otp);
+            const emailOptions = {
+                to: stepData.Email,
+                subject: 'Your OTP for Nexis Bank Account Verification',
+                text: `Your verification code is: ${otp}`,
+            };
+
+            EmailService.sendOtpEmail(emailOptions.to, otp)
+                .then(() => {
+                    console.log(`OTP sent to ${stepData.Email}`);
+                    callback(null, { message: 'OTP sent to email. Please verify.' });
+                })
+                .catch((emailErr) => {
+                    console.error('Failed to send OTP email:', emailErr);
+                    callback(new Error('Failed to send OTP email: ' + emailErr.message));
+                });
+        } else {
+            callback(null, { message: 'Customer data updated successfully for this step.' });
         }
-        callback(null, result);
-      });
-    });
-  },
+    },
+
+    verifyOtp: (Email, otp, callback) => {
+        console.log(`Verifying OTP for email: ${Email} with OTP: ${otp}`);
+        
+        const storedOtp = otpMap.get(Email);
+
+        if (!storedOtp) {
+            console.error('OTP not found or expired for email:', Email);
+            return callback(new Error('OTP not found or expired'));
+        }
+
+        if (storedOtp === otp) {
+            console.log('OTP verified successfully.');
+
+            // Find the customer by Email to extract their CustID_Nr
+            const customerDataArray = Array.from(tempCustomerData.values());
+            const customerData = customerDataArray.find(data => data.Email === Email);
+
+            if (!customerData) {
+                console.error('Customer data not found for the provided email:', Email);
+                return callback(new Error('Customer data not found for the provided email.'));
+            }
+
+            console.log('Customer data found for OTP verification:', customerData);
+
+            // Proceed with creating the customer in the database
+            CustomerDAO.create(customerData, (createErr, result) => {
+                if (createErr) {
+                    console.error('Error creating customer in the database:', createErr);
+                    return callback(createErr);
+                }
+
+                otpMap.delete(Email); // Clear the OTP
+                tempCustomerData.delete(customerData.CustID_Nr); // Clear temporary data
+                
+                console.log('Customer successfully registered and temporary data cleared for:', customerData.CustID_Nr);
+                callback(null, { message: 'OTP verified successfully, customer registered.' });
+            });
+        } else {
+            console.error('Invalid OTP provided for email:', Email);
+            callback(new Error('Invalid OTP'));
+        }
+    },
 };
 
 module.exports = CustomerService;

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const SupportingDocumentService = require('../services/supportingDocumentService'); // Adjust path as needed
 
-// Get a supporting document by ID
 router.get('/documents/:id', async (req, res) => {
     const docId = req.params.id;
     try {
@@ -16,10 +15,10 @@ router.get('/documents/:id', async (req, res) => {
     }
 });
 
-// Update a supporting document
+
 router.put('/documents/:id', async (req, res) => {
     const docId = req.params.id;
-    const updatedDocument = req.body; // Assuming the updated document data is sent in the request body
+    const updatedDocument = req.body; 
     try {
         const result = await SupportingDocumentService.updateSupportingDocument(docId, updatedDocument);
         if (result.affectedRows === 0) {
@@ -31,7 +30,7 @@ router.put('/documents/:id', async (req, res) => {
     }
 });
 
-// Delete a supporting document
+
 router.delete('/documents/:id', async (req, res) => {
     const docId = req.params.id;
     try {
@@ -45,7 +44,7 @@ router.delete('/documents/:id', async (req, res) => {
     }
 });
 
-// Get all supporting documents
+
 router.get('/documents', async (req, res) => {
     try {
         const documents = await SupportingDocumentService.getAllSupportingDocuments();
