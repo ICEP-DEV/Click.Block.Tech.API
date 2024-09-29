@@ -1,107 +1,144 @@
 const CustomerDAO = require('../DAO/customerDAO');
+const BankAccountDAO = require('../DAO/bankAccountDAO');
 const EmailService = require('./emailService');
 const crypto = require('crypto');
+
 const otpMap = new Map();
-const tempCustomerData = new Map(); // Temporary storage for customer data
+const tempCustomerData = new Map();
 
 const CustomerService = {
     createCustomer: (customerData, callback) => {
+        if (typeof callback !== 'function') {
+            throw new Error('Callback is not provided or not a function');
+        }
         console.log('Creating customer with data:', customerData);
-        
-        // Store temporary customer data using CustID_Nr as the key
-        tempCustomerData.set(customerData.CustID_Nr, { ...customerData });
-        
-        console.log('Temporary customer data after creation:', tempCustomerData);
-        callback(null, { message: 'Customer created successfully, proceed to the next step.' });
+
+        // Check for duplicate CustID_Nr
+        CustomerDAO.checkDuplicate(customerData.CustID_Nr, (err, isDuplicate) => {
+            if (err) {
+                return callback(err); // Handle any database errors
+            }
+
+            if (isDuplicate) {
+                return callback({ status: 400, message: 'Customer ID already exists. Please use a unique CustID_Nr.' });
+            }
+
+            // Temporarily store customer data
+            tempCustomerData.set(customerData.CustID_Nr, customerData);
+            console.log('Temporary customer data after creation:', tempCustomerData);
+            callback(null, { message: 'Customer data stored. Proceed to the next step.' });
+        });
     },
 
     updateCustomerStep: (custID_Nr, stepData, callback) => {
-        console.log(`Updating customer step for CustID_Nr: ${custID_Nr} with data:`, stepData);
-        
+        if (typeof callback !== 'function') {
+            throw new Error('Callback is not provided or not a function');
+        }
+
         const existingData = tempCustomerData.get(custID_Nr);
 
         if (!existingData) {
-            console.error(`Customer with CustID_Nr: ${custID_Nr} not found.`);
-            return callback(new Error('Customer ID not found'));
+            return callback({ status: 404, message: 'Customer ID not found' });
         }
 
-        console.log('Existing customer data before update:', existingData);
-
-        // Merge the existing data with the new step data
         const updatedData = { ...existingData, ...stepData };
-        
-        // Store updated data back using CustID_Nr
+
         tempCustomerData.set(custID_Nr, updatedData);
 
-        console.log('Updated customer data after step update:', updatedData);
-
-        // If the email is provided, send OTP
         if (stepData.Email) {
-            console.log('Email provided, generating OTP...');
             const otp = crypto.randomInt(100000, 999999).toString();
             otpMap.set(stepData.Email, otp);
-            const emailOptions = {
-                to: stepData.Email,
-                subject: 'Your OTP for Nexis Bank Account Verification',
-                text: `Your verification code is: ${otp}`,
-            };
-
-            EmailService.sendOtpEmail(emailOptions.to, otp)
-                .then(() => {
-                    console.log(`OTP sent to ${stepData.Email}`);
-                    callback(null, { message: 'OTP sent to email. Please verify.' });
-                })
-                .catch((emailErr) => {
-                    console.error('Failed to send OTP email:', emailErr);
-                    callback(new Error('Failed to send OTP email: ' + emailErr.message));
-                });
+            EmailService.sendOtpEmail(stepData.Email, otp)
+                .then(() => callback(null, { message: 'OTP sent. Verify it.' }))
+                .catch(emailErr => callback({ status: 500, message: 'Failed to send OTP: ' + emailErr.message }));
         } else {
-            callback(null, { message: 'Customer data updated successfully for this step.' });
+            callback(null, { message: 'Customer data updated successfully.' });
         }
     },
 
     verifyOtp: (Email, otp, callback) => {
-        console.log(`Verifying OTP for email: ${Email} with OTP: ${otp}`);
-        
-        const storedOtp = otpMap.get(Email);
-
-        if (!storedOtp) {
-            console.error('OTP not found or expired for email:', Email);
-            return callback(new Error('OTP not found or expired'));
+        if (typeof callback !== 'function') {
+            throw new Error('Callback is not provided or not a function');
         }
 
-        if (storedOtp === otp) {
-            console.log('OTP verified successfully.');
-
-            // Find the customer by Email to extract their CustID_Nr
-            const customerDataArray = Array.from(tempCustomerData.values());
-            const customerData = customerDataArray.find(data => data.Email === Email);
-
-            if (!customerData) {
-                console.error('Customer data not found for the provided email:', Email);
-                return callback(new Error('Customer data not found for the provided email.'));
+        try {
+            const storedOtp = otpMap.get(Email);
+            if (storedOtp !== otp) {
+                return callback({ status: 400, message: 'Invalid OTP' });
             }
 
-            console.log('Customer data found for OTP verification:', customerData);
+            const customerData = Array.from(tempCustomerData.values()).find(data => data.Email === Email);
 
-            // Proceed with creating the customer in the database
-            CustomerDAO.create(customerData, (createErr, result) => {
-                if (createErr) {
-                    console.error('Error creating customer in the database:', createErr);
-                    return callback(createErr);
+            if (!customerData) {
+                return callback({ status: 404, message: 'Customer data not found for email.' });
+            }
+
+            // Create the customer first (without AccountID)
+            CustomerDAO.create(customerData, (err, customerResult) => {
+                if (err) {
+                    if (err.status === 400) {
+                        // Handle duplicate email error
+                        return callback({ status: 400, message: 'Email already exists' });
+                    } else {
+                        console.error('Failed to create customer:', err);
+                        return callback({ status: 500, message: 'Database error' });
+                    }
                 }
 
-                otpMap.delete(Email); // Clear the OTP
-                tempCustomerData.delete(customerData.CustID_Nr); // Clear temporary data
-                
-                console.log('Customer successfully registered and temporary data cleared for:', customerData.CustID_Nr);
-                callback(null, { message: 'OTP verified successfully, customer registered.' });
+                // Use the provided CustID_Nr as the customer ID
+                const customerID = customerData.CustID_Nr; // Get the CustID_Nr from the input data
+
+                // Log the customer ID for debugging
+                console.log('Customer created with ID:', customerID);
+
+                // Create the bank account without expecting accountData from the controller
+                const newBankAccount = {
+                    AccountNr: generateRandomAccountNumber(),
+                    AccountType: 'Savings', // Default value
+                    Balance: 0,             // Default value
+                    CreationDate: new Date(),
+                    isActive: 1
+                };
+
+                BankAccountDAO.create(newBankAccount, (accountErr, bankAccountResult) => {
+                    if (accountErr) {
+                        console.error('Error creating bank account:', accountErr);
+                        return callback({ status: 500, message: 'Failed to create bank account' });
+                    }
+
+                    const bankAccountID = bankAccountResult.insertId;
+
+                    // Log the bank account ID for debugging
+                    console.log('Bank account created with ID:', bankAccountID);
+
+                    // Update the customer with the newly created AccountID
+                    CustomerDAO.updateFields(customerID, { AccountID: bankAccountID }, (updateErr, updateResult) => {
+                        if (updateErr) {
+                            console.error('Error updating customer with AccountID:', updateErr);
+                            return callback({ status: 500, message: 'Failed to update customer with AccountID' });
+                        }
+
+                        // Log the result of the update query for debugging
+                        console.log('Customer updated with AccountID:', updateResult);
+
+                        // Successfully created customer and bank account
+                        otpMap.delete(Email); // Clear the OTP
+                        tempCustomerData.delete(customerData.CustID_Nr); // Clear temporary data
+
+                        console.log('Customer and bank account successfully created:', customerData.CustID_Nr);
+                        callback(null, { message: 'OTP verified, customer and bank account created.' });
+                    });
+                });
             });
-        } else {
-            console.error('Invalid OTP provided for email:', Email);
-            callback(new Error('Invalid OTP'));
+        } catch (error) {
+            console.error('Unexpected error during OTP verification:', error);
+            callback({ status: 500, message: 'Unexpected server error' });
         }
-    },
+    }
 };
+
+function generateRandomAccountNumber() {
+    return Date.now().toString();  // Simple account number generator using the current timestamp
+}
 
 module.exports = CustomerService;
