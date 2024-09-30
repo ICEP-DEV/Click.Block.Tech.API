@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/customer', createCustomer);  
 router.get('/customer/:custID_Nr', getCustomer);  
-router.get('/customer/:custID_Nr/account', getCustomerAccount); // Updated to use 'custID_Nr'
+//router.get('/customer/:custID_Nr/account', getCustomerAccount); // Updated to use 'custID_Nr'
 
 module.exports = router;

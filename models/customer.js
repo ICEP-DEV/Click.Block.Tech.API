@@ -11,7 +11,7 @@ class Customer {
     this._AlertPin = AlertPin;
     this._isVerified = isVerified;
     this._PanicButtonStatus = PanicButtonStatus;
-    this._AccountID = AccountID; // Replaced AdminID with AccountID
+    this._AccountID = AccountID; 
   }
 
   // Getters and Setters (error handling remains the same)
