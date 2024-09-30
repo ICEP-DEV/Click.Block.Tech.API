@@ -1,9 +1,6 @@
 {
     "server": {
       "port": 5000
-    },
-    "apiKeys": {
-      "someService": "API_KEY_VALUE"
     }
-  }
+}
   
