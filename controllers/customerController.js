@@ -52,5 +52,5 @@ const accountNr = req.params.AccountNr;
   });
 };
 
-
+module.exports = {createCustomer, getCustomer, getAccountID};
 
