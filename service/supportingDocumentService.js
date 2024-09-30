@@ -1,64 +1,83 @@
 const SupportingDocumentsDAO = require('../DAO/supportingDocumentDAO');
 const SupportingDocument = require('../models/supportingDocuments');
 
+// Upload or Update Document
 const uploadDocument = async (documentData) => {
     try {
         const existingDocument = await SupportingDocumentsDAO.getByCustomerID(documentData.CustID_Nr);
 
         if (existingDocument) {
-            return await updateDocument(documentData);
-        } 
-        
-        const newDocument = new SupportingDocument(
-            documentData.SuppDocsID, 
-            documentData.CustID_Nr,
-            documentData.ID_Document,
-            documentData.Selfie_With_ID
-        );
+            const updatedDocument = new SupportingDocument(
+                existingDocument.suppDocsID,
+                documentData.CustID_Nr,
+                documentData.ID_Document,
+                documentData.Selfie_With_ID
+            );
+            
+            if (!updatedDocument.isValid()) {
+                throw new Error('Invalid supporting document data');
+            }
 
-        if (!newDocument.isValid()) {
-            throw new Error('Invalid supporting document data');
+            return await SupportingDocumentsDAO.updateDocument(updatedDocument);
+        } else {
+            const newDocument = new SupportingDocument(
+                null, // SuppDocsID, assuming auto-increment
+                documentData.CustID_Nr,
+                documentData.ID_Document,
+                documentData.Selfie_With_ID
+            );
+
+            if (!newDocument.isValid()) {
+                throw new Error('Invalid supporting document data');
+            }
+
+            return await SupportingDocumentsDAO.createDocument(newDocument);
         }
-
-        return await SupportingDocumentsDAO.createDocument(newDocument);
     } catch (err) {
-        throw err; // Handle the error as needed
+        throw err;
     }
 };
 
+// Get Documents by Customer ID
+const getDocumentsByCustomer = async (CustID_Nr) => {
+    try {
+        return await SupportingDocumentsDAO.getByCustomerID(CustID_Nr);
+    } catch (err) {
+        throw err;
+    }
+};
+
+// Update Document
 const updateDocument = async (documentData) => {
     try {
-        const updatedDocument = new SupportingDocument(
-            documentData.SuppDocsID, 
+        const document = new SupportingDocument(
+            null,
             documentData.CustID_Nr,
             documentData.ID_Document,
             documentData.Selfie_With_ID
         );
-
-        if (!updatedDocument.isValid()) {
-            throw new Error('Invalid supporting document data');
+        if (!document.isValid()) {
+            throw new Error('Invalid document data');
         }
 
-        return await SupportingDocumentsDAO.updateDocument(updatedDocument);
+        return await SupportingDocumentsDAO.updateDocument(document);
     } catch (err) {
-        throw err; // Handle the error as needed
+        throw err;
     }
 };
 
-const getDocumentsByCustomer = async (customerID) => {
+// Delete Documents by Customer ID
+const deleteDocumentsByCustomer = async (CustID_Nr) => {
     try {
-        return await SupportingDocumentsDAO.getByCustomerID(customerID);
+        return await SupportingDocumentsDAO.deleteDocumentsByCustomer(CustID_Nr);
     } catch (err) {
-        throw err; // Handle the error as needed
+        throw err;
     }
 };
 
-const deleteDocumentsByCustomer = async (customerID) => {
-    try {
-        return await SupportingDocumentsDAO.deleteDocumentsByCustomer(customerID);
-    } catch (err) {
-        throw err; // Handle the error as needed
-    }
+module.exports = {
+    uploadDocument,
+    getDocumentsByCustomer,
+    updateDocument,
+    deleteDocumentsByCustomer
 };
-
-module.exports = { uploadDocument, getDocumentsByCustomer, updateDocument, deleteDocumentsByCustomer };
