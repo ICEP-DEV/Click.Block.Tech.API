@@ -17,10 +17,10 @@ const CustomerService = {
         });
     },
     
-    authCustomer: (custAuthData, callback) => {
+    getbyAccountNumber: (accountNum,callback) => {
         //checking if the phonenumber is provided
-        if (!custAuthData.PhoneNumber && !custAuthData.LoginPin) return callback(new Error('Customer phone number and Log in pin are required'));
-        CustomerDAO.getbyPhoneAndPin(custAuthData,callback);
+        if (!accountNum) return callback(new Error('Account Number is required'));
+        CustomerDAO.getbyAccountNumber(accountNum,callback);
     },
     getCustomerById: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));
