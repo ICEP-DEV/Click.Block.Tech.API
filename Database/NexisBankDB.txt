@@ -1,0 +1,96 @@
+
+CREATE TABLE `Location` (
+  `LocationID` INT AUTO_INCREMENT PRIMARY KEY,
+  `StreetAddress` VARCHAR(255) NOT NULL,
+  `Suburb` VARCHAR(100) NULL,
+  `City` VARCHAR(100) NOT NULL,
+  `Province` VARCHAR(100) NOT NULL,
+  `PostalCode` VARCHAR(10) NULL,
+  `Country` VARCHAR(100) NOT NULL DEFAULT 'South Africa'
+);
+
+
+CREATE TABLE `BankAccount` (
+  `AccountID` INT AUTO_INCREMENT PRIMARY KEY,
+  `AccountNr` VARCHAR(10) UNIQUE NOT NULL,
+  `ExpirationDate` DATE NULL,
+  `AccountType` VARCHAR(50) NOT NULL,
+  `Balance` DECIMAL(10, 2) NOT NULL,
+  `CreationDate` DATE NOT NULL,
+  `isActive` TINYINT NOT NULL
+);
+
+
+CREATE TABLE `Customer` (
+  `CustID_Nr` CHAR(13) PRIMARY KEY,
+  `LastName` VARCHAR(100) NOT NULL,
+  `FirstName` VARCHAR(100) NOT NULL,
+  `PhoneNumber` VARCHAR(15) NULL,
+  `Address` VARCHAR(255) NULL,
+  `Email` VARCHAR(100) UNIQUE NOT NULL,
+  `DateOfBirth` DATE NOT NULL,
+  `LoginPin` VARCHAR(5) NOT NULL,
+  `AlertPin` VARCHAR(5) NOT NULL,
+  `isVerified` TINYINT(1) NOT NULL,
+  `PanicButtonStatus` TINYINT(1) NOT NULL,
+  `AccountID` INT NOT NULL,
+  FOREIGN KEY (`AccountID`) REFERENCES `BankAccount`(`AccountID`)
+);
+
+
+CREATE TABLE `BankCard` (
+  `CardID` INT AUTO_INCREMENT PRIMARY KEY,
+  `AccountID` INT NOT NULL,
+  `CardNumber` VARCHAR(16) NOT NULL,
+  `CardType` VARCHAR(50) NOT NULL,
+  `ExpirationDate` DATE NOT NULL,
+  `CVV` VARCHAR(3) NOT NULL,
+  `IsActive` TINYINT NOT NULL,
+  FOREIGN KEY (`AccountID`) REFERENCES `BankAccount`(`AccountID`)
+);
+
+
+CREATE TABLE `Transaction` (
+  `TransactionID` INT AUTO_INCREMENT PRIMARY KEY,
+  `AccountID` INT NOT NULL,
+  `TransactionType` VARCHAR(50) NOT NULL,
+  `TransactionDate` DATE NOT NULL,
+  `TransactionAmount` DECIMAL(10, 2) NOT NULL,
+  `Status` VARCHAR(50) NOT NULL,
+  `IsPanicTrigered` BOOLEAN NULL,
+  `LocationID` INT NOT NULL,
+  FOREIGN KEY (`AccountID`) REFERENCES `BankAccount`(`AccountID`),
+  FOREIGN KEY (`LocationID`) REFERENCES `Location`(`LocationID`)
+);
+
+
+CREATE TABLE `SupportingDocument` (
+  `SuppDocsID` INT AUTO_INCREMENT PRIMARY KEY,
+  `CustID_Nr` CHAR(13) NOT NULL,
+  `ID_Document` VARCHAR(255) NOT NULL,
+  `Selfie_With_ID` VARCHAR(255) NULL,
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`)
+);
+
+
+CREATE TABLE `Alert` (
+  `AlertID` INT AUTO_INCREMENT PRIMARY KEY,
+  `CustID_Nr` CHAR(13) NOT NULL,
+  `AlertType` VARCHAR(50) NOT NULL,
+  `SentDate` DATE NOT NULL,
+  `LocationID` INT NOT NULL,
+  `Receiver` VARCHAR(255) NOT NULL,
+  `Message` TEXT NULL,
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`),
+  FOREIGN KEY (`LocationID`) REFERENCES `Location`(`LocationID`)
+);
+
+
+CREATE TABLE `Notification` (
+  `NotificationID` INT AUTO_INCREMENT PRIMARY KEY,
+  `TransactionID` INT NOT NULL,
+  `NotificationType` VARCHAR(50) NOT NULL,
+  `SentDate` DATE NOT NULL,
+  `Status` VARCHAR(50) NOT NULL,
+  FOREIGN KEY (`TransactionID`) REFERENCES `Transaction`(`TransactionID`)
+);

@@ -2,6 +2,7 @@ const CustomerService = require('../service/customerService');
 
 // Create a new customer
 const createCustomer = (req, res) => {
+  console.log(req.body);
   const customerData = req.body;
 
   // Ensure required fields are provided
@@ -37,27 +38,19 @@ const getCustomer = (req, res) => {
     }
   });
 };
-
-// Get customer bank account details by CustID_Nr
-const getCustomerAccount = (req, res) => {
-  const custID_Nr = req.params.custID_Nr;
-
-  if (!custID_Nr) {
-    return res.status(400).send('Customer ID is required');
-  }
-
-  // Call service to fetch customer and their associated bank account
-  CustomerService.getCustomerAccountById(custID_Nr, (err, result) => {
-    if (err) {
-      return res.status(500).send(err.message);
+const  getAccountID =  (req,res)=>{
+const accountNr = req.params.AccountNr;
+  CustomerService.getbyAccountNumber(accountNr,(err, result) => {
+    if(err){
+      return res.status(500).send(err);
     }
-    if (result) {
-      // Return customer and bank account details
-      res.status(200).json(result);
-    } else {
-      res.status(404).send('Customer or associated bank account not found');
+    if(result){
+      res.status(200).send(result);
+    }else{
+      res.status(404).send('Account not found).');
     }
   });
 };
 
-module.exports = { createCustomer, getCustomer, getCustomerAccount };
+
+
