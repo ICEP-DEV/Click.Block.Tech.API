@@ -1,6 +1,7 @@
 const CustomerService = require('../service/customerService');
 
 const createCustomer = (req, res) => {
+  console.log(req.body);
   const customerData = req.body;
   CustomerService.createCustomer(customerData, (err, result) => {
     if (err) {
@@ -23,18 +24,18 @@ const getCustomer = (req, res) => {
     }
   });
 };
-const  authenticateCustomer =  (req,res)=>{
-const customerAuthData = req.body;
-  CustomerService.authCustomer(customerAuthData,(err, result) => {
+const  getAccountID =  (req,res)=>{
+const accountNr = req.params.AccountNr;
+  CustomerService.getbyAccountNumber(accountNr,(err, result) => {
     if(err){
       return res.status(500).send(err);
     }
     if(result){
       res.status(200).send(result);
     }else{
-      res.status(404).send('customer not found (Wrong LoginPin or Phone number).');
+      res.status(404).send('Account not found).');
     }
   });
 };
 
-module.exports = { createCustomer, getCustomer, authenticateCustomer };
+module.exports = { createCustomer, getCustomer, getAccountID};
