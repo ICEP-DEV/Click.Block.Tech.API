@@ -18,7 +18,6 @@ const CustomerDAO = {
     });
   },
 
-  // New method to check for duplicate CustID_Nr
   checkDuplicate: (custID_Nr, callback) => {
     const sql = 'SELECT COUNT(*) AS count FROM customer WHERE CustID_Nr = ?';
     
@@ -27,7 +26,7 @@ const CustomerDAO = {
         console.error("SQL Error:", err);
         return callback({ status: 500, message: 'Database error' });
       }
-      callback(null, results[0].count > 0); // returns true if duplicate exists
+      callback(null, results[0].count > 0); 
     });
   },
 

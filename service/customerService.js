@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');  // Add bcrypt
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
 const EmailService = require('./emailService');
@@ -6,6 +7,8 @@ const crypto = require('crypto');
 const otpMap = new Map();
 const tempCustomerData = new Map();
 
+const SALT_ROUNDS = 10; // bcrypt salt rounds
+
 const CustomerService = {
     createCustomer: (customerData, callback) => {
         if (typeof callback !== 'function') {
@@ -13,18 +16,19 @@ const CustomerService = {
         }
         console.log('Creating customer with data:', customerData);
 
-        // Check for duplicate CustID_Nr
-        CustomerDAO.checkDuplicate(customerData.CustID_Nr, (err, isDuplicate) => {
+        // Hash the password using bcrypt before storing
+        bcrypt.hash(customerData.loginPin, SALT_ROUNDS, (err, hashedPassword) => {
             if (err) {
-                return callback(err); // Handle any database errors
+                console.error('Error hashing password:', err);
+                return callback({ status: 500, message: 'Error hashing password' });
             }
 
-            if (isDuplicate) {
-                return callback({ status: 400, message: 'Customer ID already exists. Please use a unique CustID_Nr.' });
-            }
+            // Replace the loginPin with the hashed password
+            customerData.loginPin = hashedPassword;
 
             // Temporarily store customer data
             tempCustomerData.set(customerData.CustID_Nr, customerData);
+
             console.log('Temporary customer data after creation:', tempCustomerData);
             callback(null, { message: 'Customer data stored. Proceed to the next step.' });
         });
@@ -73,11 +77,10 @@ const CustomerService = {
                 return callback({ status: 404, message: 'Customer data not found for email.' });
             }
 
-            // Create the customer first (without AccountID)
+            // Create the customer first (with hashed password)
             CustomerDAO.create(customerData, (err, customerResult) => {
                 if (err) {
                     if (err.status === 400) {
-                        // Handle duplicate email error
                         return callback({ status: 400, message: 'Email already exists' });
                     } else {
                         console.error('Failed to create customer:', err);
@@ -85,17 +88,14 @@ const CustomerService = {
                     }
                 }
 
-                // Use the provided CustID_Nr as the customer ID
-                const customerID = customerData.CustID_Nr; // Get the CustID_Nr from the input data
+                const customerID = customerData.CustID_Nr;
 
-                // Log the customer ID for debugging
                 console.log('Customer created with ID:', customerID);
 
-                // Create the bank account without expecting accountData from the controller
                 const newBankAccount = {
                     AccountNr: generateRandomAccountNumber(),
-                    AccountType: 'Savings', // Default value
-                    Balance: 0,             // Default value
+                    AccountType: 'Savings',
+                    Balance: 0,
                     CreationDate: new Date(),
                     isActive: 1
                 };
@@ -108,22 +108,14 @@ const CustomerService = {
 
                     const bankAccountID = bankAccountResult.insertId;
 
-                    // Log the bank account ID for debugging
-                    console.log('Bank account created with ID:', bankAccountID);
-
-                    // Update the customer with the newly created AccountID
                     CustomerDAO.updateFields(customerID, { AccountID: bankAccountID }, (updateErr, updateResult) => {
                         if (updateErr) {
                             console.error('Error updating customer with AccountID:', updateErr);
                             return callback({ status: 500, message: 'Failed to update customer with AccountID' });
                         }
 
-                        // Log the result of the update query for debugging
-                        console.log('Customer updated with AccountID:', updateResult);
-
-                        // Successfully created customer and bank account
-                        otpMap.delete(Email); // Clear the OTP
-                        tempCustomerData.delete(customerData.CustID_Nr); // Clear temporary data
+                        otpMap.delete(Email);
+                        tempCustomerData.delete(customerData.CustID_Nr);
 
                         console.log('Customer and bank account successfully created:', customerData.CustID_Nr);
                         callback(null, { message: 'OTP verified, customer and bank account created.' });
@@ -138,7 +130,7 @@ const CustomerService = {
 };
 
 function generateRandomAccountNumber() {
-    return Date.now().toString();  // Simple account number generator using the current timestamp
+    return Date.now().toString();
 }
 
 module.exports = CustomerService;
