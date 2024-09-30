@@ -1,4 +1,5 @@
 const db = require('../config/config');
+const BankAccount = require('../models/bankAccount');
 const Customer = require('../models/customer');
 
 const CustomerDAO = {
@@ -6,33 +7,20 @@ const CustomerDAO = {
     const sql = 'INSERT INTO customer SET ?';
     db.query(sql, customerData, callback);
   },
-  getbyPhoneAndPin: (custAuthData, callback)=>{
-    const phoneNumber = custAuthData.PhoneNumber;
-    const loginPin = custAuthData.LoginPin;
-    const sql = 'SELECT * FROM customer WHERE PhoneNumber = ? AND LoginPin = ?';
-    db.query(sql, [phoneNumber,loginPin], (err, result) => {
+  //returning the accountID when the account number match 
+  getbyAccountNumber: (accountNum, callback)=>{
+    const sql = 'SELECT * FROM bankaccount WHERE AccountNr = ?';
+    db.query(sql, [accountNum], (err, result) => {
       if (err) {
         callback(err, null);
       } else {
 
         if (result.length > 0) {
-          const customer = new Customer(
-            result[0].CustID_Nr,
-            result[0].FirstName,
-            result[0].LastName,
-            result[0].PhoneNumber,
-            result[0].Address,
-            result[0].Email,
-            result[0].DateOfBirth,
-            result[0].LoginPin,
-            result[0].AlertPin,
-            result[0].isActive,
-            result[0].PanicButtonStatus,
-            result[0].AccountID
-      
+          const bankAccount = new BankAccount(
+            result[0].AccountID,
           );
     
-          callback(null, customer);
+          callback(null, bankAccount);
         } else {
           callback(null, null);  
         }
