@@ -1,10 +1,31 @@
 const db = require('../config/config');
+const BankAccount = require('../models/bankAccount');
 const Customer = require('../models/customer');
 
 const CustomerDAO = {
   create: (customerData, callback) => {
     const sql = 'INSERT INTO customer SET ?';
     db.query(sql, customerData, callback);
+  },
+  //returning the accountID when the account number match 
+  getbyAccountNumber: (accountNum, callback)=>{
+    const sql = 'SELECT * FROM bankaccount WHERE AccountNr = ?';
+    db.query(sql, [accountNum], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+
+        if (result.length > 0) {
+          const bankAccount = new BankAccount(
+            result[0].AccountID,
+          );
+    
+          callback(null, bankAccount);
+        } else {
+          callback(null, null);  
+        }
+      }
+    });
   },
 
   getById: (custID_Nr, callback) => {

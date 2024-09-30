@@ -1,5 +1,5 @@
 class Customer {
-  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AdminID) {
+  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AccountID) {
     this._CustID_Nr = CustID_Nr; // this is the id number and serves as the PK
     this._FirstName = FirstName;
     this._LastName = LastName;
@@ -11,7 +11,7 @@ class Customer {
     this._AlertPin = AlertPin;
     this._isActive = isActive;
     this._PanicButtonStatus = PanicButtonStatus;
-    this._AdminID = AdminID;
+    this._AccountID = AccountID;
   }
 
 //_____________________SETTERS_____________________________________
@@ -72,6 +72,7 @@ class Customer {
     this._LoginPin = value;
   }
 
+  //What length is the AlertPin?
   set AlertPin(value) {
     if (typeof value !== 'string' || value.length < 4) {
       throw new Error('AlertPin must be a string with at least 4 characters');
@@ -93,12 +94,14 @@ class Customer {
     this._PanicButtonStatus = value;
   }
 
-  set AdminID(value) {
-    if (typeof value !== 'number') {
-      throw new Error('AdminID must be a number');
+  set AccountID(value){
+    if(typeof value !== 'string' || value.length < 10 || value.length > 10){
+      throw new Error('Account must be a 10 digits');
     }
-    this._AdminID = value;
+    this._AccountID = value
   }
+
+ 
 
   //_______________________________GETTERS_________________________________
 
@@ -146,8 +149,8 @@ class Customer {
     return this._PanicButtonStatus;
   }
 
-  get AdminID() {
-    return this._AdminID;
+  get AccountID(){
+    return this._AccountID;
   }
 }
 
