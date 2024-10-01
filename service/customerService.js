@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt'); 
+const bcrypt = require('bcrypt');
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
 const EmailService = require('./emailService');
@@ -16,60 +16,57 @@ const CustomerService = {
         }
         console.log('Creating customer with data:', customerData);
 
-        // Hash the password using bcrypt before storing
+       
         bcrypt.hash(customerData.loginPin, SALT_ROUNDS, (err, hashedPassword) => {
             if (err) {
                 console.error('Error hashing password:', err);
                 return callback({ status: 500, message: 'Error hashing password' });
             }
 
-            // Replace the loginPin with the hashed password
+           
             customerData.loginPin = hashedPassword;
 
-            // Temporarily store customer data
+          
             tempCustomerData.set(customerData.CustID_Nr, customerData);
 
             console.log('Temporary customer data after creation:', tempCustomerData);
             callback(null, { message: 'Customer data stored. Proceed to the next step.' });
         });
     },
-    
-    getbyAccountNumber: (accountNum,callback) => {
-        //checking if the phonenumber is provided
+
+    getbyAccountNumber: (accountNum, callback) => {
         if (!accountNum) return callback(new Error('Account Number is required'));
-        CustomerDAO.getbyAccountNumber(accountNum,callback);
+        CustomerDAO.getbyAccountNumber(accountNum, callback);
     },
-    
+
     getCustomerById: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));
- 
+
         CustomerDAO.getById(custID_Nr, callback);
     },
- 
+
     updateCustomer: (custID_Nr, updateData, callback) => {
         if (!custID_Nr || !updateData) return callback(new Error('Customer ID and update data are required'));
- 
+
         CustomerDAO.getById(custID_Nr, (err, existingCustomer) => {
             if (err) return callback(err);
-            // Check for null before accessing length
             if (!existingCustomer || existingCustomer.length === 0) {
                 return callback(new Error('Customer not found'));
             }
- 
+
             CustomerDAO.update(custID_Nr, updateData, callback);
         });
     },
- 
+
     deleteCustomer: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));
- 
+
         CustomerDAO.getById(custID_Nr, (err, existingCustomer) => {
             if (err) return callback(err);
-            // Check for null before accessing length
             if (!existingCustomer || existingCustomer.length === 0) {
                 return callback(new Error('Customer not found'));
             }
- 
+
             CustomerDAO.delete(custID_Nr, callback);
         });
     },
@@ -86,7 +83,6 @@ const CustomerService = {
         }
 
         const updatedData = { ...existingData, ...stepData };
-
         tempCustomerData.set(custID_Nr, updatedData);
 
         if (stepData.Email) {
@@ -112,12 +108,11 @@ const CustomerService = {
             }
 
             const customerData = Array.from(tempCustomerData.values()).find(data => data.Email === Email);
-
             if (!customerData) {
                 return callback({ status: 404, message: 'Customer data not found for email.' });
             }
 
-            // Create the customer first (with hashed password)
+          
             CustomerDAO.create(customerData, (err, customerResult) => {
                 if (err) {
                     if (err.status === 400) {
@@ -129,7 +124,6 @@ const CustomerService = {
                 }
 
                 const customerID = customerData.CustID_Nr;
-
                 console.log('Customer created with ID:', customerID);
 
                 const newBankAccount = {
@@ -146,8 +140,10 @@ const CustomerService = {
                         return callback({ status: 500, message: 'Failed to create bank account' });
                     }
 
-                    const bankAccountID = bankAccountResult.insertId;
+                    const bankAccountID = bankAccountResult.id;
+                    console.log('Bank Account created with ID:', bankAccountID); 
 
+                    
                     CustomerDAO.updateFields(customerID, { AccountID: bankAccountID }, (updateErr, updateResult) => {
                         if (updateErr) {
                             console.error('Error updating customer with AccountID:', updateErr);

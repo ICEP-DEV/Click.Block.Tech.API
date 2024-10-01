@@ -42,6 +42,7 @@ const verifyOtp = (req, res) => {
 };
 
 
+// Get customer details by CustID_Nr
 const getCustomer = (req, res) => {
     const custID_Nr = req.params.custID_Nr;
 
@@ -54,6 +55,18 @@ const getCustomer = (req, res) => {
         }
         res.status(200).send(customer);
     });
+
+  CustomerService.getCustomerById(custID_Nr, (err, result) => {
+    if (err) {
+      return res.status(500).send(err.message);
+    }
+    if (result) {
+      // Return customer details
+      res.status(200).json(result);
+    } else {
+      res.status(404).send('Customer not found');
+    }
+  });
 };
 
 const  getAccountID =  (req,res)=>{
