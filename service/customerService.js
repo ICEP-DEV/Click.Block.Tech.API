@@ -1,6 +1,8 @@
 const CustomerDAO = require('../DAO/customerDAO');
  
 const CustomerService = {
+
+
     createCustomer: (customerData, callback) => {
         if (!customerData.CustID_Nr || !customerData.Email) {
             return callback(new Error('Customer ID and Email are required'));
@@ -55,6 +57,7 @@ const CustomerService = {
             CustomerDAO.delete(custID_Nr, callback);
         });
     },
+
 };
  
 module.exports = CustomerService;

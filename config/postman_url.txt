@@ -1,0 +1,2 @@
+Post : http://localhost:5000/api/customer
+Get customer : http://localhost:5000/api/customer/1

@@ -1,6 +1,8 @@
 class Customer {
+
   constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AccountID) {
     this._CustID_Nr = CustID_Nr; // this is the id number and serves as the PK
+
     this._FirstName = FirstName;
     this._LastName = LastName;
     this._PhoneNumber = PhoneNumber;
@@ -9,8 +11,9 @@ class Customer {
     this._DateOfBirth = DateOfBirth;
     this._LoginPin = LoginPin;
     this._AlertPin = AlertPin;
-    this._isActive = isActive;
+    this._isVerified = isVerified;
     this._PanicButtonStatus = PanicButtonStatus;
+
     this._AccountID = AccountID;
   }
 
@@ -152,6 +155,7 @@ class Customer {
   get AccountID(){
     return this._AccountID;
   }
+
 }
 
 module.exports = Customer;

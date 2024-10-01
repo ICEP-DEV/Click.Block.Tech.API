@@ -4,18 +4,31 @@ const customerRoutes = require('./route/customerRoutes');
 const adminRoutes = require('./route/adminRoutes');
 const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const path = require('path');
+const bankAccountRoutes = require('./route/bankAccountRoutes'); 
 
 const app = express();
-app.use(express.json());
+
+// configuring the body parser 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: false })); // Use express' built-in URL-encoded parser
+
+// configure CORS
 app.use(cors());
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+// Use customer routes
 app.use('/api', customerRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', supportingDocumentRoutes);
+// Use bankAccount routes
+app.use('/api', bankAccountRoutes);
 
+/* for testing on postman
+app.use('/', (req, res) => {
+  res.send('Endpoint...1234');
+});
+*/
+
+// Start the server
 app.listen(5000, () => {
   console.log('Server is running on port 5000');
 });
