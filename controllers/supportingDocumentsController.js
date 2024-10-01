@@ -1,57 +1,78 @@
-const express = require('express');
-const router = express.Router();
-const SupportingDocumentService = require('../services/supportingDocumentService'); // Adjust path as needed
+const SupportingDocumentsService = require('../service/supportingDocumentService');
+const upload = require('../config/multerConfig');
 
-router.get('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
+// Upload a document
+const uploadDocument = async (req, res) => {
     try {
-        const document = await SupportingDocumentService.getSupportingDocumentById(docId);
-        if (!document) {
-            return res.status(404).json({ error: 'Document not found' });
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).send({ message: 'No file uploaded' });
         }
-        res.status(200).json(document);
+
+        const { CustID_Nr } = req.body;
+        const ID_Document = req.files['ID_Document'][0];
+        const Selfie_With_ID = req.files['Selfie_With_ID'][0];
+
+        const documentData = {
+            CustID_Nr: CustID_Nr,
+            ID_Document: ID_Document.filename,
+            Selfie_With_ID: Selfie_With_ID.filename
+        };
+
+        const result = await SupportingDocumentsService.uploadDocument(documentData);
+        res.status(200).send({ message: 'Document uploaded successfully', data: result });
     } catch (err) {
-        res.status(500).json({ error: 'Error fetching document' });
+        res.status(500).send({ message: err.message || 'Document upload failed' });
     }
-});
+};
 
-
-router.put('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
-    const updatedDocument = req.body; 
+// Get documents by customer ID
+const getDocumentsByCustomer = async (req, res) => {
     try {
-        const result = await SupportingDocumentService.updateSupportingDocument(docId, updatedDocument);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Document not found' });
+        const { customerID } = req.params;
+        const documents = await SupportingDocumentsService.getDocumentsByCustomer(customerID);
+        if (!documents) {
+            return res.status(404).send({ message: 'No documents found for this customer' });
         }
-        res.status(200).json({ message: 'Document updated' });
+        res.status(200).send(documents);
     } catch (err) {
-        res.status(500).json({ error: 'Error updating document' });
+        res.status(500).send({ message: err.message || 'Error retrieving documents' });
     }
-});
+};
 
-
-router.delete('/documents/:id', async (req, res) => {
-    const docId = req.params.id;
+// Update a document
+const updateDocument = async (req, res) => {
     try {
-        const result = await SupportingDocumentService.deleteSupportingDocument(docId);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Document not found' });
-        }
-        res.status(200).json({ message: 'Document deleted' });
+        const { CustID_Nr } = req.body;
+        const ID_Document = req.files['ID_Document'][0];
+        const Selfie_With_ID = req.files['Selfie_With_ID'][0];
+
+        const documentData = {
+            CustID_Nr: CustID_Nr,
+            ID_Document: ID_Document.filename,
+            Selfie_With_ID: Selfie_With_ID.filename
+        };
+
+        const result = await SupportingDocumentsService.updateDocument(documentData);
+        res.status(200).send({ message: 'Document updated successfully', data: result });
     } catch (err) {
-        res.status(500).json({ error: 'Error deleting document' });
+        res.status(500).send({ message: err.message || 'Document update failed' });
     }
-});
+};
 
-
-router.get('/documents', async (req, res) => {
+// Delete documents by customer ID
+const deleteDocumentsByCustomer = async (req, res) => {
     try {
-        const documents = await SupportingDocumentService.getAllSupportingDocuments();
-        res.status(200).json(documents);
+        const { customerID } = req.params;
+        const result = await SupportingDocumentsService.deleteDocumentsByCustomer(customerID);
+        res.status(200).send({ message: 'Documents deleted successfully' });
     } catch (err) {
-        res.status(500).json({ error: 'Error fetching documents' });
+        res.status(500).send({ message: err.message || 'Document deletion failed' });
     }
-});
+};
 
-module.exports = router;
+module.exports = {
+    uploadDocument,
+    getDocumentsByCustomer,
+    updateDocument,
+    deleteDocumentsByCustomer
+};

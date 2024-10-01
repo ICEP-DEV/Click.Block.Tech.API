@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const AdminController = require('../Controllers/AdminController'); // Adjust the path as needed
+const AdminController = require('../Controllers/AdminController'); 
 
-// Get an admin by ID
+
 router.get('/admins/:id', AdminController.getAdminById);
 
 
