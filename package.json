@@ -13,7 +13,7 @@
   "dependencies": {
     "aws-sdk": "^2.1691.0",
     "axios": "^1.7.7",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "click.block.tech.api": "file:",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

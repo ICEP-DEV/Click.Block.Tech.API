@@ -1,6 +1,6 @@
 class Customer {
 
-  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isActive, PanicButtonStatus, AccountID) {
+  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isVerified, PanicButtonStatus, AccountID) {
     this._CustID_Nr = CustID_Nr; // this is the id number and serves as the PK
 
     this._FirstName = FirstName;

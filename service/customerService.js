@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
 const EmailService = require('./emailService');
@@ -34,9 +34,15 @@ const CustomerService = {
         });
     },
 
+
     getbyAccountNumber: (accountNum, callback) => {
         if (!accountNum) return callback(new Error('Account Number is required'));
-        CustomerDAO.getbyAccountNumber(accountNum, callback);
+     CustomerDAO.getbyAccountNumber(accountNum, callback);
+        
+    },
+    getbyAccountID: (accountID, callback) =>{
+        if(!accountID) return callback(new Error('Account ID ir required'));
+        CustomerDAO.getCustomerByAccID(accountID,callback);
     },
 
     getCustomerById: (custID_Nr, callback) => {

@@ -40,8 +40,60 @@ const verifyOtp = (req, res) => {
         res.status(200).send(result);
     });
 };
+const getCustomerByAccNr = (req, res) => {
+    const accountNr = req.params.AccountNr;
+    const loginPin = req.params.LoginPin;
+    const bcrypt = require('bcryptjs');
+    
+    var accountID = 0;
+    CustomerService.getbyAccountNumber(accountNr,(err, result) => {
+        if(err){
+          return res.status(500).send(err);
+        }
+        if(result){
+        accountID = result.AccountID;
+        //getting customer using the account ID
+        CustomerService.getbyAccountID(accountID, (err, result) => {
+            if (err) {
+                return res.status(500).send({ error: err.message });
+            }
+    
+            if (result) {
+                //matching input password with the hashed password
+                console.log(loginPin)
+                bcrypt.compare(loginPin, result._LoginPin, (err, result) => {
+                    if (err) {
+                        // Handle error
+                        console.error('Error comparing passwords:', err);
+                        return;
+                    }
+             
+                    if (result) {
+                    // Passwords match, authentication successful
+                    console.log('Passwords match! User authenticated.');
+                    res.status(200).send(result);
+                    } else {
+                    // Passwords don't match, authentication failed
+                    console.log('Passwords do not match! Authentication failed.');
+                    res.status(200).send(result);
+                    }
+                });
+                
+                
+            }else{
+                res.status(404).send({ error: 'Customer not found' });
+            }
+           
+        });
+        }else{
+          res.status(404).send('Account not found).');
+        }
+      });
+      
+      
 
 
+}
 // Get customer details by CustID_Nr
 const getCustomer = (req, res) => {
     const custID_Nr = req.params.custID_Nr;
@@ -50,10 +102,13 @@ const getCustomer = (req, res) => {
         if (err) {
             return res.status(500).send({ error: err.message });
         }
-        if (!customer) {
-            return res.status(404).send({ error: 'Customer not found' });
+        if (customer) {
+            res.status(200).send(customer);
+        }else{
+            res.status(404).send({ error: 'Customer not found' });
         }
-        res.status(200).send(customer);
+       
+
     });
 };
 
@@ -71,10 +126,12 @@ const accountNr = req.params.AccountNr;
   });
 };
 
+
 module.exports = {
     createCustomer,
     updateCustomerStep,
     verifyOtp,
     getAccountID,
-    getCustomer
+    getCustomer,
+    getCustomerByAccNr
 };
