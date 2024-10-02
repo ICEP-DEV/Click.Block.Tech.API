@@ -42,6 +42,35 @@ const verifyOtp = (req, res) => {
 };
 
 
+
+const getCustomerByAccNr = (req, res) => {
+    const accountNr = req.params.AccountNr;
+    var accountID = 0;
+    CustomerService.getbyAccountNumber(accountNr,(err, result) => {
+        if(err){
+          return res.status(500).send(err);
+        }
+        if(result){
+        accountID = result.AccountID;
+        }else{
+          res.status(404).send('Account not found).');
+        }
+      });
+      
+      CustomerService.getbyAccountID(1, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        }
+        if (result) {
+            res.status(200).send(result);
+        }else{
+            res.status(404).send({ error: 'Customer not found' });
+        }
+       
+    });
+
+
+}
 // Get customer details by CustID_Nr
 const getCustomer = (req, res) => {
     const custID_Nr = req.params.custID_Nr;
@@ -50,10 +79,13 @@ const getCustomer = (req, res) => {
         if (err) {
             return res.status(500).send({ error: err.message });
         }
-        if (!customer) {
-            return res.status(404).send({ error: 'Customer not found' });
+        if (customer) {
+            res.status(200).send(customer);
+        }else{
+            res.status(404).send({ error: 'Customer not found' });
         }
-        res.status(200).send(customer);
+       
+
     });
 };
 
@@ -71,10 +103,12 @@ const accountNr = req.params.AccountNr;
   });
 };
 
+
 module.exports = {
     createCustomer,
     updateCustomerStep,
     verifyOtp,
     getAccountID,
-    getCustomer
+    getCustomer,
+    getCustomerByAccNr
 };
