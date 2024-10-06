@@ -100,14 +100,21 @@ const BankCardDAO = {
 getCustomerByCardID: (CardID, callback) => {
   const sql = `
     SELECT 
-      c.CustID_Nr, c.FirstName, c.LastName, c.Email, c.PhoneNumber
+      c.CustID_Nr, 
+      c.FirstName, 
+      c.LastName, 
+      c.Email, 
+      c.PhoneNumber,
+      bc.CardNumber, 
+      bc.CVV, 
+      bc.ExpirationDate
     FROM bankcard bc
     JOIN customer c ON bc.AccountID = c.AccountID
     WHERE bc.CardID = ?`;
 
   db.query(sql, [CardID], (err, result) => {
     if (err) {
-      return callback(new Error('Failed to retrieve customer: ' + err.message));
+      return callback(new Error('Failed to retrieve customer and card details: ' + err.message));
     }
     if (result.length > 0) {
       const customer = {
@@ -116,12 +123,16 @@ getCustomerByCardID: (CardID, callback) => {
         LastName: result[0].LastName,
         Email: result[0].Email,
         PhoneNumber: result[0].PhoneNumber,
+        CardNumber: result[0].CardNumber,
+        CVV: result[0].CVV,
+        ExpirationDate: result[0].ExpirationDate,
       };
       return callback(null, customer);
     }
     callback(null, null); // Customer not found
   });
 }
+
 };
 
 module.exports = BankCardDAO;

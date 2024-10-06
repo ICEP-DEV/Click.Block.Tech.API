@@ -17,7 +17,8 @@ router.delete('/bankcards/:cardID', bankCardController.deleteBankCard);
 // Route to get bank cards by Account ID
 router.get('/accounts/:accountID/bankcards', bankCardController.getCardsByAccountID);
 
-//Route to get Customer details for associated card
+//Route to get Customer details for associated card 
+//Use this on frontend for manage_card.
 router.get('/bankcards/:cardID/customer', bankCardController.getCustomerByCardID);
 
 module.exports = router;
