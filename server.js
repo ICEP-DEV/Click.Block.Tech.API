@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const customerRoutes = require('./route/customerRoutes');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
+const bankCardRoutes =  require('./route/bankCardRoutes'); 
 
 const app = express();
 
@@ -17,6 +18,9 @@ app.use('/api', customerRoutes);
 
 // Use bankAccount routes
 app.use('/api', bankAccountRoutes);
+
+//Use BankCard Routes
+app.use('/api', bankCardRoutes);
 
 /* for testing on postman
 app.use('/', (req, res) => {
