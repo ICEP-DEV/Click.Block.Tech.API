@@ -46,32 +46,32 @@ const getCustomerByAccNr = (req, res) => {
     const bcrypt = require('bcryptjs');
     
     var accountID = 0;
-    CustomerService.getbyAccountNumber(accountNr,(err, result) => {
+    CustomerService.getbyAccountNumber(accountNr,(err, customerByAccNr) => {
         if(err){
           return res.status(500).send(err);
         }
-        if(result){
-        accountID = result.AccountID;
+        if(customerByAccNr){
+        accountID = customerByAccNr.AccountID;
         //getting customer using the account ID
-        CustomerService.getbyAccountID(accountID, (err, result) => {
+        CustomerService.getbyAccountID(accountID, (err, customer) => {
             if (err) {
                 return res.status(500).send({ error: err.message });
             }
     
-            if (result) {
+            if (customer) {
                 //matching input password with the hashed password
-                console.log(loginPin)
-                bcrypt.compare(loginPin, result._LoginPin, (err, result) => {
+           
+                bcrypt.compare(loginPin, customer._LoginPin, (err, result) => {
                     if (err) {
                         // Handle error
                         console.error('Error comparing passwords:', err);
                         return;
                     }
              
-                    if (result) {
+                    if (customer) {
                     // Passwords match, authentication successful
                     console.log('Passwords match! User authenticated.');
-                    res.status(200).send(result);
+                    res.status(200).send(customerByAccNr);
                     } else {
                     // Passwords don't match, authentication failed
                     console.log('Passwords do not match! Authentication failed.');
