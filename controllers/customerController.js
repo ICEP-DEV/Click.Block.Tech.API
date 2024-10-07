@@ -127,6 +127,7 @@ const accountNr = req.params.AccountNr;
 };
 
 
+
 module.exports = {
     createCustomer,
     updateCustomerStep,
@@ -135,3 +136,4 @@ module.exports = {
     getCustomer,
     getCustomerByAccNr
 };
+
