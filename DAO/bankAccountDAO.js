@@ -9,6 +9,7 @@ const BankAccountDAO = {
         return callback(new Error('Failed to create account: ' + err.message));
       }
       callback(null, { id: result.insertId, ...accountData });
+      console.log(result.insertId);
     });
   },
 
@@ -30,7 +31,7 @@ const BankAccountDAO = {
         );
         return callback(null, bankAccount);
       }
-      callback(null, null); // Account not found
+      callback(null, null); 
     });
   },
 
@@ -58,7 +59,7 @@ const BankAccountDAO = {
       if (err) {
         return callback(new Error('Failed to update account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); // Returns true if update was successful
+      callback(null, result.affectedRows > 0); 
     });
   },
 
@@ -68,7 +69,7 @@ const BankAccountDAO = {
       if (err) {
         return callback(new Error('Failed to delete account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); // Returns true if deletion was successful
+      callback(null, result.affectedRows > 0); 
     });
   }
 };
