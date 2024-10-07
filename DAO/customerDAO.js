@@ -63,6 +63,34 @@ const CustomerDAO = {
       }
     });
   },
+   getCustomerByAccID: (accountID, callback)=>{
+    const sql = 'SELECT * FROM customer WHERE AccountID = ?';
+    db.query(sql, [accountID], (err, result) =>{
+      if(err){
+        callback(err, null);
+      }else{
+        if(result.length > 0){
+          const customer = new Customer(
+          result[0].CustID_Nr,
+          result[0].FirstName,
+          result[0].LastName,
+          result[0].PhoneNumber,
+          result[0].Address,
+          result[0].Email,
+          result[0].DateOfBirth,
+          result[0].LoginPin,
+          result[0].AlertPin,
+          result[0].isVerified,
+          result[0].PanicButtonStatus,
+          result[0].AccountID,
+          );
+          callback(null, customer);
+        } else {
+          callback(null, null);  
+        }
+      }
+    });
+   },
 
     getById: (custID_Nr, callback) => {
     const sql = `
