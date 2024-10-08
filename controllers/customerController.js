@@ -68,7 +68,7 @@ const getCustomerByAccNr = (req, res) => {
                         return;
                     }
              
-                    if (customer) {
+                    if (result) {
                     // Passwords match, authentication successful
                     console.log('Passwords match! User authenticated.');
                     res.status(200).send(customerByAccNr);
@@ -79,14 +79,13 @@ const getCustomerByAccNr = (req, res) => {
                     }
                 });
                 
-                
             }else{
                 res.status(404).send({ error: 'Customer not found' });
             }
            
         });
         }else{
-          res.status(404).send('Account not found).');
+          res.status(200).send(null);
         }
       });
       
