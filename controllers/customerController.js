@@ -71,7 +71,7 @@ const getCustomerByAccNr = (req, res) => {
                     if (result) {
                     // Passwords match, authentication successful
                     console.log('Passwords match! User authenticated.');
-                    res.status(200).send(customerByAccNr);
+                    res.status(200).send(customer);
                     } else {
                     // Passwords don't match, authentication failed
                     console.log('Passwords do not match! Authentication failed.');
