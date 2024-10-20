@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
+const BankCardDAO = require('../DAO/bankCardDAO');
 const EmailService = require('./emailService');
 const crypto = require('crypto');
 
@@ -149,6 +150,39 @@ const CustomerService = {
                     const bankAccountID = bankAccountResult.id;
                     console.log('Bank Account created with ID:', bankAccountID); 
 
+                    //creating a bankcard
+                    const newBankCard = {AccountID: bankAccountID}
+                    if (!newBankCard.AccountID) {
+                        return callback(new Error('Account ID is required'));
+                      }
+                  
+                      // Randomize last 12 digits of card number (first 4 digits are 5478)
+                      const randomCardNumber = '5478' + Math.floor(Math.random() * 1000000000000).toString().padStart(12, '0');
+                  
+                      // Randomize CVV (3-digit number)
+                      const randomCVV = Math.floor(100 + Math.random() * 900).toString();
+                  
+                      // Randomize expiration date (1-5 years in the future)
+                      const currentDate = new Date();
+                      const futureYear = currentDate.getFullYear() + Math.floor(Math.random() * 5) + 1;
+                      const randomExpirationDate = new Date(futureYear, currentDate.getMonth(), currentDate.getDate());
+                  
+                      // Setting defaults for missing fields
+                      newBankCard.CardNumber = randomCardNumber;
+                      newBankCard.CVV = randomCVV;
+                      newBankCard.ExpirationDate = randomExpirationDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+                      newBankCard.IsActive = 1;
+                      newBankCard.CardType = 'debit';
+                     // Active by default
+                  
+                      BankCardDAO.create(newBankCard, (err, cardID) => {
+                        if (err) {
+                          return callback(new Error('Failed to create bank card: ' + err.message));
+                        }
+                        callback(null, cardID); // Return the new CardID
+                      });
+                  
+
                     
                     CustomerDAO.updateFields(customerID, { AccountID: bankAccountID }, (updateErr, updateResult) => {
                         if (updateErr) {
@@ -162,7 +196,9 @@ const CustomerService = {
                         console.log('Customer and bank account successfully created:', customerData.CustID_Nr);
                         callback(null, { message: 'OTP verified, customer and bank account created.' });
                     });
+                
                 });
+               
             });
         } catch (error) {
             console.error('Unexpected error during OTP verification:', error);
