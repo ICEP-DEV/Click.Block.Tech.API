@@ -37,7 +37,7 @@ const verifyOtp = (req, res) => {
         if (err) {
             return res.status(err.status || 500).send({ error: err.message });
         }
-        res.status(200).send(result);
+        res.sendStatus(200).send(result);
     });
 };
 const getCustomerByAccNr = (req, res) => {
