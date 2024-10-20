@@ -78,12 +78,12 @@ const getCardsByAccountID = (req, res) => {
 
 };
 
-const getCustomerByCardID = (req, res) => {
-  const CardID = req.params.cardID;
+const getCustCardByAccountID= (req, res) => {
+  const AccountID = req.params.AccountID;
 
-  console.log('Fetching customer for bank card with ID:', CardID);
+  console.log('Fetching customer for bank card with ID:', AccountID);
 
-  BankCardService.getCustomerByCardID(CardID, (err, result) => {
+  BankCardService.getCardsByAccountID(AccountID, (err, result) => {
     if (err) {
       console.error('Error in getCustomerByCardID:', err);
       return res.status(500).json({ error: 'Failed to retrieve customer', message: err.message });
@@ -102,5 +102,5 @@ module.exports = {
   updateBankCard,
   deleteBankCard,
   getCardsByAccountID,
-  getCustomerByCardID
+  getCustCardByAccountID,
 };
