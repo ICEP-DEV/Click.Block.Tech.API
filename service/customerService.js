@@ -17,7 +17,7 @@ const CustomerService = {
         }
         console.log('Creating customer with data:', customerData);
 
-       
+       //Check here for the bcrypt for update 
         bcrypt.hash(customerData.loginPin, SALT_ROUNDS, (err, hashedPassword) => {
             if (err) {
                 console.error('Error hashing password:', err);
@@ -64,6 +64,58 @@ const CustomerService = {
             CustomerDAO.update(custID_Nr, updateData, callback);
         });
     },
+
+
+    //Updated Update Customers
+     
+    updateCustomerDetailsSevice: (custID_Nr, updateData, callback) => {
+        if (!custID_Nr || !updateData) return callback(new Error('Customer ID and update data are required'));
+    
+        // Check if there is a new LoginPin or AlertPin to be updated
+        const promises = [];
+    
+        if (updateData.loginPin) {
+            // Hash the new LoginPin before updating
+            const loginPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.loginPin, SALT_ROUNDS, (err, hashedLoginPin) => {
+                    if (err) return reject(err);
+                    updateData.loginPin = hashedLoginPin; // Replace the loginPin with the hashed version
+                    resolve();
+                });
+            });
+            promises.push(loginPinPromise);
+        }
+    
+        if (updateData.alertPin) {
+            // Hash the new AlertPin before updating
+            const alertPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.alertPin, SALT_ROUNDS, (err, hashedAlertPin) => {
+                    if (err) return reject(err);
+                    updateData.alertPin = hashedAlertPin; // Replace the alertPin with the hashed version
+                    resolve();
+                });
+            });
+            promises.push(alertPinPromise);
+        }
+    
+        // Wait for all hashing promises to complete
+        Promise.all(promises)
+            .then(() => {
+                CustomerDAO.update(custID_Nr, updateData, (err, result) => {
+                    if (err) return callback(err);
+                    if (result.affectedRows === 0) {
+                        return callback(new Error('Customer not found or no changes made'));
+                    }
+                    callback(null, result);
+                });
+            })
+            .catch(err => {
+                console.error('Error hashing pin:', err);
+                return callback({ status: 500, message: 'Error hashing pin' });
+            });
+    },
+    
+/// end of Updated Update Customers 
 
     deleteCustomer: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));

@@ -125,6 +125,22 @@ const accountNr = req.params.AccountNr;
   });
 };
 
+//New update Customer 
+// Update customer details
+const updateCustomerDetails = (req, res) => {
+    const custID_Nr = req.params.custID_Nr;  // Use lowercase 'custID_Nr' to match the request parameters
+    const updateData = req.body;
+
+    console.log('Updating customer details with ID:', custID_Nr, 'with data:', updateData);
+
+    CustomerService.updateCustomerDetailsSevice(custID_Nr, updateData, (err, result) => {
+        if (err) {
+            console.error('Error in updateCustomerDetails:', err);
+            return res.status(500).json({ error: 'Failed to update customer', message: err.message });
+        }
+        res.status(200).json({ message: 'Customer updated successfully', success: result });
+    });
+};
 
 
 module.exports = {
@@ -133,6 +149,8 @@ module.exports = {
     verifyOtp,
     getAccountID,
     getCustomer,
-    getCustomerByAccNr
+    getCustomerByAccNr,
+    updateCustomerDetails
+
 };
 
