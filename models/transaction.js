@@ -6,7 +6,7 @@ class Transaction {
       this.transactionDate = transactionDate;
       this.transactionAmount = transactionAmount;
       this.status = status;
-      this.isPanicTriggered = isPanicTriggered;
+      this.isPanicTrigered = isPanicTriggered;
       this.locationID = locationID;
     }
   }

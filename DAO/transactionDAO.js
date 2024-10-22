@@ -1,41 +1,62 @@
 const db = require('../config/config'); 
+const BankAccount = require('../models/bankAccount'); // Assuming this model exists
 
-class TransactionDAO {
-    async getCustomerByCardNumber(cardNumber) {
-        try {
-            // Log the card number received
-            console.log('Card Number:', cardNumber);
+const TransactionDAO = {
+  getCustomerByCardNumber: (cardNumber, callback) => {
+    const query = `SELECT c.CustID_Nr, c.AccountID
+                   FROM customer c 
+                   JOIN bankcard bc ON c.AccountID = bc.AccountID 
+                   JOIN bankaccount ba ON bc.AccountID = ba.AccountID 
+                   WHERE bc.CardNumber = ?`;
 
-            const sqlQuery = `git
-                SELECT c.CustID_Nr 
-                FROM BankCard bc 
-                INNER JOIN BankAccount b ON bc.AccountID = b.AccountID 
-                INNER JOIN Customer c ON b.AccountID = c.AccountID 
-                WHERE TRIM(bc.CardNumber) = ?
-            `;
+    db.query(query, [cardNumber], (err, result) => {
+      if (err) {
+        console.error('Error retrieving customer by card number:', err);
+        return callback({ status: 500, message: 'Database error' }, null);
+      }
 
-            // Log the SQL query before execution
-            console.log('Executing SQL Query:', sqlQuery);
+      if (result.length > 0) {
+        console.log("Customer found:", result[0]);
+        callback(null, result[0]); // Return the first row if customer is found
+      } else {
+        console.log("No customer found with this card number.");
+        callback(null, null); // Return null if no result is found
+      }
+    });
+  },
 
-            // Execute the query
-            const result = await db.query(sqlQuery, [cardNumber]);
-            console.log('Raw Query Result:', result);
+  verifyPin: (customerID, pin, callback) => {
+    const query = 'SELECT LoginPin FROM customer WHERE CustID_Nr = ? AND LoginPin = ?';
 
-            // Check if result is an array and has data
-            const rows = Array.isArray(result) ? result : [result]; // Ensure it's in array format
-            
-            if (Array.isArray(rows) && rows.length > 0) {
-                console.log('Customer found: CustID_Nr:', rows[0].CustID_Nr);
-                return rows[0]; // Return the first matching customer
-            } else {
-                console.log('No matching customer found in the query result.');
-                throw new Error('No matching customer found.');
-            }
-        } catch (error) {
-            console.error('Error fetching customer by card number:', error);
-            throw error; // Rethrow the error to be handled elsewhere
-        }
-    }
-}
+    db.query(query, [customerID, pin], (err, result) => {
+      if (err) {
+        console.error('Error verifying PIN:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
 
-module.exports = new TransactionDAO();
+      if (result.length > 0) {
+        console.log("PIN verification successful.");
+        callback(null, true); // Return true if the PIN matches
+      } else {
+        console.log("PIN verification failed.");
+        callback(null, false); // Return false if the PIN does not match
+      }
+    });
+  },
+
+  createTransaction: (transactionData, callback) => {
+    const query = 'INSERT INTO transaction SET ?';
+
+    db.query(query, transactionData, (err, result) => {
+      if (err) {
+        console.error('Error creating transaction:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
+
+      console.log("Transaction created successfully:", result);
+      callback(null, result.insertId); // Return the newly created transaction ID
+    });
+  }
+};
+
+module.exports = TransactionDAO;
