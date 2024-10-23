@@ -1,35 +1,62 @@
-const db = require('../config/config'); // Assuming you have a database connection file
+const db = require('../config/config'); 
+const BankAccount = require('../models/bankAccount'); // Assuming this model exists
 
-class TransactionDAO {
-    // Method to fetch customer by card number and PIN
-    async getCustomerByCardNumberAndPin(cardNumber, pin) {
-        const query = `
-            SELECT c.CustID_Nr
-            FROM BankCard bc
-            INNER JOIN BankAccount b ON bc.AccountID = b.AccountID
-            INNER JOIN Customer c ON b.AccountID = c.AccountID
-            WHERE bc.CardNumber = ? AND c.LoginPin = ?
-        `;
-        const [customer] = await db.query(query, [cardNumber, pin]);
-        return customer;
-    }
+const TransactionDAO = {
+  getCustomerByCardNumber: (cardNumber, callback) => {
+    const query = `SELECT c.CustID_Nr, c.AccountID
+                   FROM customer c 
+                   JOIN bankcard bc ON c.AccountID = bc.AccountID 
+                   JOIN bankaccount ba ON bc.AccountID = ba.AccountID 
+                   WHERE bc.CardNumber = ?`;
 
-    // Method to fetch account by customer ID
-    async getAccountByCustomerID(custID) {
-        const query = `SELECT * FROM BankAccount WHERE AccountID = ?`;
-        const [account] = await db.query(query, [custID]);
-        return account;
-    }
+    db.query(query, [cardNumber], (err, result) => {
+      if (err) {
+        console.error('Error retrieving customer by card number:', err);
+        return callback({ status: 500, message: 'Database error' }, null);
+      }
 
-    // Method to create a transaction
-    async createTransaction(accountID, transactionType, transactionAmount, locationID) {
-        const query = `
-            INSERT INTO Transaction (AccountID, TransactionType, TransactionDate, TransactionAmount, Status, LocationID)
-            VALUES (?, ?, NOW(), ?, 'Pending', ?)
-        `;
-        const result = await db.query(query, [accountID, transactionType, transactionAmount, locationID]);
-        return result;
-    }
-}
+      if (result.length > 0) {
+        console.log("Customer found:", result[0]);
+        callback(null, result[0]); // Return the first row if customer is found
+      } else {
+        console.log("No customer found with this card number.");
+        callback(null, null); // Return null if no result is found
+      }
+    });
+  },
 
-module.exports = new TransactionDAO();
+  verifyPin: (customerID, pin, callback) => {
+    const query = 'SELECT LoginPin FROM customer WHERE CustID_Nr = ? AND LoginPin = ?';
+
+    db.query(query, [customerID, pin], (err, result) => {
+      if (err) {
+        console.error('Error verifying PIN:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
+
+      if (result.length > 0) {
+        console.log("PIN verification successful.");
+        callback(null, true); // Return true if the PIN matches
+      } else {
+        console.log("PIN verification failed.");
+        callback(null, false); // Return false if the PIN does not match
+      }
+    });
+  },
+
+  createTransaction: (transactionData, callback) => {
+    const query = 'INSERT INTO transaction SET ?';
+
+    db.query(query, transactionData, (err, result) => {
+      if (err) {
+        console.error('Error creating transaction:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
+
+      console.log("Transaction created successfully:", result);
+      callback(null, result.insertId); // Return the newly created transaction ID
+    });
+  }
+};
+
+module.exports = TransactionDAO;

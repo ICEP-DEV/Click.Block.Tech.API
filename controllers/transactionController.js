@@ -16,7 +16,9 @@ const handleTransaction = async (req, res) => {
         console.error('Error processing transaction:', error.message);
         res.status(500).json({ error: 'Transaction processing failed', details: error.message });
     }
-};
+
+    
+}
 
 // Export the controller function
 module.exports = { handleTransaction };
