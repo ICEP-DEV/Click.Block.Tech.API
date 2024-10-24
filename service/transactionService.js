@@ -1,4 +1,5 @@
 const TransactionDAO = require('../DAO/transactionDAO');
+const BankAccountDAO = require('../DAO/bankAccountDAO'); // Using this DAO for bank account operations
 const Transaction = require('../models/transaction'); // Assuming a Transaction model exists
 
 class TransactionService {
@@ -24,7 +25,13 @@ class TransactionService {
             return reject(new Error('Invalid PIN.'));
           }
 
-          // Step 3: Create Transaction
+          // Step 3: Validate transaction type before proceeding
+          const validTransactionTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
+          if (!validTransactionTypes.includes(transactionType)) {
+            return reject(new Error('Unknown transaction type, transaction aborted.'));
+          }
+
+          // Step 4: Create Transaction
           const transaction = new Transaction(
             null, // TransactionID will be auto-generated
             customer.AccountID,
@@ -41,12 +48,75 @@ class TransactionService {
               return reject(new Error('Error creating transaction.'));
             }
 
-            // Successfully created the transaction, resolve with transaction ID
-            resolve(transactionID);
+            console.log(`Transaction created with ID: ${transactionID}`);
+            console.log(`AccountID: ${customer.AccountID}, TransactionType: ${transactionType}, Amount: ${transactionAmount}`);
+
+            // Step 5: Update bank account balance based on transaction type
+            this.updateBankAccountBalance(customer.AccountID, transactionType, transactionAmount)
+              .then(() => {
+                resolve(transactionID); // Return transaction ID after successful balance update
+              })
+              .catch((err) => {
+                console.error('Error updating bank account balance:', err);
+                return reject(new Error('Error updating bank account balance.'));
+              });
           });
         });
       });
     });
+  }
+
+  async updateBankAccountBalance(accountID, transactionType, transactionAmount) {
+    try {
+      console.log(`Fetching account balance for AccountID: ${accountID}`);
+
+      // Fetch the current bank account
+      BankAccountDAO.getById(accountID, (err, bankAccount) => {
+        if (err) {
+          throw new Error('Failed to retrieve bank account: ' + err.message);
+        }
+
+        if (!bankAccount) {
+          throw new Error('Bank account not found');
+        }
+
+        console.log(`Current balance: ${bankAccount.Balance}`);
+
+        let newBalance = bankAccount.Balance;
+
+        // Adjust balance based on transaction type
+        switch (transactionType) {
+          case 'Cash Transfer':
+          case 'EFT':
+          case 'Online Purchase':
+          case 'Cash Payment':
+          case 'Payment Order':
+            newBalance -= transactionAmount;
+            break;
+          default:
+            throw new Error('Unknown transaction type, no balance update should happen.');
+        }
+
+        console.log(`New balance after ${transactionType}: ${newBalance}`);
+
+        // Update the bank account with the new balance
+        const updateData = { Balance: newBalance };
+        BankAccountDAO.update(accountID, updateData, (err, result) => {
+          if (err) {
+            throw new Error('Failed to update bank account: ' + err.message);
+          }
+
+          if (result) {
+            console.log('Bank account balance updated successfully');
+          } else {
+            throw new Error('Bank account balance update failed');
+          }
+        });
+      });
+    } catch (err) {
+      console.error('Error in updateBankAccountBalance:', err);
+      throw err;
+    }
   }
 }
 
