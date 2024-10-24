@@ -10,4 +10,11 @@ router.post('/customers/verify-otp', verifyOtp);
 router.get('/get_accountNr/:AccountNr', getAccountID);
 router.get('/get_customer_byID/:AccountNr/:LoginPin/', getCustomerByAccNr);
 
+//verify the old pin
+router.post('/customers/verify-pin', verifyOldPin);
+ 
+//update Customer
+router.put('/customers/:custID_Nr',updateCustomerDetails);
+module.exports = router;
+
 module.exports = router;
