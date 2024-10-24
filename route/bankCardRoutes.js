@@ -19,6 +19,6 @@ router.get('/accounts/:accountID/bankcards', bankCardController.getCardsByAccoun
 
 //Route to get Customer details for associated card 
 //Use this on frontend for manage_card.
-router.get('/bankcards/:cardID/customer', bankCardController.getCustomerByCardID);
+router.get('/bankcards/:AccountID/customer', bankCardController.getCustCardByAccountID);
 
 module.exports = router;

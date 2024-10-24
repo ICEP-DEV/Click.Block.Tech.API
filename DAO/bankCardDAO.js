@@ -97,7 +97,7 @@ const BankCardDAO = {
   },
 //joining customer table and bankcard to get customer information
 
-getCustomerByCardID: (CardID, callback) => {
+getCustCardDetailsByAccountID: (AccountID, callback) => {
   const sql = `
     SELECT 
       c.CustID_Nr, 
@@ -110,9 +110,9 @@ getCustomerByCardID: (CardID, callback) => {
       bc.ExpirationDate
     FROM bankcard bc
     JOIN customer c ON bc.AccountID = c.AccountID
-    WHERE bc.CardID = ?`;
+    WHERE bc.AccountID = ?`;
 
-  db.query(sql, [CardID], (err, result) => {
+  db.query(sql, [AccountID], (err, result) => {
     if (err) {
       return callback(new Error('Failed to retrieve customer and card details: ' + err.message));
     }

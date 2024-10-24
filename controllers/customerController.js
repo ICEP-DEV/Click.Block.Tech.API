@@ -37,7 +37,7 @@ const verifyOtp = (req, res) => {
         if (err) {
             return res.status(err.status || 500).send({ error: err.message });
         }
-        res.status(200).send(result);
+        res.sendStatus(200).send(result);
     });
 };
 const getCustomerByAccNr = (req, res) => {
@@ -68,10 +68,10 @@ const getCustomerByAccNr = (req, res) => {
                         return;
                     }
              
-                    if (customer) {
+                    if (result) {
                     // Passwords match, authentication successful
                     console.log('Passwords match! User authenticated.');
-                    res.status(200).send(customerByAccNr);
+                    res.status(200).send(customer);
                     } else {
                     // Passwords don't match, authentication failed
                     console.log('Passwords do not match! Authentication failed.');
@@ -79,14 +79,13 @@ const getCustomerByAccNr = (req, res) => {
                     }
                 });
                 
-                
             }else{
                 res.status(404).send({ error: 'Customer not found' });
             }
            
         });
         }else{
-          res.status(404).send('Account not found).');
+          res.status(200).send(null);
         }
       });
       
@@ -174,7 +173,9 @@ module.exports = {
     getAccountID,
     getCustomer,
     getCustomerByAccNr,
+
     updateCustomerDetails,
     verifyOldPin
+
 };
 

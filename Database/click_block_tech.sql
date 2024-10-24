@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 20, 2024 at 04:33 PM
+-- Generation Time: Oct 07, 2024 at 12:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `nexis_bank_db`
+-- Database: `click_block_tech`
 --
 
 -- --------------------------------------------------------
@@ -53,6 +53,19 @@ CREATE TABLE `bankaccount` (
   `isActive` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `bankaccount`
+--
+
+INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`) VALUES
+(2, '1727681513', NULL, 'Savings', 0.00, '2024-09-30', 1),
+(3, '1727684539', NULL, 'Savings', 0.00, '2024-09-30', 1),
+(4, '1727700053', NULL, 'Savings', 0.00, '2024-09-30', 1),
+(5, '1727702703', NULL, 'Savings', 0.00, '2024-09-30', 1),
+(6, '1727765062', NULL, 'Savings', 0.00, '2024-10-01', 1),
+(7, '1727765769', NULL, 'Savings', 0.00, '2024-10-01', 1),
+(8, '1727766203', NULL, 'Savings', 0.00, '2024-10-01', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -83,12 +96,20 @@ CREATE TABLE `customer` (
   `Address` varchar(255) DEFAULT NULL,
   `Email` varchar(100) NOT NULL,
   `DateOfBirth` date NOT NULL,
-  `LoginPin` varchar(5) NOT NULL,
-  `AlertPin` varchar(5) NOT NULL,
+  `LoginPin` varchar(255) NOT NULL,
+  `AlertPin` varchar(255) NOT NULL,
   `isVerified` tinyint(1) NOT NULL,
   `PanicButtonStatus` tinyint(1) NOT NULL,
-  `AccountID` int(11) NOT NULL
+  `AccountID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer`
+--
+
+INSERT INTO `customer` (`CustID_Nr`, `LastName`, `FirstName`, `PhoneNumber`, `Address`, `Email`, `DateOfBirth`, `LoginPin`, `AlertPin`, `isVerified`, `PanicButtonStatus`, `AccountID`) VALUES
+('12345576912', 'Icke', 'Adam', '1234567890', '123 Main St', 'blessingsx99@gmail.com', '1990-01-01', '$2b$1', '', 0, 0, 8),
+('12345678412', 'BING', 'CHANDLER', '1234567890', '123 Main St, Cityville', 'jonathanmoatshe@gmail.com', '1990-01-01', '$2b$1', '', 0, 0, 4);
 
 -- --------------------------------------------------------
 
@@ -226,7 +247,7 @@ ALTER TABLE `alert`
 -- AUTO_INCREMENT for table `bankaccount`
 --
 ALTER TABLE `bankaccount`
-  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `bankcard`
