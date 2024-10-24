@@ -17,4 +17,4 @@ router.post('/customers/verify-pin', verifyOldPin);
 router.put('/customers/:custID_Nr',updateCustomerDetails);
 module.exports = router;
 
-module.exports = router;
+
