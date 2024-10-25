@@ -1,5 +1,5 @@
 // routes/notificationRoutes.js
-const express = require('express');
+/*const express = require('express');
 const NotificationController = require('../controllers/acceptOrDeclineController');
 
 
@@ -13,4 +13,4 @@ router.post('/:transactionId/decline', NotificationController.declineNotificatio
 //router.post('/:transactionId/decline', NotificationController.validateNotificationStatus, NotificationController.declineNotification);
 
 
-module.exports = router;
+module.exports = router;*/

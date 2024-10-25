@@ -1,5 +1,6 @@
 // controllers/notificationController.js
-const NotificationService = require('../service/acceptOrDeclineService');
+/*const NotificationService = require('../service/acceptOrDeclineService');
+
 
 class NotificationController {
 
@@ -96,4 +97,4 @@ class NotificationController {
     }
 }
 
-module.exports = NotificationController;
+module.exports = NotificationController;*/

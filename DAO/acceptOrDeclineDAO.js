@@ -1,5 +1,5 @@
 // dao/acceptOrDeclineDAO.js
-const db = require('../config/config'); // Ensure you're importing your pool
+/*const db = require('../config/config'); // Ensure you're importing your pool
 
 class NotificationDao {
     
@@ -62,4 +62,4 @@ class NotificationDao {
     }
 }
 
-module.exports = NotificationDao;
+module.exports = NotificationDao;*/

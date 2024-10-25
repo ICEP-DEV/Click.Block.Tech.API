@@ -5,7 +5,7 @@ const adminRoutes = require('./route/adminRoutes');
 const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const path = require('path');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
-const notificationRoutes = require('./route/acceptOrDeclineRoutes');
+const notificationRoutes = require('./route/notificationRoutes');
 
 const app = express();
 
@@ -21,6 +21,10 @@ app.use('/api', adminRoutes);
 // Use bankAccount routes
 app.use('/api', bankAccountRoutes);
 app.use('/api/notifications', notificationRoutes);
+
+
+
+
 
 
 app.listen(5000, () => {

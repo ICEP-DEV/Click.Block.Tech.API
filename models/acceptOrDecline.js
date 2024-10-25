@@ -1,5 +1,5 @@
 // models/Notification.js
-class Notification {
+/*class Notification {
     constructor(id, transactionId, notificationType, sentDate, status) {
         this.id = id;
         this.transactionId = transactionId;
@@ -10,3 +10,4 @@ class Notification {
 }
 
 module.exports = Notification;
+*/
