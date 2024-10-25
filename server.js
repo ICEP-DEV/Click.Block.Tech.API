@@ -5,6 +5,7 @@ const adminRoutes = require('./route/adminRoutes');
 const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const path = require('path');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
+const notificationRoutes = require('./route/notificationRoutes');
 const bankCardRoutes =  require('./route/bankCardRoutes'); 
 
 const app = express();
@@ -17,9 +18,14 @@ app.use(cors());
 
 app.use('/api', customerRoutes);
 app.use('/api', adminRoutes);
-app.use('/api', supportingDocumentRoutes);
+//app.use('/api', supportingDocumentRoutes);
 // Use bankAccount routes
 app.use('/api', bankAccountRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+
+
+
 
 
 //Use BankCard Routes

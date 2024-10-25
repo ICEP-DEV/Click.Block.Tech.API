@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const supportingDocumentsController = require('../controllers/supportingDocumentsController');
 const upload = require('../config/multerConfig');
@@ -21,4 +21,4 @@ router.put('/update', upload.fields([
 // Route for deleting documents by customer ID
 router.delete('/:customerID', supportingDocumentsController.deleteDocumentsByCustomer);
 
-module.exports = router;
+module.exports = router;*/

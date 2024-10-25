@@ -1,4 +1,4 @@
-const SupportingDocumentsService = require('../service/supportingDocumentService');
+/*const SupportingDocumentsService = require('../service/supportingDocumentService');
 const upload = require('../config/multerConfig');
 
 // Upload a document
@@ -75,4 +75,4 @@ module.exports = {
     getDocumentsByCustomer,
     updateDocument,
     deleteDocumentsByCustomer
-};
+};*/

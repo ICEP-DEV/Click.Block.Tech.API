@@ -1,4 +1,4 @@
-const SupportingDocumentsDAO = require('../DAO/supportingDocumentDAO');
+/*const SupportingDocumentsDAO = require('../DAO/supportingDocumentDAO');
 const SupportingDocument = require('../models/supportingDocuments');
 
 // Upload or Update Document
@@ -80,4 +80,4 @@ module.exports = {
     getDocumentsByCustomer,
     updateDocument,
     deleteDocumentsByCustomer
-};
+};*/
