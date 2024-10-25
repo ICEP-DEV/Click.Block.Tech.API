@@ -74,8 +74,7 @@ const BankCardService = {
     if (!AccountID) {
       return callback(new Error('Account ID is required'));
     }
-
-    BankCardDAO.getByAccountID(AccountID, (err, result) => {
+    BankCardDAO.getCustCardDetailsByAccountID(AccountID, (err, result) => {
       if (err) {
         return callback(new Error('Failed to retrieve cards: ' + err.message));
       }
@@ -84,12 +83,12 @@ const BankCardService = {
   },
 
   // get customer information associated to the bank card
-  getCustomerByCardID: (CardID, callback) => {
-    if (!CardID) {
+  getCustomerByAccID: (AccountID, callback) => {
+    if (!AccountID) {
       return callback(new Error('Card ID is required'));
     }
 
-    BankCardDAO.getCustomerByCardID(CardID, (err, result) => {
+    BankCardDAO.getCustCardDetailsByAccountID(AccountID, (err, result) => {
       if (err) {
         return callback(new Error('Failed to retrieve customer: ' + err.message));
       }

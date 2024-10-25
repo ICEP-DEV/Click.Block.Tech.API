@@ -37,7 +37,7 @@ const verifyOtp = (req, res) => {
         if (err) {
             return res.status(err.status || 500).send({ error: err.message });
         }
-        res.status(200).send(result);
+        res.sendStatus(200).send(result);
     });
 };
 const getCustomerByAccNr = (req, res) => {
@@ -71,7 +71,7 @@ const getCustomerByAccNr = (req, res) => {
                     if (result) {
                     // Passwords match, authentication successful
                     console.log('Passwords match! User authenticated.');
-                    res.status(200).send(customerByAccNr);
+                    res.status(200).send(customer);
                     } else {
                     // Passwords don't match, authentication failed
                     console.log('Passwords do not match! Authentication failed.');
@@ -125,6 +125,45 @@ const accountNr = req.params.AccountNr;
   });
 };
 
+// Verify old PIN before updating
+const verifyOldPin = (req, res) => {
+    const { custID_Nr, oldPin, pinKey } = req.body;
+ 
+    CustomerService.verifyPin(custID_Nr, oldPin, pinKey, (err, result) => {
+        if (err) {
+            return res.status(err.status || 500).send({ error: err.message });
+        }
+        res.status(200).send(result);
+    });
+};
+ 
+const updateCustomerDetails = (req, res) => {
+    const custID_Nr = req.params.custID_Nr; // Get customer ID from the request params
+    const { updateData, oldPin, pinKey } = req.body; // Get oldPin and pinKey from the request body
+ 
+    console.log('Starting customer update for ID:', custID_Nr, 'with data:', updateData);
+ 
+    // Verify the old PIN first
+    CustomerService.verifyPin(custID_Nr, oldPin, pinKey, (err, verificationResult) => {
+        if (err || !verificationResult.success) {
+            console.error('Old PIN verification failed:', err || verificationResult.message);
+            return res.status(400).json({ error: 'Old PIN verification failed', message: err ? err.message : verificationResult.message });
+        }
+ 
+        // If old PIN is verified, proceed to update the customer details
+        CustomerService.updateCustomerDetailsService(custID_Nr, updateData, oldPin, pinKey, (err, result) => {
+            if (err) {
+                console.error('Error in updateCustomerDetails:', err); // Log database update error
+                return res.status(500).json({ error: 'Failed to update customer', message: err.message });
+            }
+ 
+            console.log('Customer update successful for ID:', custID_Nr); // Log success
+            res.status(200).json({ message: 'Customer updated successfully', success: result });
+        });
+    });
+};
+ 
+
 
 
 module.exports = {
@@ -133,6 +172,10 @@ module.exports = {
     verifyOtp,
     getAccountID,
     getCustomer,
-    getCustomerByAccNr
+    getCustomerByAccNr,
+
+    updateCustomerDetails,
+    verifyOldPin
+
 };
 

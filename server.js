@@ -4,6 +4,7 @@ const customerRoutes = require('./route/customerRoutes');
 const adminRoutes = require('./route/adminRoutes');
 const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
+const notificationRoutes = require('./route/notificationRoutes');
 const bankCardRoutes =  require('./route/bankCardRoutes'); 
 const transactionRoutes = require('./route/transactionRoutes');  // Import transaction routes
 
@@ -17,8 +18,13 @@ app.use(cors());
 
 app.use('/api', customerRoutes);
 app.use('/api', adminRoutes);
-app.use('/api', supportingDocumentRoutes);
+//app.use('/api', supportingDocumentRoutes);
 app.use('/api', bankAccountRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+
+
+
 app.use('/api', bankCardRoutes);
 app.use('/api', transactionRoutes);  // Use transaction routes
 

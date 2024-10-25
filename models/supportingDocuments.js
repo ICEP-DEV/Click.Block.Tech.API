@@ -1,5 +1,5 @@
 
-class SupportingDocument {
+/*class SupportingDocument {
     constructor(suppDocsID, custIDNr, idDocument, selfieWithID) {
         this.suppDocsID = suppDocsID;
         this.custIDNr = custIDNr;
@@ -35,4 +35,4 @@ class SupportingDocument {
     
 }
 
-module.exports = SupportingDocument;
+module.exports = SupportingDocument;*/

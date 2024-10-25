@@ -1,4 +1,4 @@
-const db = require('../config/config');
+/*const db = require('../config/config');
 
 const createDocument = (document) => {
     const query = 'INSERT INTO supportingdocument (CustID_Nr, ID_Document, Selfie_With_ID) VALUES (?, ?, ?)';
@@ -59,4 +59,4 @@ module.exports = {
     updateDocument,
     getByCustomerID,
     deleteDocumentsByCustomer
-};
+};*/

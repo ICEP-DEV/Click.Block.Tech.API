@@ -1,7 +1,12 @@
 const express = require('express');
-const router = express.Router();
 const TransactionController = require('../controllers/transactionController');
 
-router.post('/transactions', TransactionController.handleTransaction);
+const router = express.Router();
+
+// Process transaction
+router.post('/process-transaction', TransactionController.processTransaction);
+
+// Approve or decline transaction
+router.post('/approve-transaction', TransactionController.approveTransaction);
 
 module.exports = router;

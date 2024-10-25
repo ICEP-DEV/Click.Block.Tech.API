@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
+const BankCardDAO = require('../DAO/bankCardDAO');
 const EmailService = require('./emailService');
 const crypto = require('crypto');
 
@@ -16,7 +17,7 @@ const CustomerService = {
         }
         console.log('Creating customer with data:', customerData);
 
-       
+       //Check here for the bcrypt for update 
         bcrypt.hash(customerData.loginPin, SALT_ROUNDS, (err, hashedPassword) => {
             if (err) {
                 console.error('Error hashing password:', err);
@@ -63,6 +64,169 @@ const CustomerService = {
             CustomerDAO.update(custID_Nr, updateData, callback);
         });
     },
+    // Method to verify the old PIN (loginPin or alertPin)
+verifyPin: (custID_Nr, oldPin, pinKey, callback) => {
+    console.log(`Verifying PIN for customer ID: ${custID_Nr}, PIN type: ${pinKey}`);
+ 
+    CustomerDAO.getById(custID_Nr, (err, customer) => {
+        if (err) {
+            console.error('Database error:', err); // Log database error
+            return callback({ status: 500, message: 'Database error' });
+        }
+        if (!customer) {
+            console.error('Customer not found:', custID_Nr); // Log if customer is not found
+            return callback({ status: 404, message: 'Customer not found' });
+        }
+ 
+        // Map pinKey to match the database field names (capitalize first letter)
+        const pinField = pinKey === 'loginPin' ? 'LoginPin' : 'AlertPin';
+ 
+        // Compare provided old PIN with the stored hashed PIN
+        const hashedPin = customer[pinField];
+        if (!hashedPin) {
+            console.error(`No hashed PIN found for customer ${custID_Nr} and pinKey: ${pinField}`); // Log missing hashed PIN
+            return callback({ status: 400, message: `No ${pinField} found for this customer` });
+        }
+ 
+        // Log the hashed PIN for debugging purposes
+        console.log(`Retrieved hashed PIN for customer ${custID_Nr}:`, hashedPin);
+ 
+        // Compare provided old PIN with the corresponding hashed PIN (loginPin or alertPin)
+        bcrypt.compare(oldPin, hashedPin, (err, isMatch) => {
+            if (err) {
+                console.error('Error verifying PIN:', err); // Log bcrypt error
+                return callback({ status: 500, message: 'Error verifying PIN' });
+            }
+ 
+            if (isMatch) {
+                console.log('Old PIN verified successfully for customer:', custID_Nr); // Log success
+                return callback(null, { success: true, message: 'Old PIN verified' });
+            } else {
+                console.log('Old PIN is incorrect for customer:', custID_Nr); // Log incorrect PIN
+                return callback({ status: 400, message: 'Old PIN is incorrect' });
+            }
+        });
+    });
+},
+ 
+// Updated Update Customers with Old PIN Verification
+updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback) => {
+    console.log('Verifying old PIN for customer:', custID_Nr);
+ 
+    // First, verify the old PIN before proceeding with the update
+    CustomerService.verifyPin(custID_Nr, oldPin, pinKey, (err, verificationResult) => {
+        if (err || !verificationResult.success) {
+            console.error('Old PIN verification failed:', err || verificationResult.message);
+            return callback(err || { status: 400, message: 'Old PIN verification failed' });
+        }
+ 
+        // Proceed to hash and update the new PIN(s)
+        const promises = [];
+ 
+        // Check if LoginPin needs to be updated and hash it
+        if (updateData.loginPin) {
+            const loginPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.loginPin, SALT_ROUNDS, (err, hashedLoginPin) => {
+                    if (err) {
+                        console.error('Error hashing LoginPin:', err); // Log bcrypt hash error
+                        return reject(err);
+                    }
+                    updateData.loginPin = hashedLoginPin; // Replace the plain text PIN with the hashed one
+                    resolve();
+                });
+            });
+            promises.push(loginPinPromise);
+        }
+ 
+        // Check if AlertPin needs to be updated and hash it
+        if (updateData.alertPin) {
+            const alertPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.alertPin, SALT_ROUNDS, (err, hashedAlertPin) => {
+                    if (err) {
+                        console.error('Error hashing AlertPin:', err); // Log bcrypt hash error
+                        return reject(err);
+                    }
+                    updateData.alertPin = hashedAlertPin; // Replace the plain text PIN with the hashed one
+                    resolve();
+                });
+            });
+            promises.push(alertPinPromise);
+        }
+ 
+        // Wait for all PIN updates to complete before updating the customer details
+        Promise.all(promises)
+            .then(() => {
+                CustomerDAO.update(custID_Nr, updateData, (err, result) => {
+                    if (err) {
+                        console.error('Error updating customer:', err); // Log database update error
+                        return callback(err);
+                    }
+                    if (result.affectedRows === 0) {
+                        console.error('Customer not found or no changes made:', custID_Nr); // Log if no changes were made
+                        return callback(new Error('Customer not found or no changes made'));
+                    }
+                    callback(null, { success: true, message: 'Customer details updated successfully' });
+                });
+            })
+            .catch(err => {
+                console.error('Error hashing PIN(s):', err); // Log error for hashing failure
+                return callback({ status: 500, message: 'Error hashing PIN(s)' });
+            });
+    });
+},
+//end of updaATE
+
+
+    //Updated Update Customers
+     
+    updateCustomerDetailsSevice: (custID_Nr, updateData, callback) => {
+        if (!custID_Nr || !updateData) return callback(new Error('Customer ID and update data are required'));
+    
+        // Check if there is a new LoginPin or AlertPin to be updated
+        const promises = [];
+    
+        if (updateData.loginPin) {
+            // Hash the new LoginPin before updating
+            const loginPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.loginPin, SALT_ROUNDS, (err, hashedLoginPin) => {
+                    if (err) return reject(err);
+                    updateData.loginPin = hashedLoginPin; // Replace the loginPin with the hashed version
+                    resolve();
+                });
+            });
+            promises.push(loginPinPromise);
+        }
+    
+        if (updateData.alertPin) {
+            // Hash the new AlertPin before updating
+            const alertPinPromise = new Promise((resolve, reject) => {
+                bcrypt.hash(updateData.alertPin, SALT_ROUNDS, (err, hashedAlertPin) => {
+                    if (err) return reject(err);
+                    updateData.alertPin = hashedAlertPin; // Replace the alertPin with the hashed version
+                    resolve();
+                });
+            });
+            promises.push(alertPinPromise);
+        }
+    
+        // Wait for all hashing promises to complete
+        Promise.all(promises)
+            .then(() => {
+                CustomerDAO.update(custID_Nr, updateData, (err, result) => {
+                    if (err) return callback(err);
+                    if (result.affectedRows === 0) {
+                        return callback(new Error('Customer not found or no changes made'));
+                    }
+                    callback(null, result);
+                });
+            })
+            .catch(err => {
+                console.error('Error hashing pin:', err);
+                return callback({ status: 500, message: 'Error hashing pin' });
+            });
+    },
+    
+/// end of Updated Update Customers 
 
     deleteCustomer: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));
@@ -149,6 +313,39 @@ const CustomerService = {
                     const bankAccountID = bankAccountResult.id;
                     console.log('Bank Account created with ID:', bankAccountID); 
 
+                    //creating a bankcard
+                    const newBankCard = {AccountID: bankAccountID}
+                    if (!newBankCard.AccountID) {
+                        return callback(new Error('Account ID is required'));
+                      }
+                  
+                      // Randomize last 12 digits of card number (first 4 digits are 5478)
+                      const randomCardNumber = '5478' + Math.floor(Math.random() * 1000000000000).toString().padStart(12, '0');
+                  
+                      // Randomize CVV (3-digit number)
+                      const randomCVV = Math.floor(100 + Math.random() * 900).toString();
+                  
+                      // Randomize expiration date (1-5 years in the future)
+                      const currentDate = new Date();
+                      const futureYear = currentDate.getFullYear() + Math.floor(Math.random() * 5) + 1;
+                      const randomExpirationDate = new Date(futureYear, currentDate.getMonth(), currentDate.getDate());
+                  
+                      // Setting defaults for missing fields
+                      newBankCard.CardNumber = randomCardNumber;
+                      newBankCard.CVV = randomCVV;
+                      newBankCard.ExpirationDate = randomExpirationDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+                      newBankCard.IsActive = 1;
+                      newBankCard.CardType = 'debit';
+                     // Active by default
+                  
+                      BankCardDAO.create(newBankCard, (err, cardID) => {
+                        if (err) {
+                          return callback(new Error('Failed to create bank card: ' + err.message));
+                        }
+                        callback(null, cardID); // Return the new CardID
+                      });
+                  
+
                     
                     CustomerDAO.updateFields(customerID, { AccountID: bankAccountID }, (updateErr, updateResult) => {
                         if (updateErr) {
@@ -162,7 +359,9 @@ const CustomerService = {
                         console.log('Customer and bank account successfully created:', customerData.CustID_Nr);
                         callback(null, { message: 'OTP verified, customer and bank account created.' });
                     });
+                
                 });
+               
             });
         } catch (error) {
             console.error('Unexpected error during OTP verification:', error);

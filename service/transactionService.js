@@ -1,122 +1,110 @@
+const NotificationService = require('../service/notificationService');
 const TransactionDAO = require('../DAO/transactionDAO');
-const BankAccountDAO = require('../DAO/bankAccountDAO'); // Using this DAO for bank account operations
-const Transaction = require('../models/transaction'); // Assuming a Transaction model exists
+const BankAccountDAO = require('../DAO/bankAccountDAO');
+const Transaction = require('../models/transaction');
 
 class TransactionService {
+  // Attempt to create a transaction that requires approval
   async processTransaction(cardNumber, pin, transactionType, transactionAmount, locationID) {
     return new Promise((resolve, reject) => {
-      // Step 1: Get Customer by Card Number
       TransactionDAO.getCustomerByCardNumber(cardNumber, (err, customer) => {
-        if (err) {
-          return reject(new Error('Error fetching customer.'));
-        }
-        
-        if (!customer) {
-          return reject(new Error('Customer not found.'));
-        }
+        if (err) return reject(new Error('Error fetching customer.'));
+        if (!customer) return reject(new Error('Customer not found.'));
 
-        // Step 2: Verify PIN
         TransactionDAO.verifyPin(customer.CustID_Nr, pin, (err, isPinValid) => {
-          if (err) {
-            return reject(new Error('Error verifying PIN.'));
-          }
+          if (err) return reject(new Error('Error verifying PIN.'));
+          if (!isPinValid) return reject(new Error('Invalid PIN.'));
 
-          if (!isPinValid) {
-            return reject(new Error('Invalid PIN.'));
-          }
-
-          // Step 3: Validate transaction type before proceeding
           const validTransactionTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
-          if (!validTransactionTypes.includes(transactionType)) {
-            return reject(new Error('Unknown transaction type, transaction aborted.'));
-          }
+          const status = validTransactionTypes.includes(transactionType) ? 'Pending' : 'Completed';
 
-          // Step 4: Create Transaction
-          const transaction = new Transaction(
-            null, // TransactionID will be auto-generated
-            customer.AccountID,
-            transactionType,
-            new Date(),
-            transactionAmount,
-            'Pending', // Initial status of transaction
-            false, // Default for isFraud
-            null  // AdminUserID for review (optional)
-          );
-
-          TransactionDAO.createTransaction(transaction, (err, transactionID) => {
-            if (err) {
-              return reject(new Error('Error creating transaction.'));
-            }
-
-            console.log(`Transaction created with ID: ${transactionID}`);
-            console.log(`AccountID: ${customer.AccountID}, TransactionType: ${transactionType}, Amount: ${transactionAmount}`);
-
-            // Step 5: Update bank account balance based on transaction type
+          if (status === 'Completed') {
+            // If the transaction does not require approval, directly update the balance and save it
             this.updateBankAccountBalance(customer.AccountID, transactionType, transactionAmount)
               .then(() => {
-                resolve(transactionID); // Return transaction ID after successful balance update
+                const transaction = new Transaction(
+                  null,
+                  customer.AccountID,
+                  transactionType,
+                  new Date(),
+                  transactionAmount,
+                  'Completed',
+                  false,
+                  null
+                );
+                return TransactionDAO.createTransaction(transaction, (err, transactionID) => {
+                  if (err) return reject(new Error('Error creating transaction.'));
+                  resolve({ transactionID, message: 'Transaction completed successfully' });
+                });
               })
-              .catch((err) => {
-                console.error('Error updating bank account balance:', err);
-                return reject(new Error('Error updating bank account balance.'));
-              });
-          });
+              .catch((err) => reject(new Error('Error updating bank account balance.')));
+          } else {
+            // If the transaction requires approval, hold off on saving it until approved
+            const pendingTransaction = new Transaction(
+              null,
+              customer.AccountID,
+              transactionType,
+              new Date(),
+              transactionAmount,
+              'Pending',
+              false,
+              null
+            );
+
+            // Save the pending transaction to the database and retrieve its ID
+            TransactionDAO.createPendingTransaction(pendingTransaction, (err, transactionID) => {
+              if (err) return reject(new Error('Error saving pending transaction.'));
+              resolve({ transactionID, message: 'Transaction created and awaiting approval' });
+            });
+          }
         });
       });
     });
   }
 
-  async updateBankAccountBalance(accountID, transactionType, transactionAmount) {
+  // Approve a pending transaction, then save it in the database
+  async approveTransaction(transactionID) {
     try {
-      console.log(`Fetching account balance for AccountID: ${accountID}`);
+      await NotificationService.updateNotificationStatus(transactionID, 'Approved');
 
-      // Fetch the current bank account
+      const transaction = await TransactionDAO.getTransactionById(transactionID);
+      if (!transaction) throw new Error('Transaction not found');
+
+      // Update balance only for withdrawal-type transactions
+      const withdrawalTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
+      if (withdrawalTypes.includes(transaction.TransactionType)) {
+        await this.updateBankAccountBalance(transaction.AccountID, transaction.TransactionType, transaction.Amount);
+      }
+
+      // After updating balance, update status to completed and save in database
+      await TransactionDAO.updateTransactionStatus(transactionID, 'Completed');
+      return { message: 'Transaction approved, processed, and saved to the database', transactionID };
+    } catch (error) {
+      console.error('Error approving transaction:', error);
+      throw new Error('Failed to approve transaction');
+    }
+  }
+
+  // Update bank account balance
+  async updateBankAccountBalance(accountID, transactionType, transactionAmount) {
+    return new Promise((resolve, reject) => {
       BankAccountDAO.getById(accountID, (err, bankAccount) => {
-        if (err) {
-          throw new Error('Failed to retrieve bank account: ' + err.message);
-        }
-
-        if (!bankAccount) {
-          throw new Error('Bank account not found');
-        }
-
-        console.log(`Current balance: ${bankAccount.Balance}`);
+        if (err) return reject(new Error('Failed to retrieve bank account.'));
+        if (!bankAccount) return reject(new Error('Bank account not found'));
 
         let newBalance = bankAccount.Balance;
-
-        // Adjust balance based on transaction type
-        switch (transactionType) {
-          case 'Cash Transfer':
-          case 'EFT':
-          case 'Online Purchase':
-          case 'Cash Payment':
-          case 'Payment Order':
-            newBalance -= transactionAmount;
-            break;
-          default:
-            throw new Error('Unknown transaction type, no balance update should happen.');
+        if (['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'].includes(transactionType)) {
+          newBalance -= transactionAmount;
+        } else {
+          newBalance += transactionAmount;
         }
 
-        console.log(`New balance after ${transactionType}: ${newBalance}`);
-
-        // Update the bank account with the new balance
-        const updateData = { Balance: newBalance };
-        BankAccountDAO.update(accountID, updateData, (err, result) => {
-          if (err) {
-            throw new Error('Failed to update bank account: ' + err.message);
-          }
-
-          if (result) {
-            console.log('Bank account balance updated successfully');
-          } else {
-            throw new Error('Bank account balance update failed');
-          }
+        BankAccountDAO.update(accountID, { Balance: newBalance }, (err, result) => {
+          if (err) return reject(new Error('Failed to update bank account balance.'));
+          resolve();
         });
       });
-    } catch (err) {
-      console.error('Error in updateBankAccountBalance:', err);
-      throw err;
-    }
+    });
   }
 }
 

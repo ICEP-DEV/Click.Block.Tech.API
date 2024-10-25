@@ -1,24 +1,34 @@
-const transactionService = require('../service/transactionService'); // Import the service layer
+const TransactionService = require('../service/transactionService');
 
-// Define the function to handle the transaction
-const handleTransaction = async (req, res) => {
+class TransactionController {
+  async processTransaction(req, res) {
     try {
-        // Extract data from the request body
-        const { cardNumber, pin, transactionType, transactionAmount, locationID } = req.body;
-
-        // Call the service layer to process the transaction
-        const transaction = await transactionService.processTransaction(cardNumber, pin, transactionType, transactionAmount, locationID);
-
-        // Send the successful response
-        res.status(200).json({ message: 'Transaction successful', transaction });
+      const { cardNumber, pin, transactionType, transactionAmount, locationID } = req.body;
+      const result = await TransactionService.processTransaction(cardNumber, pin, transactionType, transactionAmount, locationID);
+      res.status(200).json(result);
     } catch (error) {
-        // Log and send error response
-        console.error('Error processing transaction:', error.message);
-        res.status(500).json({ error: 'Transaction processing failed', details: error.message });
+      res.status(400).json({ error: error.message });
     }
+  }
 
-    
+  async approveTransaction(req, res) {
+    try {
+      const { transactionId, action } = req.body;
+      if (action !== 'approve' && action !== 'decline') {
+        return res.status(400).json({ error: 'Invalid action. Must be "approve" or "decline".' });
+      }
+
+      if (action === 'approve') {
+        const result = await TransactionService.approveTransaction(transactionId);
+        res.status(200).json(result);
+      } else {
+        // Handle decline logic if necessary
+        res.status(200).json({ message: 'Transaction declined.' });
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 }
 
-// Export the controller function
-module.exports = { handleTransaction };
+module.exports = new TransactionController();
