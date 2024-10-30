@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 07, 2024 at 12:06 PM
+-- Generation Time: Oct 30, 2024 at 01:45 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,23 @@ SET time_zone = "+00:00";
 --
 -- Database: `click_block_tech`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `AdminID` char(13) NOT NULL,
+  `LastName` varchar(100) NOT NULL,
+  `FirstName` varchar(100) NOT NULL,
+  `PhoneNumber` varchar(100) NOT NULL,
+  `Address` varchar(255) NOT NULL,
+  `Email` varchar(100) NOT NULL,
+  `DateOfBirth` date NOT NULL,
+  `LoginPin` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -53,19 +70,6 @@ CREATE TABLE `bankaccount` (
   `isActive` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `bankaccount`
---
-
-INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`) VALUES
-(2, '1727681513', NULL, 'Savings', 0.00, '2024-09-30', 1),
-(3, '1727684539', NULL, 'Savings', 0.00, '2024-09-30', 1),
-(4, '1727700053', NULL, 'Savings', 0.00, '2024-09-30', 1),
-(5, '1727702703', NULL, 'Savings', 0.00, '2024-09-30', 1),
-(6, '1727765062', NULL, 'Savings', 0.00, '2024-10-01', 1),
-(7, '1727765769', NULL, 'Savings', 0.00, '2024-10-01', 1),
-(8, '1727766203', NULL, 'Savings', 0.00, '2024-10-01', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -80,6 +84,23 @@ CREATE TABLE `bankcard` (
   `ExpirationDate` date NOT NULL,
   `CVV` varchar(3) NOT NULL,
   `IsActive` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contactmemessage`
+--
+
+CREATE TABLE `contactmemessage` (
+  `MessageID` int(11) NOT NULL,
+  `CustID_Nr` char(13) NOT NULL,
+  `FullNames` varchar(100) NOT NULL,
+  `PhoneNumber` varchar(100) NOT NULL,
+  `Email` varchar(100) NOT NULL,
+  `MessageDescription` varchar(255) DEFAULT NULL,
+  `Status` varchar(10) NOT NULL,
+  `AdminID` char(13) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -103,14 +124,6 @@ CREATE TABLE `customer` (
   `AccountID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `customer`
---
-
-INSERT INTO `customer` (`CustID_Nr`, `LastName`, `FirstName`, `PhoneNumber`, `Address`, `Email`, `DateOfBirth`, `LoginPin`, `AlertPin`, `isVerified`, `PanicButtonStatus`, `AccountID`) VALUES
-('12345576912', 'Icke', 'Adam', '1234567890', '123 Main St', 'blessingsx99@gmail.com', '1990-01-01', '$2b$1', '', 0, 0, 8),
-('12345678412', 'BING', 'CHANDLER', '1234567890', '123 Main St, Cityville', 'jonathanmoatshe@gmail.com', '1990-01-01', '$2b$1', '', 0, 0, 4);
-
 -- --------------------------------------------------------
 
 --
@@ -124,7 +137,9 @@ CREATE TABLE `location` (
   `City` varchar(100) NOT NULL,
   `Province` varchar(100) NOT NULL,
   `PostalCode` varchar(10) DEFAULT NULL,
-  `Country` varchar(100) NOT NULL DEFAULT 'South Africa'
+  `Country` varchar(100) NOT NULL DEFAULT 'South Africa',
+  `latitude` varchar(255) DEFAULT NULL,
+  `longitude` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -176,6 +191,12 @@ CREATE TABLE `transaction` (
 --
 
 --
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`AdminID`);
+
+--
 -- Indexes for table `alert`
 --
 ALTER TABLE `alert`
@@ -196,6 +217,14 @@ ALTER TABLE `bankaccount`
 ALTER TABLE `bankcard`
   ADD PRIMARY KEY (`CardID`),
   ADD KEY `AccountID` (`AccountID`);
+
+--
+-- Indexes for table `contactmemessage`
+--
+ALTER TABLE `contactmemessage`
+  ADD PRIMARY KEY (`MessageID`),
+  ADD KEY `AdminID` (`AdminID`),
+  ADD KEY `CustID_Nr` (`CustID_Nr`);
 
 --
 -- Indexes for table `customer`
@@ -247,13 +276,19 @@ ALTER TABLE `alert`
 -- AUTO_INCREMENT for table `bankaccount`
 --
 ALTER TABLE `bankaccount`
-  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bankcard`
 --
 ALTER TABLE `bankcard`
   MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contactmemessage`
+--
+ALTER TABLE `contactmemessage`
+  MODIFY `MessageID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -295,6 +330,13 @@ ALTER TABLE `alert`
 --
 ALTER TABLE `bankcard`
   ADD CONSTRAINT `bankcard_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `bankaccount` (`AccountID`);
+
+--
+-- Constraints for table `contactmemessage`
+--
+ALTER TABLE `contactmemessage`
+  ADD CONSTRAINT `contactmemessage_ibfk_1` FOREIGN KEY (`AdminID`) REFERENCES `admin` (`AdminID`),
+  ADD CONSTRAINT `contactmemessage_ibfk_2` FOREIGN KEY (`CustID_Nr`) REFERENCES `customer` (`CustID_Nr`);
 
 --
 -- Constraints for table `customer`

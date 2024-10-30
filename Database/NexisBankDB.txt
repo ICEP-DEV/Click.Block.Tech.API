@@ -5,7 +5,19 @@ CREATE TABLE `Location` (
   `City` VARCHAR(100) NOT NULL,
   `Province` VARCHAR(100) NOT NULL,
   `PostalCode` VARCHAR(10) NULL,
-  `Country` VARCHAR(100) NOT NULL DEFAULT 'South Africa'
+  `Country` VARCHAR(100) NOT NULL DEFAULT 'South Africa',
+  `latitude` VARCHAR(255) NULL,
+  `longitude` VARCHAR(255) NULL
+);
+CREATE TABLE `Admin` (
+    `AdminID` CHAR(13) PRIMARY KEY,
+    `LastName` VARCHAR(100) NOT NULL,
+    `FirstName` VARCHAR(100) NOT NULL,
+    `PhoneNumber` VARCHAR(100) NOT NULL,
+    `Address` VARCHAR(255) NOT NULL,
+    `Email` VARCHAR(100) NOT NULL,
+    `DateOfBirth` DATE NOT NULL,
+    `LoginPin` VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE `BankAccount` (
@@ -32,6 +44,18 @@ CREATE TABLE `Customer` (
   `PanicButtonStatus` TINYINT(1) NOT NULL,
   `AccountID` INT NULL,  -- Nullable AccountID
   FOREIGN KEY (`AccountID`) REFERENCES `BankAccount`(`AccountID`)
+);
+CREATE TABLE `ContactMeMessage`(
+    `MessageID` INT AUTO_INCREMENT PRIMARY KEY,
+    `CustID_Nr` CHAR(13) NOT NULL,
+    `FullNames` VARCHAR(100) NOT NULL,
+    `PhoneNumber` VARCHAR(100) NOT NULL,
+    `Email` VARCHAR(100) NOT NULL,
+    `MessageDescription` VARCHAR (255) NULL,
+    `Status` VARCHAR(10) NOT NULL,
+    `AdminID` CHAR(13) NULL,
+    FOREIGN KEY (`AdminID`) REFERENCES `Admin`(`AdminID`),
+    FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`)
 );
 
 CREATE TABLE `BankCard` (
