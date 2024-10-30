@@ -40,6 +40,58 @@ const verifyOtp = (req, res) => {
         res.sendStatus(200).send(result);
     });
 };
+
+//This method is for comparing the Alert PIN with Login PIN and vise versa
+const comparePINS = (req, res) =>{
+    const accountNr = req.params.AccountNr;
+    const pin = req.params.Pin;
+    const bcrypt = require('bcryptjs');
+
+    var accountID = 0;
+    CustomerService.getbyAccountNumber(accountNr,(err, customerByAccNr) => {
+        if(err){
+          return res.status(500).send(err);
+        }
+        if(customerByAccNr){
+        accountID = customerByAccNr.AccountID;
+        //getting customer using the account ID
+        CustomerService.getbyAccountID(accountID, (err, customer) => {
+            if (err) {
+                return res.status(500).send({ error: err.message });
+            }
+    
+            if (customer) {
+                //matching input password with the hashed password
+           
+                bcrypt.compare(pin, customer._LoginPin, (err, result) => {
+                    if (err) {
+                        // Handle error
+                        console.error('Error comparing passwords:', err);
+                        return;
+                    }
+             
+                    if (result) {
+                    // Passwords match, authentication successful
+                    console.log('PINS match');
+                    res.status(200).send(result);
+                    } else {
+                    // Passwords don't match, authentication failed
+                    console.log('PINS dont match');
+                    res.status(200).send(result);
+                    }
+                });
+                
+            }else{
+                res.status(404).send({ error: 'Customer not found' });
+            }
+           
+        });
+        }else{
+          res.status(200).send(null);
+        }
+      });
+
+}
 const getCustomerByAccNr = (req, res) => {
     const accountNr = req.params.AccountNr;
     const loginPin = req.params.LoginPin;
@@ -92,7 +144,7 @@ const getCustomerByAccNr = (req, res) => {
       
 
 
-}
+};
 // Get customer details by CustID_Nr
 const getCustomer = (req, res) => {
     const custID_Nr = req.params.custID_Nr;
@@ -137,6 +189,24 @@ const verifyOldPin = (req, res) => {
     });
 };
  
+//This method is for creating new Alert PIN
+const createAlertPin = (req, res) => {
+    const custID_Nr = req.params.custID_Nr; // Get customer ID from the request params
+    const newAlertPIN =  req.body; // Get oldPin and pinKey from the request body
+ 
+    CustomerService.createCustomerPIN(custID_Nr, newAlertPIN, (err, result) => {
+        if (err) {
+            console.error('Error in updateCustomerDetails:', err); // Log database update error
+            return res.status(500).json({ error: 'Failed to update customer', message: err.message });
+        }
+
+        console.log('Alert PIN created successfully for ID:', custID_Nr); // Log success
+        res.status(200).json({ message: 'Alert PIN created successfully', success: result });
+    });
+};
+ 
+
+//This method is for Updating PINs 
 const updateCustomerDetails = (req, res) => {
     const custID_Nr = req.params.custID_Nr; // Get customer ID from the request params
     const { updateData, oldPin, pinKey } = req.body; // Get oldPin and pinKey from the request body
@@ -173,9 +243,10 @@ module.exports = {
     getAccountID,
     getCustomer,
     getCustomerByAccNr,
-
+    createAlertPin,
     updateCustomerDetails,
-    verifyOldPin
+    verifyOldPin,
+    comparePINS
 
 };
 
