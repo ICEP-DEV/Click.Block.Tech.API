@@ -110,6 +110,8 @@ verifyPin: (custID_Nr, oldPin, pinKey, callback) => {
 },
  
 // Updated Update Customers with Old PIN Verification
+
+//No longer valied Remove it Later/*************************** */
 updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback) => {
     console.log('Verifying old PIN for customer:', custID_Nr);
  
@@ -174,12 +176,13 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             });
     });
 },
+//No longer valied Remove it Later/*************************** */
 //end of updaATE
 
 
     //Updated Update Customers
      
-    updateCustomerDetailsSevice: (custID_Nr, updateData, callback) => {
+    createCustomerPIN: (custID_Nr, updateData, callback) => {
         if (!custID_Nr || !updateData) return callback(new Error('Customer ID and update data are required'));
     
         // Check if there is a new LoginPin or AlertPin to be updated
@@ -188,6 +191,7 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
         if (updateData.loginPin) {
             // Hash the new LoginPin before updating
             const loginPinPromise = new Promise((resolve, reject) => {
+                   
                 bcrypt.hash(updateData.loginPin, SALT_ROUNDS, (err, hashedLoginPin) => {
                     if (err) return reject(err);
                     updateData.loginPin = hashedLoginPin; // Replace the loginPin with the hashed version
@@ -198,6 +202,7 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
         }
     
         if (updateData.alertPin) {
+            console.log(updateData.alertPin)
             // Hash the new AlertPin before updating
             const alertPinPromise = new Promise((resolve, reject) => {
                 bcrypt.hash(updateData.alertPin, SALT_ROUNDS, (err, hashedAlertPin) => {
@@ -373,5 +378,6 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
 function generateRandomAccountNumber() {
     return Date.now().toString();
 }
+
 
 module.exports = CustomerService;
