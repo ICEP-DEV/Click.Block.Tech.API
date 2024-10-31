@@ -1,72 +1,102 @@
 class Admin {
-    constructor(AdminID, Firstname, Email, Role) {
-        this._AdminID = AdminID;
-        this._Firstname = Firstname;
+    constructor(AdminID, LastName, FirstName, PhoneNumber, Address, Email, DateOfBirth, LoginPin) {
+        this._AdminID = AdminID; // Primary Key, immutable
+        this._LastName = LastName;
+        this._FirstName = FirstName;
+        this._PhoneNumber = PhoneNumber;
+        this._Address = Address;
         this._Email = Email;
-        this._Role = Role;
+        this._DateOfBirth = DateOfBirth;
+        this._LoginPin = LoginPin; // Store hashed password
     }
- // ===============================================================================================
- //                                             Setters
-  // ===============================================================================================
 
-    set AdminID(id) {
-        if (typeof id !== 'number' || id <= 0) {
-            throw new Error('AdminID must be a positive number.');
+    //_____________________SETTERS_____________________________________
+    set AdminID(value) {
+        throw new Error('AdminID cannot be modified');
+    }
+
+    set LastName(value) {
+        if (typeof value !== 'string' || value.trim() === '') {
+            throw new Error('LastName must be a non-empty string');
         }
-        this._AdminID = id;
+        this._LastName = value;
     }
 
-    set Firstname(name) {
-        if (typeof name !== 'string' || name.trim() === '') {
-            throw new Error('Firstname must be a non-empty string.');
+    set FirstName(value) {
+        if (typeof value !== 'string' || value.trim() === '') {
+            throw new Error('FirstName must be a non-empty string');
         }
-        this._Firstname = name;
+        this._FirstName = value;
     }
 
-    set Email(email) {
-        const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-        if (!emailPattern.test(email)) {
-            throw new Error('Invalid email format.');
+    set PhoneNumber(value) {
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(value)) {
+            throw new Error('PhoneNumber must be a 10-digit number');
         }
-        this._Email = email;
+        this._PhoneNumber = value;
     }
 
-    set Role(role) {
-        const validRoles = ['admin', 'superadmin'];
-        if (!validRoles.includes(role.toLowerCase())) {
-            throw new Error('Invalid role. Role must be one of the following: admin, superadmin.');
+    set Address(value) {
+        if (typeof value !== 'string' || value.trim() === '') {
+            throw new Error('Address must be a non-empty string');
         }
-        this._Role = role;
+        this._Address = value;
     }
 
-    // ===============================================================================================
-    //                                          Getters
-    // ===============================================================================================
+    set Email(value) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(value)) {
+            throw new Error('Invalid email format');
+        }
+        this._Email = value;
+    }
 
+    set DateOfBirth(value) {
+        if (!(value instanceof Date) || isNaN(value.getTime())) {
+            throw new Error('DateOfBirth must be a valid date');
+        }
+        this._DateOfBirth = value;
+    }
+
+    set LoginPin(value) {
+        if (typeof value !== 'string' || value.length < 4) {
+            throw new Error('LoginPin must be a string with at least 4 characters');
+        }
+        this._LoginPin = value;
+    }
+
+    //_______________________________GETTERS_________________________________
     get AdminID() {
         return this._AdminID;
     }
 
-    get Firstname() {
-        return this._Firstname;
+    get LastName() {
+        return this._LastName;
+    }
+
+    get FirstName() {
+        return this._FirstName;
+    }
+
+    get PhoneNumber() {
+        return this._PhoneNumber;
+    }
+
+    get Address() {
+        return this._Address;
     }
 
     get Email() {
         return this._Email;
     }
 
-    get Role() {
-        return this._Role;
+    get DateOfBirth() {
+        return this._DateOfBirth;
     }
 
-    // Method to display Admin details (excluding sensitive info like password)
-    displayAdminDetails() {
-        return {
-            AdminID: this._AdminID,
-            Firstname: this._Firstname,
-            Email: this._Email,
-            Role: this._Role
-        };
+    get LoginPin() {
+        return this._LoginPin;
     }
 }
 

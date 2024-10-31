@@ -1,19 +1,59 @@
-const AdminDAO = require('../DAO/adminDAO'); // Adjust the path as needed
+const AdminService = require('../service/adminService');
 
-class AdminController {
-    // Get an admin by ID
-    static getAdminById(req, res) {
-        const adminId = req.params.id;
-        AdminDAO.getAdminById(adminId, (err, admin) => {
+const AdminController = {
+    createAdmin: (req, res) => {
+        const adminData = req.body;
+        AdminService.createAdmin(adminData, (err, result) => {
             if (err) {
-                return res.status(500).json({ error: 'Database query failed', details: err.message });
+                return res.status(err.status || 500).json(err);
+            }
+            res.status(201).json(result);
+        });
+    },
+
+    login: (req, res) => {
+        const { Email, LoginPin } = req.body;
+        AdminService.login(Email, LoginPin, (err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json(result);
+        });
+    },
+
+    getAdmin: (req, res) => {
+        const adminID = req.params.id;
+        AdminService.getAdminById(adminID, (err, admin) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
             }
             if (!admin) {
                 return res.status(404).json({ message: 'Admin not found' });
             }
-            res.status(200).json(admin);
+            res.json(admin);
+        });
+    },
+
+    updateAdmin: (req, res) => {
+        const adminID = req.params.id;
+        const updateData = req.body;
+        AdminService.updateAdmin(adminID, updateData, (err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({ message: 'Admin updated successfully', result });
+        });
+    },
+
+    deleteAdmin: (req, res) => {
+        const adminID = req.params.id;
+        AdminService.deleteAdmin(adminID, (err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({ message: 'Admin deleted successfully', result });
         });
     }
-}
+};
 
 module.exports = AdminController;

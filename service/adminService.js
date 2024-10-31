@@ -1,46 +1,64 @@
-const AdminDAO = require('./DAO/adminDAO'); // Adjust the path as needed
-const Admin = require('./models/admin'); // Adjust the path as needed
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const AdminDAO = require('../DAO/adminDAO');
+const jwt = require('jsonwebtoken');
 
-class AdminService {
-   
+const SECRET_KEY = process.env.SECRET_KEY; // Use environment variable for production
 
-    // Get an admin by ID
-    static getAdminById(adminId, callback) {
-        if (!adminId) {
-            return callback(new Error('Admin ID is required'));
-        }
-
-        AdminDAO.getAdminById(adminId, (err, adminData) => {
+const AdminService = {
+    createAdmin: (adminData, callback) => {
+        AdminDAO.checkDuplicate(adminData.Email, (err, isDuplicate) => {
             if (err) {
                 return callback(err);
             }
-            if (!adminData) {
-                return callback(new Error('Admin not found'));
+            if (isDuplicate) {
+                return callback({ status: 400, message: 'Email already exists' });
             }
-            
-            // Create an Admin instance from data
-            const admin = new Admin(adminData.id, adminData.Firstname, adminData.Email, null);
-            admin._PasswordHash = adminData.PasswordHash; // Set the hashed password for comparison purposes
-
-            callback(null, admin.displayAdminDetails());
+            AdminDAO.create(adminData, callback);
         });
-    
-            // Create an Admin instance with the fetched data
-            const admin = new Admin(adminData.id, adminData.Firstname, adminData.Email, null);
-            admin._PasswordHash = adminData.PasswordHash; // Set the hashed password
+    },
 
-            admin.comparePassword(password, (err, isMatch) => {
-                if (err) {
-                    return callback(err);
-                }
-                if (!isMatch) {
-                    return callback(new Error('Invalid email or password'));
-                }
-                callback(null, admin.displayAdminDetails());
-            });
+    login: (email, loginPin, callback) => {
+        if (!email || !loginPin) {
+            return callback({ status: 400, message: 'Email and login PIN are required' });
         }
-};
-    
 
+        AdminDAO.login(email, loginPin, (err, admin) => {
+            if (err) {
+                console.error('Login error:', err);
+                return callback(err);
+            }
+
+            const token = jwt.sign({ adminId: admin.AdminID, role: 'admin' }, SECRET_KEY, {
+                expiresIn: '1h'
+            });
+
+            callback(null, { success: true, message: 'Login successful', token, admin });
+        });
+    },
+
+    getAdminById: (adminID, callback) => {
+        AdminDAO.getById(adminID, callback);
+    },
+
+    updateAdmin: (adminID, updateData, callback) => {
+        if (updateData.LoginPin) {
+            // Hash the new LoginPin before updating
+            bcrypt.hash(updateData.LoginPin, 10, (err, hashedPin) => {
+                if (err) {
+                    return callback({ status: 500, message: 'Error hashing password' });
+                }
+                updateData.LoginPin = hashedPin; // Update to hashed password
+                AdminDAO.updateFields(adminID, updateData, callback);
+            });
+        } else {
+            AdminDAO.updateFields(adminID, updateData, callback);
+        }
+    },
+
+    deleteAdmin: (adminID, callback) => {
+        AdminDAO.delete(adminID, callback);
+    }
+};
 
 module.exports = AdminService;
