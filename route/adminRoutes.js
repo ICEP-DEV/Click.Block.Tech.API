@@ -3,10 +3,12 @@ const router = express.Router();
 const AdminController = require('../controllers/adminController');
 
 // Admin routes
-router.post('/create', AdminController.createAdmin);
-router.post('/login', AdminController.login);
-router.get('/:id', AdminController.getAdmin);
-router.put('/:id', AdminController.updateAdmin);
-router.delete('/:id', AdminController.deleteAdmin);
+router.post('/admin', AdminController.createAdmin);
+router.post('/admin/login', AdminController.login);
+router.get('/admin/:id', AdminController.getAdmin);
+router.put('/admin/:id', AdminController.updateAdmin);
+router.delete('/admin/:id', AdminController.deleteAdmin);
 
 module.exports = router;
+
+

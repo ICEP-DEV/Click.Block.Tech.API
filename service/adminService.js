@@ -3,31 +3,23 @@ const bcrypt = require('bcryptjs');
 const AdminDAO = require('../DAO/adminDAO');
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = process.env.SECRET_KEY; // Use environment variable for production
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const AdminService = {
     createAdmin: (adminData, callback) => {
         AdminDAO.checkDuplicate(adminData.Email, (err, isDuplicate) => {
-            if (err) {
-                return callback(err);
-            }
-            if (isDuplicate) {
-                return callback({ status: 400, message: 'Email already exists' });
-            }
+            if (err) return callback(err);
+            if (isDuplicate) return callback({ status: 400, message: 'Email already exists' });
+
             AdminDAO.create(adminData, callback);
         });
     },
 
     login: (email, loginPin, callback) => {
-        if (!email || !loginPin) {
-            return callback({ status: 400, message: 'Email and login PIN are required' });
-        }
+        if (!email || !loginPin) return callback({ status: 400, message: 'Email and login PIN are required' });
 
         AdminDAO.login(email, loginPin, (err, admin) => {
-            if (err) {
-                console.error('Login error:', err);
-                return callback(err);
-            }
+            if (err) return callback(err);
 
             const token = jwt.sign({ adminId: admin.AdminID, role: 'admin' }, SECRET_KEY, {
                 expiresIn: '1h'
@@ -36,6 +28,9 @@ const AdminService = {
             callback(null, { success: true, message: 'Login successful', token, admin });
         });
     },
+
+ 
+
 
     getAdminById: (adminID, callback) => {
         AdminDAO.getById(adminID, callback);
