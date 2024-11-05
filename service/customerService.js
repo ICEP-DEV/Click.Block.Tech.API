@@ -52,6 +52,7 @@ const CustomerService = {
         CustomerDAO.getById(custID_Nr, callback);
     },
 
+
     updateCustomer: (custID_Nr, updateData, callback) => {
         if (!custID_Nr || !updateData) return callback(new Error('Customer ID and update data are required'));
 
@@ -111,7 +112,6 @@ verifyPin: (custID_Nr, oldPin, pinKey, callback) => {
  
 // Updated Update Customers with Old PIN Verification
 
-//No longer valied Remove it Later/*************************** */
 updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback) => {
     console.log('Verifying old PIN for customer:', custID_Nr);
  
@@ -176,7 +176,7 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             });
     });
 },
-//No longer valied Remove it Later/*************************** */
+
 //end of updaATE
 
 
@@ -300,13 +300,17 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
 
                 const customerID = customerData.CustID_Nr;
                 console.log('Customer created with ID:', customerID);
-
+                const cardExpirDate = new Date();
+                cardExpirDate.setFullYear(cardExpirDate.getFullYear() + 7);
                 const newBankAccount = {
                     AccountNr: generateRandomAccountNumber(),
                     AccountType: 'Savings',
+                    ExpirationDate: cardExpirDate,
                     Balance: 0,
                     CreationDate: new Date(),
-                    isActive: 1
+                    isActive: 1,
+
+
                 };
 
                 BankAccountDAO.create(newBankAccount, (accountErr, bankAccountResult) => {
