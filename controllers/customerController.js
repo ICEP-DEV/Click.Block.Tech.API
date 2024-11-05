@@ -92,6 +92,57 @@ const comparePINS = (req, res) =>{
       });
 
 }
+
+const comparePINSAlert = (req, res) =>{
+    const accountNr = req.params.AccountNr;
+    const pin = req.params.Pin;
+    const bcrypt = require('bcryptjs');
+
+    var accountID = 0;
+    CustomerService.getbyAccountNumber(accountNr,(err, customerByAccNr) => {
+        if(err){
+          return res.status(500).send(err);
+        }
+        if(customerByAccNr){
+        accountID = customerByAccNr.AccountID;
+        //getting customer using the account ID
+        CustomerService.getbyAccountID(accountID, (err, customer) => {
+            if (err) {
+                return res.status(500).send({ error: err.message });
+            }
+    
+            if (customer) {
+                //matching input password with the hashed password
+           
+                bcrypt.compare(pin, customer._AlertPin, (err, result) => {
+                    if (err) {
+                        // Handle error
+                        console.error('Error comparing passwords:', err);
+                        return;
+                    }
+             
+                    if (result) {
+                    // Passwords match, authentication successful
+                    console.log('PINS match');
+                    res.status(200).send(result);
+                    } else {
+                    // Passwords don't match, authentication failed
+                    console.log('PINS dont match');
+                    res.status(200).send(result);
+                    }
+                });
+                
+            }else{
+                res.status(404).send({ error: 'Customer not found' });
+            }
+           
+        });
+        }else{
+          res.status(200).send(null);
+        }
+      });
+
+}
 const getCustomerByAccNr = (req, res) => {
     const accountNr = req.params.AccountNr;
     const loginPin = req.params.LoginPin;
@@ -204,6 +255,19 @@ const createAlertPin = (req, res) => {
         res.status(200).json({ message: 'Alert PIN created successfully', success: result });
     });
 };
+//This method i for updating customer details
+const updatePanicStatus = (req, res) =>{
+    const custID_Nr = req.params.custID_Nr;
+    const newPanicStatus = req.body;
+    CustomerService.updateCustomer(custID_Nr,newPanicStatus,(err, result) =>{
+        if(err){
+            console.error('Error updating Panic button status:', err);
+            return res.status(500).json({error: 'Failed to update customer Panic Button Status'});
+        }
+        console.log('Panic Button Status updated successfully for ID: ', custID_Nr);
+        res.status(200).json({message: 'Panic Button Status updated'});
+    });
+}
  
 
 //This method is for Updating PINs 
@@ -246,7 +310,9 @@ module.exports = {
     createAlertPin,
     updateCustomerDetails,
     verifyOldPin,
-    comparePINS
+    comparePINS,
+    comparePINSAlert,
+    updatePanicStatus
 
 };
 

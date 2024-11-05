@@ -142,6 +142,7 @@ const CustomerDAO = {
     const sql = 'UPDATE customer SET ? WHERE CustID_Nr = ?';
     db.query(sql, [updateData, custID_Nr], callback); // Update customer info
   },
+  
 
   delete: (custID_Nr, callback) => {
     const sql = 'DELETE FROM customer WHERE CustID_Nr = ?';

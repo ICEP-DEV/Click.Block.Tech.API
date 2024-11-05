@@ -6,6 +6,7 @@ const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const path = require('path');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
 const bankCardRoutes =  require('./route/bankCardRoutes'); 
+const alertRoutes = require('./route/alertRoutes');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use('/api', supportingDocumentRoutes);
 // Use bankAccount routes
 app.use('/api', bankAccountRoutes);
 
-
+app.use('/api',alertRoutes);
 //Use BankCard Routes
 app.use('/api', bankCardRoutes);
 
