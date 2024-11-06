@@ -2,7 +2,8 @@ const db = require('../config/config');
 const BankAccount = require('../models/bankAccount'); // Assuming this model exists
 
 const TransactionDAO = {
-  getCustomerByCardNumber: (cardNumber, callback) => {
+  getCustomerByCardNumber: (cardNumber, callback = () => {}) => {
+    console.log('Calling getCustomerByCardNumber with card number:', cardNumber);
     const query = `SELECT c.CustID_Nr, c.AccountID
                    FROM customer c 
                    JOIN bankcard bc ON c.AccountID = bc.AccountID 
@@ -25,7 +26,8 @@ const TransactionDAO = {
     });
   },
 
-  verifyPin: (customerID, pin, callback) => {
+  verifyPin: (customerID, pin, callback = () => {}) => {
+    console.log('Verifying PIN for customerID:', customerID);
     const query = 'SELECT LoginPin FROM customer WHERE CustID_Nr = ? AND LoginPin = ?';
 
     db.query(query, [customerID, pin], (err, result) => {
@@ -44,7 +46,8 @@ const TransactionDAO = {
     });
   },
 
-  createPendingTransaction: (transactionData, callback) => {
+  createPendingTransaction: (transactionData, callback = () => {}) => {
+    console.log('Creating pending transaction with data:', transactionData);
     const query = 'INSERT INTO transaction SET ?';
 
     db.query(query, transactionData, (err, result) => {
@@ -56,9 +59,10 @@ const TransactionDAO = {
         console.log("Pending transaction created successfully:", result);
         callback(null, result.insertId); // Return the newly created transaction ID
     });
-},
+  },
 
-  createTransaction: (transactionData, callback) => {
+  createTransaction: (transactionData, callback = () => {}) => {
+    console.log('Creating transaction with data:', transactionData);
     const query = 'INSERT INTO transaction SET ?';
 
     db.query(query, transactionData, (err, result) => {
@@ -72,7 +76,8 @@ const TransactionDAO = {
     });
   },
 
-  updateTransactionStatus: (transactionId, status, callback) => {
+  updateTransactionStatus: (transactionId, status, callback = () => {}) => {
+    console.log('Updating transaction status for transactionId:', transactionId, 'to status:', status);
     const query = 'UPDATE transaction SET status = ? WHERE transactionId = ?';
 
     db.query(query, [status, transactionId], (err, result) => {
@@ -86,27 +91,32 @@ const TransactionDAO = {
     });
   },
 
-  getTransactionById: (transactionId, callback) => {
+  getTransactionById: (transactionId, callback = null) => {
+    console.log('Getting transaction by ID:', transactionId); // Log the transactionId value
     const query = 'SELECT * FROM transaction WHERE transactionId = ?';
-
+  
     db.query(query, [transactionId], (err, result) => {
       if (err) {
         console.error('Error retrieving transaction by ID:', err);
-        return callback({ status: 500, message: 'Database error' });
+        if (callback) callback({ status: 500, message: 'Database error' });
+        return;
       }
-
+  
+      console.log('Query result:', result); // Log the query result for debugging
+  
       if (result.length > 0) {
-        console.log("Transaction found:", result[0]);
-        callback(null, result[0]); // Return the transaction if found
+        console.log('Transaction found 666666666:', result[0]);
+        if (callback) callback(null, result[0]); // Use callback if provided
       } else {
-        console.log("No transaction found with this ID.");
-        callback(null, null); // Return null if no result is found
+        console.log('No transaction found with this ID.');
+        if (callback) callback(null, null); // Use callback if provided
       }
     });
   },
+  
 
-  // Example method to get a bank account by ID (you can modify as needed)
-  getBankAccountById: (accountId, callback) => {
+  getBankAccountById: (accountId, callback = () => {}) => {
+    console.log('Getting bank account by AccountID:', accountId);
     const query = 'SELECT * FROM bankaccount WHERE AccountID = ?';
 
     db.query(query, [accountId], (err, result) => {
@@ -125,8 +135,8 @@ const TransactionDAO = {
     });
   },
 
-  // Example method to update the bank account balance
-  updateBankAccountBalance: (accountId, newBalance, callback) => {
+  updateBankAccountBalance: (accountId, newBalance, callback = () => {}) => {
+    console.log('Updating bank account balance for AccountID:', accountId, 'to new balance:', newBalance);
     const query = 'UPDATE bankaccount SET Balance = ? WHERE AccountID = ?';
 
     db.query(query, [newBalance, accountId], (err, result) => {
