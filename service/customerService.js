@@ -385,23 +385,23 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
 
         BankAccountDAO.countAllAccounts((err, total) => {
             if (err) return callback(err);
-            stats.totalAccounts = total;
+            stats.TotalAccounts = total;
 
             BankAccountDAO.countActiveAccounts((err, active) => {
                 if (err) return callback(err);
-                stats.activeAccounts = active;
+                stats.ActiveAccounts = active;
 
                 BankAccountDAO.countFrozenAccounts((err, frozen) => {
                     if (err) return callback(err);
-                    stats.frozenAccounts = frozen;
+                    stats.FrozenAccounts = frozen;
 
                     BankAccountDAO.countDeactivatedAccounts((err, deactivated) => {
                         if (err) return callback(err);
-                        stats.deactivatedAccounts = deactivated;
+                        stats.DeactivatedAccounts = deactivated;
 
                         BankAccountDAO.countRestoredAccounts((err, restored) => {
                             if (err) return callback(err);
-                            stats.restoredAccounts = restored;
+                            stats.RestoredAccounts = restored;
 
                             callback(null, stats);
                         });
