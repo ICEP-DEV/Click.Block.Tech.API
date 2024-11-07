@@ -29,7 +29,9 @@ const BankAccountDAO = {
           result[0].AccountType,
           result[0].Balance,
           result[0].CreationDate,
-          result[0].isActive
+          result[0].isActive,
+          result[0].LastModified,        
+          result[0].RestorationCount     
         );
         return callback(null, bankAccount);
       }
@@ -50,7 +52,9 @@ const BankAccountDAO = {
         result[0].AccountType,
         result[0].Balance,
         result[0].CreationDate,
-        result[0].isActive
+        result[0].isActive,
+        result[0].LastModified,        
+        result[0].RestorationCount  
       ) : null);
     });
   },
@@ -75,6 +79,17 @@ const BankAccountDAO = {
     });
   },
   //Methods to do calculations for dashboard statistics 
+
+  updateLastModified: (accountID, callback) => {
+    const sql = 'UPDATE bankaccount SET lastModified = NOW() WHERE AccountID = ?';
+    db.query(sql, [accountID], (err, result) => {
+        if (err) {
+            return callback(new Error('Failed to update lastModified: ' + err.message));
+        }
+        callback(null, result.affectedRows > 0);
+    });
+},
+
   countAllAccounts: (callback) => {
     const query = 'SELECT COUNT(*) AS total FROM bankaccount';
     db.query(query, (err, results) => {
@@ -109,20 +124,28 @@ countDeactivatedAccounts: (callback) => {
     });
 },
 countRestoredAccounts: (callback) => {
-    const query = `
-        SELECT COUNT(*) AS restored
-        FROM bankaccount
-        WHERE isActive = 1 AND AccountID IN (
-            SELECT AccountID
-            FROM account_status_changes
-            WHERE previousStatus = 0 AND currentStatus = 1
-        )
-    `;
-    db.query(query, (err, results) => {
-        if (err) return callback(err);
-        callback(null, results[0].restored);
-    });
-}
+  const query = 'SELECT SUM(restorationCount) AS restored FROM bankaccount WHERE restorationCount > 0';
+  db.query(query, (err, results) => {
+      if (err) return callback(err);
+      callback(null, results[0].restored);
+  });
+},
+
+restoreAccount: (accountID, callback) => {
+  const sql = `
+      UPDATE bankaccount 
+      SET isActive = 1, 
+          lastModified = NOW(), 
+          restorationCount = restorationCount + 1 
+      WHERE AccountID = ? AND isActive = 0
+  `;
+  db.query(sql, [accountID], (err, result) => {
+      if (err) {
+          return callback(new Error('Failed to restore account: ' + err.message));
+      }
+      callback(null, result.affectedRows > 0);
+  });
+},
 };
 
 

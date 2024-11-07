@@ -1,5 +1,5 @@
 class BankAccount {
-  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive) {
+  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive , lastModified, restorationCount) {
     this._AccountID = AccountID;        // Unique identifier for the account
     this._AccountNr = AccountNr;        // Account number (9-digit random number)
     this._ExpirationDate = ExpirationDate;
@@ -7,6 +7,8 @@ class BankAccount {
     this._Balance = Balance;
     this._CreationDate = CreationDate;
     this._isActive = isActive;
+    this.LastModified = LastModified;           // New field for last modified timestamp
+   this.RestorationCount =RestorationCount;   // New field for restoration count
   }
 
   //_____________________SETTERS_____________________________________
