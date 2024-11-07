@@ -1,5 +1,7 @@
 const db = require('../config/config');
 const BankAccount = require('../models/bankAccount');
+const Customer = require('../models/customer');
+
 
 const BankAccountDAO = {
   create: (accountData, callback) => {
@@ -74,28 +76,33 @@ const BankAccountDAO = {
   },
   //Methods to do calculations for dashboard statistics 
   countAllAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS total FROM bank_accounts';
+    const query = 'SELECT COUNT(*) AS total FROM bankaccount';
     db.query(query, (err, results) => {
         if (err) return callback(err);
         callback(null, results[0].total);
     });
 },
 countActiveAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS active FROM bank_accounts WHERE isActive = 1';
+    const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     db.query(query, (err, results) => {
         if (err) return callback(err);
         callback(null, results[0].active);
     });
 },
 countFrozenAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS frozen FROM bank_accounts WHERE isActive = 0 AND AlertPin IS NOT NULL';
-    db.query(query, (err, results) => {
-        if (err) return callback(err);
-        callback(null, results[0].frozen);
-    });
+  const query = `
+      SELECT COUNT(*) AS frozen 
+      FROM bankaccount 
+      INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
+      WHERE bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1
+  `;
+  db.query(query, (err, results) => {
+      if (err) return callback(err);
+      callback(null, results[0].frozen);
+  });
 },
 countDeactivatedAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS deactivated FROM bank_accounts WHERE isActive = 0';
+    const query = 'SELECT COUNT(*) AS deactivated FROM bankaccount WHERE isActive = 0';
     db.query(query, (err, results) => {
         if (err) return callback(err);
         callback(null, results[0].deactivated);
@@ -104,7 +111,7 @@ countDeactivatedAccounts: (callback) => {
 countRestoredAccounts: (callback) => {
     const query = `
         SELECT COUNT(*) AS restored
-        FROM bank_accounts
+        FROM bankaccount
         WHERE isActive = 1 AND AccountID IN (
             SELECT AccountID
             FROM account_status_changes
