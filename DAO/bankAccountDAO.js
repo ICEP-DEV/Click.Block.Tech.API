@@ -71,7 +71,51 @@ const BankAccountDAO = {
       }
       callback(null, result.affectedRows > 0); 
     });
-  }
+  },
+  //Methods to do calculations for dashboard statistics 
+  countAllAccounts: (callback) => {
+    const query = 'SELECT COUNT(*) AS total FROM bank_accounts';
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0].total);
+    });
+},
+countActiveAccounts: (callback) => {
+    const query = 'SELECT COUNT(*) AS active FROM bank_accounts WHERE isActive = 1';
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0].active);
+    });
+},
+countFrozenAccounts: (callback) => {
+    const query = 'SELECT COUNT(*) AS frozen FROM bank_accounts WHERE isActive = 0 AND AlertPin IS NOT NULL';
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0].frozen);
+    });
+},
+countDeactivatedAccounts: (callback) => {
+    const query = 'SELECT COUNT(*) AS deactivated FROM bank_accounts WHERE isActive = 0';
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0].deactivated);
+    });
+},
+countRestoredAccounts: (callback) => {
+    const query = `
+        SELECT COUNT(*) AS restored
+        FROM bank_accounts
+        WHERE isActive = 1 AND AccountID IN (
+            SELECT AccountID
+            FROM account_status_changes
+            WHERE previousStatus = 0 AND currentStatus = 1
+        )
+    `;
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0].restored);
+    });
+}
 };
 
 

@@ -376,6 +376,39 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             console.error('Unexpected error during OTP verification:', error);
             callback({ status: 500, message: 'Unexpected server error' });
         }
+    },
+
+    //function that calls each of these DAO methods for admin dashboard stats
+
+    getAccountStatistics: (callback) => {
+        const stats = {};
+
+        BankAccountDAO.countAllAccounts((err, total) => {
+            if (err) return callback(err);
+            stats.totalAccounts = total;
+
+            BankAccountDAO.countActiveAccounts((err, active) => {
+                if (err) return callback(err);
+                stats.activeAccounts = active;
+
+                BankAccountDAO.countFrozenAccounts((err, frozen) => {
+                    if (err) return callback(err);
+                    stats.frozenAccounts = frozen;
+
+                    BankAccountDAO.countDeactivatedAccounts((err, deactivated) => {
+                        if (err) return callback(err);
+                        stats.deactivatedAccounts = deactivated;
+
+                        BankAccountDAO.countRestoredAccounts((err, restored) => {
+                            if (err) return callback(err);
+                            stats.restoredAccounts = restored;
+
+                            callback(null, stats);
+                        });
+                    });
+                });
+            });
+        });
     }
 };
 
