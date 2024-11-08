@@ -67,7 +67,9 @@ CREATE TABLE `bankaccount` (
   `AccountType` varchar(50) NOT NULL,
   `Balance` decimal(10,2) NOT NULL,
   `CreationDate` date NOT NULL,
-  `isActive` tinyint(4) NOT NULL
+  `isActive` tinyint(4) NOT NULL,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `RestorationCount` INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

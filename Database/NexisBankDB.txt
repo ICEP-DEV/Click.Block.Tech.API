@@ -27,7 +27,9 @@ CREATE TABLE `BankAccount` (
   `AccountType` VARCHAR(50) NOT NULL,
   `Balance` DECIMAL(10, 2) NOT NULL,
   `CreationDate` DATE NOT NULL,
-  `isActive` TINYINT NOT NULL
+  `isActive` TINYINT NOT NULL,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `RestorationCount` INT DEFAULT 0
 );
 
 CREATE TABLE `Customer` (
