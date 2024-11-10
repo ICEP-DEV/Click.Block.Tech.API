@@ -2,16 +2,15 @@ const db = require('../config/config');
 const BankAccount = require('../models/bankAccount');
 const Customer = require('../models/customer');
 
-
 const BankAccountDAO = {
   create: (accountData, callback) => {
     const sql = 'INSERT INTO bankaccount SET ?';
     db.query(sql, accountData, (err, result) => {
       if (err) {
+        console.error(err); // Added detailed error logging
         return callback(new Error('Failed to create account: ' + err.message));
       }
       callback(null, { id: result.insertId, ...accountData });
-      console.log(result.insertId);
     });
   },
 
@@ -19,6 +18,7 @@ const BankAccountDAO = {
     const sql = 'SELECT * FROM bankaccount WHERE AccountID = ?';
     db.query(sql, [accountID], (err, result) => {
       if (err) {
+        console.error(err);
         return callback(new Error('Failed to retrieve account: ' + err.message));
       }
       if (result.length > 0) {
@@ -30,12 +30,12 @@ const BankAccountDAO = {
           result[0].Balance,
           result[0].CreationDate,
           result[0].isActive,
-          result[0].LastModified,        
-          result[0].RestorationCount     
+          result[0].LastModified,
+          result[0].RestorationCount
         );
         return callback(null, bankAccount);
       }
-      callback(null, null); 
+      callback(null, null);
     });
   },
 
@@ -43,6 +43,7 @@ const BankAccountDAO = {
     const sql = 'SELECT * FROM bankaccount WHERE AccountNr = ?';
     db.query(sql, [accountNr], (err, result) => {
       if (err) {
+        console.error(err);
         return callback(new Error('Failed to retrieve account by number: ' + err.message));
       }
       callback(null, result.length > 0 ? new BankAccount(
@@ -53,8 +54,8 @@ const BankAccountDAO = {
         result[0].Balance,
         result[0].CreationDate,
         result[0].isActive,
-        result[0].LastModified,        
-        result[0].RestorationCount  
+        result[0].LastModified,
+        result[0].RestorationCount
       ) : null);
     });
   },
@@ -63,9 +64,10 @@ const BankAccountDAO = {
     const sql = 'UPDATE bankaccount SET ? WHERE AccountID = ?';
     db.query(sql, [updateData, accountID], (err, result) => {
       if (err) {
+        console.error(err);
         return callback(new Error('Failed to update account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); 
+      callback(null, result.affectedRows > 0);
     });
   },
 
@@ -73,81 +75,136 @@ const BankAccountDAO = {
     const sql = 'DELETE FROM bankaccount WHERE AccountID = ?';
     db.query(sql, [accountID], (err, result) => {
       if (err) {
+        console.error(err);
         return callback(new Error('Failed to delete account: ' + err.message));
       }
-      callback(null, result.affectedRows > 0); 
+      callback(null, result.affectedRows > 0);
     });
   },
-  //Methods to do calculations for dashboard statistics 
 
   updateLastModified: (accountID, callback) => {
     const sql = 'UPDATE bankaccount SET lastModified = NOW() WHERE AccountID = ?';
     db.query(sql, [accountID], (err, result) => {
         if (err) {
+            console.error(err);
             return callback(new Error('Failed to update lastModified: ' + err.message));
         }
         callback(null, result.affectedRows > 0);
     });
-},
+  },
 
   countAllAccounts: (callback) => {
     const query = 'SELECT COUNT(*) AS total FROM bankaccount';
     db.query(query, (err, results) => {
-        if (err) return callback(err);
+        if (err) {
+            console.error(err);
+            return callback(err);
+        }
         callback(null, results[0].total);
     });
-},
-countActiveAccounts: (callback) => {
+  },
+
+  countActiveAccounts: (callback) => {
     const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     db.query(query, (err, results) => {
-        if (err) return callback(err);
+        if (err) {
+            console.error(err);
+            return callback(err);
+        }
         callback(null, results[0].active);
     });
-},
-countFrozenAccounts: (callback) => {
-  const query = `
+  },
+
+  countFrozenAccounts: (callback) => {
+    const query = `
       SELECT COUNT(*) AS frozen 
       FROM bankaccount 
       INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
       WHERE bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1
-  `;
-  db.query(query, (err, results) => {
-      if (err) return callback(err);
+    `;
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error(err);
+        return callback(err);
+      }
       callback(null, results[0].frozen);
-  });
-},
-countDeactivatedAccounts: (callback) => {
+    });
+  },
+
+  countDeactivatedAccounts: (callback) => {
     const query = 'SELECT COUNT(*) AS deactivated FROM bankaccount WHERE isActive = 0';
     db.query(query, (err, results) => {
-        if (err) return callback(err);
+        if (err) {
+            console.error(err);
+            return callback(err);
+        }
         callback(null, results[0].deactivated);
     });
-},
-countRestoredAccounts: (callback) => {
-  const query = 'SELECT SUM(restorationCount) AS restored FROM bankaccount WHERE restorationCount > 0';
-  db.query(query, (err, results) => {
-      if (err) return callback(err);
-      callback(null, results[0].restored);
-  });
-},
+  },
 
-restoreAccount: (accountID, callback) => {
-  const sql = `
+  countRestoredAccounts: (callback) => {
+    const query = 'SELECT SUM(restorationCount) AS restored FROM bankaccount WHERE restorationCount > 0';
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error(err);
+            return callback(err);
+        }
+        callback(null, results[0].restored);
+    });
+  },
+
+  restoreAccount: (accountID, callback) => {
+    const sql = `
       UPDATE bankaccount 
       SET isActive = 1, 
           lastModified = NOW(), 
           restorationCount = restorationCount + 1 
       WHERE AccountID = ? AND isActive = 0
-  `;
-  db.query(sql, [accountID], (err, result) => {
+    `;
+    db.query(sql, [accountID], (err, result) => {
       if (err) {
+          console.error(err);
           return callback(new Error('Failed to restore account: ' + err.message));
       }
       callback(null, result.affectedRows > 0);
-  });
-},
+    });
+  },
+
+  getAccountActions: (callback) => {
+    const query = `
+      SELECT 
+          bankaccount.AccountNr AS CustomerAccountNumber,
+          CASE 
+              WHEN bankaccount.isActive = 1 THEN 'Activated Account'
+              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen Account'
+              WHEN bankaccount.isActive = 0 THEN 'Inactive Account'
+          END AS ActionType,
+          bankaccount.LastModified AS DateTime,
+          CASE 
+              WHEN bankaccount.isActive = 1 THEN 'Active'
+              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen'
+              ELSE 'Inactive'
+          END AS AccountStatus,
+          CASE 
+              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Automation'
+              ELSE customer.FirstName
+          END AS PerformedBy
+      FROM 
+          bankaccount
+      JOIN 
+          customer ON bankaccount.AccountID = customer.AccountID;
+    `;
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error(err);
+        return callback(new Error('Failed to retrieve account actions: ' + err.message));
+      }
+      if (results.length === 0) {
+        return callback(null, { message: 'No account actions found' });
+      }
+      callback(null, results);
+    });
+  },
 };
-
-
 
 module.exports = BankAccountDAO;

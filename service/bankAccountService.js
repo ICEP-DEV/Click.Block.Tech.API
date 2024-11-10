@@ -12,7 +12,7 @@ const BankAccountService = {
       return Math.floor(100000000 + Math.random() * 900000000).toString();
     };
 
-    // Recursive function to check for uniqueness of AccountNr and insert the account
+    // Function to check uniqueness and insert the account
     const checkAndInsertAccount = () => {
       const generatedAccountNr = generateUniqueAccountNr();
 
@@ -21,7 +21,7 @@ const BankAccountService = {
         if (err) return callback(err);
 
         if (result) {
-          // If the AccountNr exists, recursively generate a new one
+          // If AccountNr exists, recursively generate a new one
           checkAndInsertAccount();
         } else {
           // If AccountNr is unique, proceed with the account creation
@@ -58,6 +58,9 @@ const BankAccountService = {
       if (err) {
         return callback(new Error('Failed to retrieve account: ' + err.message));
       }
+      if (!result) {
+        return callback(new Error('Account not found'));
+      }
       callback(null, result);
     });
   },
@@ -66,29 +69,33 @@ const BankAccountService = {
     if (!accountID || !updateData) {
       return callback(new Error('Account ID and update data are required'));
     }
-  
+
     BankAccountDAO.update(accountID, updateData, (err, result) => {
       if (err) {
         return callback(new Error('Failed to update account: ' + err.message));
       }
+      if (!result) {
+        return callback(new Error('Account update failed'));
+      }
       callback(null, result); // Pass the result directly since it's already a boolean.
     });
   },
-  
 
   deleteAccount: (accountID, callback) => {
     if (!accountID) {
       return callback(new Error('Account ID is required'));
     }
-  
+
     BankAccountDAO.delete(accountID, (err, result) => {
       if (err) {
         return callback(new Error('Failed to delete account: ' + err.message));
       }
+      if (!result) {
+        return callback(new Error('Account deletion failed'));
+      }
       callback(null, result); // Since `result` is already a boolean (true/false), pass it directly.
     });
   },
-  
 
   deposit: (accountID, amount, callback) => {
     if (!accountID || amount <= 0) {
@@ -126,6 +133,18 @@ const BankAccountService = {
       });
     });
   },
+
+  getAccountActions: (callback) => {
+    BankAccountDAO.getAccountActions((err, results) => {
+      if (err) {
+        return callback(new Error('Failed to retrieve account actions: ' + err.message));
+      }
+      if (!results || results.length === 0) {
+        return callback(new Error('No account actions found'));
+      }
+      callback(null, results);
+    });
+  }
 };
 
 module.exports = BankAccountService;
