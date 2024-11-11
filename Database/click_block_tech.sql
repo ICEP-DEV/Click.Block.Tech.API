@@ -48,7 +48,7 @@ CREATE TABLE `alert` (
   `AlertID` int(11) NOT NULL,
   `CustID_Nr` char(13) NOT NULL,
   `AlertType` varchar(50) NOT NULL,
-  `SentDate` date NOT NULL,
+  `SentDate` timestamp NOT NULL,
   `LocationID` int(11) NOT NULL,
   `Receiver` varchar(255) NOT NULL,
   `Message` text DEFAULT NULL

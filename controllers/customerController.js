@@ -72,11 +72,11 @@ const comparePINS = (req, res) =>{
              
                     if (result) {
                     // Passwords match, authentication successful
-                    console.log('PINS match');
+                    console.log('Remote PINS match');
                     res.status(200).send(result);
                     } else {
                     // Passwords don't match, authentication failed
-                    console.log('PINS dont match');
+                    console.log('Remote PINS dont match');
                     res.status(200).send(result);
                     }
                 });
@@ -123,11 +123,11 @@ const comparePINSAlert = (req, res) =>{
              
                     if (result) {
                     // Passwords match, authentication successful
-                    console.log('PINS match');
+                    console.log('Alert PINS match');
                     res.status(200).send(result);
                     } else {
                     // Passwords don't match, authentication failed
-                    console.log('PINS dont match');
+                    console.log('Alert PINS dont match');
                     res.status(200).send(result);
                     }
                 });
