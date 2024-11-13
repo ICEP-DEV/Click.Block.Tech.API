@@ -115,8 +115,11 @@ class TransactionService {
                                 return callback(new Error(`No transaction found with ID ${transactionID}`));
                             }
                             console.log('Transaction status updated to Completed');
-                            callback(null, { message: 'Transaction approved, processed, and saved to the database', transactionID });
-                        });
+
+                            if(callback){
+                              callback(null, { message: 'Transaction approved, processed, and saved to the database', transactionID });
+                           }
+                          });
                     });
                 } else {
                     // If it's not a withdrawal type, directly update status to 'Completed'

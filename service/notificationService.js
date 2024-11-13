@@ -14,7 +14,7 @@ class NotificationService {
             }
 
             console.log(`Notification status updated successfully for Transaction ID: ${transactionId}`);
-            console.log("hello fucken world777!!!!!");
+       
             return result;
             
         } catch (error) {
