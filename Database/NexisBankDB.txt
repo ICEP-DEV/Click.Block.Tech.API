@@ -103,6 +103,13 @@ CREATE TABLE `Alert` (
   FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`),
   FOREIGN KEY (`LocationID`) REFERENCES `Location`(`LocationID`)
 );
+CREATE TABLE `alertpinlogs` (
+  `LogID` int(11) NOT NULL,
+  `CustID_Nr` char(13) NOT NULL,
+  `TriggerDate` datetime DEFAULT current_timestamp(),
+  `Action` varchar(50) DEFAULT NULL,
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`)
+);
 
 CREATE TABLE `Notification` (
   `NotificationID` INT AUTO_INCREMENT PRIMARY KEY,
