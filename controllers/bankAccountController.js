@@ -61,14 +61,37 @@ const deleteAccount = (req, res) => {
   });
 };
 
+
+
+
+// const getAccountActions = (req, res) => {
+//   BankAccountService.getAccountActions((err, results) => {
+//     if (err) {
+//       console.error('Error in getAccountActions:', err);
+//       return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
+//     }
+//     res.status(200).json(results);
+//   });
+// };
+
+
 const getAccountActions = (req, res) => {
-  BankAccountService.getAccountActions((err, results) => {
+  const accountID = req.params.accountID;
+
+  console.log('Fetching account with ID:', accountID);
+
+  BankAccountService.getAccountActions(accountID, (err, result) => {
     if (err) {
       console.error('Error in getAccountActions:', err);
-      return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
+      return res.status(500).json({ error: 'Failed to fetch account', message: err.message });
     }
-    res.status(200).json(results);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ error: 'Account not found' });
+    }
   });
 };
+
 
 module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions };

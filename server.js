@@ -7,8 +7,8 @@ const path = require('path');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
 const bankCardRoutes =  require('./route/bankCardRoutes'); 
 const alertPinLogRoutes = require('./route/alertPinLogRoutes');
-
 const adminRoutes = require('./route/adminRoutes');
+const contactMeMessageRoutes = require('./route/contactMeMessageRoute');
 
 const alertRoutes = require('./route/alertRoutes');
 
@@ -33,6 +33,8 @@ app.use('/api', bankCardRoutes);
 
 //alert pin stats route
 app.use('/api', alertPinLogRoutes);
+app.use('/api', contactMeMessageRoutes);
+
 
 
 

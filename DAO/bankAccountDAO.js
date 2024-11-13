@@ -170,41 +170,40 @@ const BankAccountDAO = {
     });
   },
 
-  getAccountActions: (callback) => {
+  getAllAccounts: (callback) => {
     const query = `
-      SELECT 
-          bankaccount.AccountNr AS CustomerAccountNumber,
-          CASE 
-              WHEN bankaccount.isActive = 1 THEN 'Activated Account'
-              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen Account'
-              WHEN bankaccount.isActive = 0 THEN 'Inactive Account'
-          END AS ActionType,
-          bankaccount.LastModified AS DateTime,
-          CASE 
-              WHEN bankaccount.isActive = 1 THEN 'Active'
-              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen'
-              ELSE 'Inactive'
-          END AS AccountStatus,
-          CASE 
-              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Automation'
-              ELSE customer.FirstName
-          END AS PerformedBy
-      FROM 
-          bankaccount
-      JOIN 
-          customer ON bankaccount.AccountID = customer.AccountID;
+        SELECT 
+            bankaccount.AccountNr AS 'CustomerAccountNumber',
+            CASE 
+                WHEN bankaccount.isActive = 1 THEN 'Activated Account'
+                WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen Account'
+                ELSE 'Inactive Account'
+            END AS 'Action Type',
+            bankaccount.LastModified AS 'Date/Time',
+            CASE 
+                WHEN bankaccount.isActive = 1 THEN 'Active'
+                WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen'
+                ELSE 'Inactive'
+            END AS 'Account Status',
+            CASE 
+                WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Automation'
+                ELSE CONCAT(customer.FirstName, ' ', customer.LastName)
+            END AS 'PerformedBy'
+        FROM 
+            bankaccount
+        LEFT JOIN 
+            customer ON bankaccount.AccountID = customer.AccountID
     `;
+
     db.query(query, (err, results) => {
-      if (err) {
-        console.error(err);
-        return callback(new Error('Failed to retrieve account actions: ' + err.message));
-      }
-      if (results.length === 0) {
-        return callback(null, { message: 'No account actions found' });
-      }
-      callback(null, results);
+        if (err) {
+            console.error(err); // Log the error for debugging
+            return callback(err);
+        }
+        callback(null, results);
     });
-  },
+}
+
 };
 
 module.exports = BankAccountDAO;

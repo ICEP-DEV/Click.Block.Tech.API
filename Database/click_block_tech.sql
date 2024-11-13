@@ -27,14 +27,14 @@ SET time_zone = "+00:00";
 -- Table structure for table `admin`
 --
 
--- CREATE TABLE `AlertPinLogs` (
---   `LogID` INT AUTO_INCREMENT PRIMARY KEY,  
---   `CustID_Nr` CHAR(13) NOT NULL,                    
---   `TriggerDate` DATETIME DEFAULT CURRENT_TIMESTAMP,                  
---   `Action` VARCHAR(50), -- Store the action (e.g., "login" or "transaction")
---   FOREIGN KEY (`CustID_Nr`) REFERENCES `customer`(`CustID_Nr`)
--- );
--- ;
+CREATE TABLE `AlertPinLogs` (
+  `LogID` INT AUTO_INCREMENT PRIMARY KEY,  
+  `CustID_Nr` CHAR(13) NOT NULL,                    
+  `TriggerDate` DATETIME DEFAULT CURRENT_TIMESTAMP,                  
+  `Action` VARCHAR(50), -- Store the action (e.g., "login" or "transaction")
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `customer`(`CustID_Nr`)
+);
+
 
 
 CREATE TABLE `admin` (
