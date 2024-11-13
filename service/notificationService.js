@@ -11,12 +11,28 @@ class NotificationService {
         }
     }
 
-    // Trigger panic button (decline the transaction and mark as panic-triggered)
+    // Trigger panic button (decline the transaction and mark the panic-triggered)
     static async triggerPanicButton(custIdNr, transactionId) {
         try {
-            const notification = await NotificationDao.updateNotificationStatus(transactionId, 'Declined');
-            // You can add additional logic here to handle panic-triggered actions if necessary
-            return { message: 'Panic button triggered, transaction declined', notification };
+            // Check if the transaction is already processed before proceeding
+            const transaction = await NotificationDao.getTransactionStatus(transactionId);
+            if (transaction && ['Approved', 'Declined', 'PanicTriggered'].includes(transaction.Status)) {
+                throw new Error('Transaction has already been processed (cannot trigger panic again)');
+            }
+
+            // Decline the transaction and set panic-triggered status
+            const transactionDecline = await NotificationDao.declineTransaction(transactionId);
+            const updateCustomerPanicStatus = await NotificationDao.updateCustomerPanicStatus(custIdNr);
+
+            // Update the notification status to 'Declined'
+            const notification = await NotificationDao.updateNotificationStatus(transactionId, 'PanicTriggered');
+            
+            return {
+                message: 'Panic button triggered, transaction declined',
+                transactionDecline,
+                updateCustomerPanicStatus,
+                notification
+            };
         } catch (error) {
             throw error;
         }
@@ -27,6 +43,16 @@ class NotificationService {
         try {
             const customer = await NotificationDao.getCustomerById(custIdNr);
             return customer;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get transaction status to check if already processed
+    static async getTransactionStatus(transactionId) {
+        try {
+            const transaction = await NotificationDao.getTransactionStatus(transactionId);
+            return transaction;
         } catch (error) {
             throw error;
         }
