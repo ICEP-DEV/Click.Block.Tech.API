@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 30, 2024 at 01:45 PM
+-- Generation Time: Nov 13, 2024 at 09:05 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -57,6 +57,19 @@ CREATE TABLE `alert` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `alertpinlogs`
+--
+
+CREATE TABLE `alertpinlogs` (
+  `LogID` int(11) NOT NULL,
+  `CustID_Nr` char(13) NOT NULL,
+  `TriggerDate` datetime DEFAULT current_timestamp(),
+  `Action` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `bankaccount`
 --
 
@@ -67,7 +80,9 @@ CREATE TABLE `bankaccount` (
   `AccountType` varchar(50) NOT NULL,
   `Balance` decimal(10,2) NOT NULL,
   `CreationDate` date NOT NULL,
-  `isActive` tinyint(4) NOT NULL
+  `isActive` tinyint(4) NOT NULL,
+  `LastModified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `RestorationCount` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -205,6 +220,13 @@ ALTER TABLE `alert`
   ADD KEY `LocationID` (`LocationID`);
 
 --
+-- Indexes for table `alertpinlogs`
+--
+ALTER TABLE `alertpinlogs`
+  ADD PRIMARY KEY (`LogID`),
+  ADD KEY `CustID_Nr` (`CustID_Nr`);
+
+--
 -- Indexes for table `bankaccount`
 --
 ALTER TABLE `bankaccount`
@@ -273,10 +295,16 @@ ALTER TABLE `alert`
   MODIFY `AlertID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `alertpinlogs`
+--
+ALTER TABLE `alertpinlogs`
+  MODIFY `LogID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `bankaccount`
 --
 ALTER TABLE `bankaccount`
-  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `AccountID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `bankcard`
@@ -294,7 +322,7 @@ ALTER TABLE `contactmemessage`
 -- AUTO_INCREMENT for table `location`
 --
 ALTER TABLE `location`
-  MODIFY `LocationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `LocationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `notification`
@@ -312,7 +340,7 @@ ALTER TABLE `supportingdocument`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123456790;
 
 --
 -- Constraints for dumped tables
@@ -324,6 +352,12 @@ ALTER TABLE `transaction`
 ALTER TABLE `alert`
   ADD CONSTRAINT `alert_ibfk_1` FOREIGN KEY (`CustID_Nr`) REFERENCES `customer` (`CustID_Nr`),
   ADD CONSTRAINT `alert_ibfk_2` FOREIGN KEY (`LocationID`) REFERENCES `location` (`LocationID`);
+
+--
+-- Constraints for table `alertpinlogs`
+--
+ALTER TABLE `alertpinlogs`
+  ADD CONSTRAINT `alertpinlogs_ibfk_1` FOREIGN KEY (`CustID_Nr`) REFERENCES `customer` (`CustID_Nr`);
 
 --
 -- Constraints for table `bankcard`

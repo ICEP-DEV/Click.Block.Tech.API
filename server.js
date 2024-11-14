@@ -1,12 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const customerRoutes = require('./route/customerRoutes');
-const adminRoutes = require('./route/adminRoutes');
 const supportingDocumentRoutes = require('./route/supportingDocumentRoutes');
 const path = require('path');
 const bankAccountRoutes = require('./route/bankAccountRoutes'); 
 const bankCardRoutes =  require('./route/bankCardRoutes'); 
+
+const adminRoutes = require('./route/adminRoutes');
+
 const alertRoutes = require('./route/alertRoutes');
+
 
 const app = express();
 
