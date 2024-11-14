@@ -26,6 +26,7 @@ const TransactionDAO = {
     });
   },
 
+  
   verifyPin: (customerID, pin, callback = () => {}) => {
     console.log('Verifying PIN for customerID:', customerID);
     const query = 'SELECT LoginPin FROM customer WHERE CustID_Nr = ? AND LoginPin = ?';

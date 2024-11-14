@@ -21,10 +21,6 @@ app.use('/api', adminRoutes);
 //app.use('/api', supportingDocumentRoutes);
 app.use('/api', bankAccountRoutes);
 app.use('/api/notifications', notificationRoutes);
-
-
-
-
 app.use('/api', bankCardRoutes);
 app.use('/api', transactionRoutes);  // Use transaction routes
 

@@ -14,6 +14,11 @@ class TransactionService {
         TransactionDAO.verifyPin(customer.CustID_Nr, pin, (err, isPinValid) => {
           if (err) return reject(new Error('Error verifying PIN.'));
           if (!isPinValid) return reject(new Error('Invalid PIN.'));
+          
+          // Check if panic is triggered
+          if (customer.PanicButtonStatus === 1) {
+            return reject(new Error('Transaction cannot proceed as panic button was triggered.'));
+          }
 
           const validTransactionTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
           const status = validTransactionTypes.includes(transactionType) ? 'Pending' : 'Completed';
@@ -22,7 +27,7 @@ class TransactionService {
             // If the transaction does not require approval, directly update the balance and save it
             this.updateBankAccountBalance(customer.AccountID, transactionType, transactionAmount, (err) => {
               if (err) return reject(new Error('Error updating bank account balance.'));
-
+              
               const transaction = new Transaction(
                 null,
                 customer.AccountID,
@@ -33,6 +38,7 @@ class TransactionService {
                 false,
                 null
               );
+              
               TransactionDAO.createTransaction(transaction, (err, transactionID) => {
                 if (err) return reject(new Error('Error creating transaction.'));
                 resolve({ transactionID, message: 'Transaction completed successfully' });
@@ -145,7 +151,6 @@ class TransactionService {
 }
 
   
-
   // Update bank account balance
   updateBankAccountBalance(accountID, transactionType, transactionAmount, callback) {
     console.log('Updating balance for account:', accountID);
