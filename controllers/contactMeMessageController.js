@@ -1,34 +1,52 @@
 const ContactMeMessageService = require('../service/contactMeMessageService');
 
-const getMessageById = (req, res) => {
-  ContactMeMessageService.getMessageById(req.params.MessageID, (err, message) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!message) return res.status(404).json({ error: 'Message not found' });
-    res.status(200).json(message);
+const createMessage = (req, res) => {
+  const messageData = req.body;
+  ContactMeMessageService.createMessage(messageData, (err, messageID) => {
+    if (err) return res.status(500).json({ error: 'Failed to create message', message: err.message });
+    res.status(201).json({ MessageID: messageID });
   });
 };
 
-const getMessagesByCustomerID = (req, res) => {
-  ContactMeMessageService.getMessagesByCustomerID(req.params.CustID_Nr, (err, messages) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!messages || messages.length === 0) {
-      return res.status(404).json({ message: 'No documents found for this customer' });
-    }
-    res.status(200).json(messages);
+const getMessage = (req, res) => {
+  const MessageID = req.params.messageID;
+  ContactMeMessageService.getMessageById(MessageID, (err, result) => {
+    if (err) return res.status(500).json({ error: 'Failed to retrieve message', message: err.message });
+    if (!result) return res.status(404).json({ error: 'Message not found' });
+    res.status(200).json(result);
   });
 };
 
-// Improved getAllMessages method
+const updateMessageStatus = (req, res) => {
+  const MessageID = req.params.messageID;
+  const status = req.body.status;
+  ContactMeMessageService.updateMessageStatus(MessageID, status, (err, success) => {
+    if (err) return res.status(500).json({ error: 'Failed to update status', message: err.message });
+    if (!success) return res.status(404).json({ error: 'Message not found' });
+    res.status(200).json({ message: 'Status updated successfully' });
+  });
+};
+
+const deleteMessage = (req, res) => {
+  const MessageID = req.params.messageID;
+  ContactMeMessageService.deleteMessage(MessageID, (err, success) => {
+    if (err) return res.status(500).json({ error: 'Failed to delete message', message: err.message });
+    if (!success) return res.status(404).json({ error: 'Message not found' });
+    res.status(204).json({ message: 'Message deleted successfully' });
+  });
+};
+
 const getAllMessages = (req, res) => {
-  ContactMeMessageService.getAllMessages((err, messages) => {
-    if (err) return res.status(500).json({ error: err.message });
-    // Return an empty array if no messages found, instead of 404
-    res.status(200).json(messages || []);
+  ContactMeMessageService.getAllMessages((err, results) => {
+    if (err) return res.status(500).json({ error: 'Failed to retrieve messages', message: err.message });
+    res.status(200).json(results);
   });
 };
 
 module.exports = {
-  getMessageById,
-  getMessagesByCustomerID,
+  createMessage,
+  getMessage,
+  updateMessageStatus,
+  deleteMessage,
   getAllMessages
 };
