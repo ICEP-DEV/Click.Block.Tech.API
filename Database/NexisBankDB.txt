@@ -96,7 +96,7 @@ CREATE TABLE `Alert` (
   `AlertID` INT AUTO_INCREMENT PRIMARY KEY,
   `CustID_Nr` CHAR(13) NOT NULL,
   `AlertType` VARCHAR(50) NOT NULL,
-  `SentDate` DATE NOT NULL,
+  `SentDate` TIMESTAMP NOT NULL,
   `LocationID` INT NOT NULL,
   `Receiver` VARCHAR(255) NOT NULL,
   `Message` TEXT NULL,
