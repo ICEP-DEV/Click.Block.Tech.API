@@ -1,6 +1,6 @@
 const AlertDAO = require('../DAO/alertDAO');
 const AlertEmailService = require('./alert_email_service');
-
+const opt_email_alert = require('./opt_alert_emailService');
 const AlertService = {
     createLocation: (locationData, callback) => {
     
@@ -25,9 +25,13 @@ const AlertService = {
                 //Since we are still on a free trial of mailtrap, I've commented the AlertEmailService method.
                 //Please only enable it when its needed like during "show and tell" and final project presentation.
                 //If you don't follow my instruction your on you own.
-                AlertEmailService.alertEmailService(location);
-                
-                callback(null, result);
+                //Only remove comments on below function if the opt_alert_emailSevice is not working
+                //AlertEmailService.alertEmailService(location);
+                opt_email_alert.alertEmailService(location)
+                .then(() =>  callback(null, result))
+                .catch(emailErr => callback({ status: 500, message: 'Failed to send Emergency alert' + emailErr.message }));
+
+               
                 
             });
 
