@@ -297,7 +297,15 @@ const updateCustomerDetails = (req, res) => {
     });
 };
  
-
+// New function to retrieve account statistics
+const getAccountStatistics = (req, res) => {
+    CustomerService.getAccountStatistics((err, stats) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        }
+        res.status(200).send(stats);
+    });
+};
 
 
 module.exports = {
@@ -312,7 +320,8 @@ module.exports = {
     verifyOldPin,
     comparePINS,
     comparePINSAlert,
-    updatePanicStatus
+    updatePanicStatus,
+    getAccountStatistics
 
 };
 
