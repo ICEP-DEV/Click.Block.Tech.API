@@ -61,7 +61,38 @@ const AlertPinLogsDAO = {
             }
             callback(null, results[0].total_usage_count);
         });
-    }
-};
+    },
 
+countAlertPinUsageByAllCustomers: (callback) => {
+    const sql = `
+        SELECT 
+            CustID_Nr AS id_number,
+            YEAR(TriggerDate) AS year,
+            MONTH(TriggerDate) AS month,
+            COUNT(*) AS alert_pin_count
+        FROM 
+            AlertPinLogs
+        WHERE 
+            Action = 'alert'
+        GROUP BY 
+            CustID_Nr, YEAR(TriggerDate), MONTH(TriggerDate)
+        ORDER BY 
+            id_number, year, month;
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error retrieving AlertPin logs for all customers:', err);
+            return callback(err);
+        }
+        const formattedResults = results.map(row => ({
+            "Id Number": row.id_number,
+            year: row.year,
+            month: new Date(row.year, row.month - 1).toLocaleString('default', { month: 'short' }),
+            count: row.alert_pin_count
+        }));
+        callback(null, formattedResults);
+    });
+}
+};
 module.exports = AlertPinLogsDAO;

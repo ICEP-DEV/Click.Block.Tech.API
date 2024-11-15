@@ -10,4 +10,7 @@ router.get('/:custID/monthlyUsage', AlertPinLogController.countAlertPinUsageByMo
 // Endpoint to get total AlertPin usage count
 router.get('/:custID/totalUsage', AlertPinLogController.countUsageByCustomerId);
 
+// Endpoint to get AlertPin logs for all customers
+router.get('/allCustomers/logs', AlertPinLogController.getAllCustomerAlertPinLogs);
+
 module.exports = router;

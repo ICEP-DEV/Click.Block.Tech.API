@@ -38,7 +38,17 @@ const AlertPinLogService = {
             }
             callback(null, count);
         });
-    }
+    },
+    // Fetch AlertPin usage logs across all customers
+getUsageByAllCustomers: (callback) => {
+    AlertPinLogsDAO.countAlertPinUsageByAllCustomers((err, results) => {
+        if (err) {
+            console.error('Error retrieving AlertPin usage for all customers:', err);
+            return callback(err);
+        }
+        callback(null, results);
+    });
+}
 };
 
 module.exports = AlertPinLogService;

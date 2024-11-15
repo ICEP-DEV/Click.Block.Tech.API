@@ -29,6 +29,15 @@ const AlertPinLogController = {
             }
             res.json({ usageCount: count });
         });
+    },
+    // Get AlertPin logs for all customers grouped by year and month
+    getAllCustomerAlertPinLogs: (req, res) => {
+        AlertPinLogService.getUsageByAllCustomers((err, results) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error retrieving AlertPin logs for all customers', error: err });
+            }
+            res.json(results);
+        });
     }
 };
 
