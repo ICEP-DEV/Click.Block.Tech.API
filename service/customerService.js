@@ -267,6 +267,7 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
         if (stepData.Email) {
             const otp = crypto.randomInt(100000, 999999).toString();
             otpMap.set(stepData.Email, otp);
+            //Sending OTP
             EmailService.sendOtpEmail(stepData.Email, otp)
                 .then(() => callback(null, { message: 'OTP sent. Verify it.' }))
                 .catch(emailErr => callback({ status: 500, message: 'Failed to send OTP: ' + emailErr.message }));
@@ -295,13 +296,12 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             CustomerDAO.create(customerData, (err, customerResult) => {
                 if (err) {
                     if (err.status === 400) {
-                        return callback({ status: 400, message: 'Email already exists' });
+                        return callback({ status: 400, message: 'account already exists' });
                     } else {
                         console.error('Failed to create customer:', err);
                         return callback({ status: 500, message: 'Database error' });
                     }
                 }
-
                 const customerID = customerData.CustID_Nr;
                 console.log('Customer created with ID:', customerID);
                 const cardExpirDate = new Date();
@@ -370,7 +370,7 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
                         tempCustomerData.delete(customerData.CustID_Nr);
 
                         console.log('Customer and bank account successfully created:', customerData.CustID_Nr);
-                        callback(null, { message: 'OTP verified, customer and bank account created.' });
+    
                     });
                 
                 });
