@@ -37,9 +37,12 @@ const deleteMessage = (req, res) => {
 };
 
 const getAllMessages = (req, res) => {
-  ContactMeMessageService.getAllMessages((err, results) => {
-    if (err) return res.status(500).json({ error: 'Failed to retrieve messages', message: err.message });
-    res.status(200).json(results);
+  ContactMeMessageService.getAllMessagess((err, results) => {
+      if (err) return res.status(500).json({ error: 'Failed to retrieve messages', message: err.message });
+      if (results.length == 0) {
+          return res.status(404).json({ message: 'No messages found' });
+      }
+      res.status(200).json(results);
   });
 };
 

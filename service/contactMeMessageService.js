@@ -33,7 +33,7 @@ const ContactMeMessageService = {
     });
   },
 
-  getAllMessages: (callback) => {
+  getAllMessagess: (callback) => {
     ContactMeMessageDAO.getAll((err, results) => {
       if (err) return callback(new Error('Failed to retrieve messages: ' + err.message));
       callback(null, results);

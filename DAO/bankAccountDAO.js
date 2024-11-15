@@ -170,7 +170,7 @@ const BankAccountDAO = {
     });
   },
 
-  getAllAccounts: (callback) => {
+  getAccountActions: (callback) => {
     const query = `
         SELECT 
             bankaccount.AccountNr AS 'CustomerAccountNumber',

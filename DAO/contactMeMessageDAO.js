@@ -46,12 +46,21 @@ const ContactMeMessageDAO = {
   },
 
   getAll: (callback) => {
+   
     const sql = 'SELECT * FROM contactmemessage';
     db.query(sql, (err, results) => {
+      
       if (err) return callback(new Error('Failed to retrieve messages: ' + err.message));
+      console.log('Callback Results:', results);
       callback(null, results);
+      
     });
   }
+  
 };
+
+
+
+
 
 module.exports = ContactMeMessageDAO;

@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const contactMeMessageController = require('../controllers/contactMeMessageController');
+const {createMessage,getMessage,updateMessageStatus, deleteMessage,getAllMessages} = require('../controllers/contactMeMessageController');
 
-router.post('/contactmessages', contactMeMessageController.createMessage);
-router.get('/contactmessages/:messageID', contactMeMessageController.getMessage);
-router.put('/contactmessages/:messageID/status', contactMeMessageController.updateMessageStatus);
-router.delete('/contactmessages/:messageID', contactMeMessageController.deleteMessage);
-router.get('/contactmessages', contactMeMessageController.getAllMessages);
+
+router.post('/contactmessages', createMessage);
+router.get('/contactmessages/:messageID', getMessage);
+router.put('/contactmessages/:messageID/status', updateMessageStatus);
+router.delete('/contactmessages/:messageID', deleteMessage);
+router.get('/messages', getAllMessages);
+//Get all contact messages
+
 
 module.exports = router;

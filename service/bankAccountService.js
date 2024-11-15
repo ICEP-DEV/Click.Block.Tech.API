@@ -144,7 +144,7 @@ const BankAccountService = {
       }
       callback(null, results);
     });
-  }
+  },
 };
 
 module.exports = BankAccountService;
