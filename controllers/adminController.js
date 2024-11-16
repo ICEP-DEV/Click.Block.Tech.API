@@ -53,6 +53,15 @@ const AdminController = {
             }
             res.json({ message: 'Admin deleted successfully', result });
         });
+    },
+
+    getAllAlerts: (req, res) =>{
+        AdminService.getAllAlerts((err, result)=>{
+            if(err){
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({message: 'Successfully fetched alerts',result});
+        });
     }
 };
 

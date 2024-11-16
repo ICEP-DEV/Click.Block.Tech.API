@@ -1,6 +1,7 @@
 const db = require('../config/config');
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/admin');
+const Alert = require('../models/alert')
 
 const AdminDAO = {
     create: (adminData, callback) => {
@@ -63,12 +64,6 @@ const AdminDAO = {
             }
         });
     },
-
-   
-
-
-
-
     // Method to fetch an admin by their ID
     getById: (adminID, callback) => {
         const sql = 'SELECT * FROM Admin WHERE AdminID = ?';
@@ -123,7 +118,35 @@ const AdminDAO = {
             console.log("Delete result:", result);
             callback(null, result);
         });
-    }
+    },
+
+    getAllAlerts: (callback) =>{
+        const sql = 'SELECT * FROM alert';
+
+        db.query(sql, (err, results) => {
+          if (err) {
+            console.error('Error retrieving alerts:', err);
+            return callback({ status: 500, message: 'Database error' });
+          }
+          if(results.length > 0){
+            const alerts = results.map(result => new Alert(
+                result.AlertID,
+                result.CustID_Nr,
+                result.AlertType,
+                result.SentDate,
+                result.LocationID,
+                result.Receiver,
+                result.Message
+            ))
+            callback(null, alerts);
+          }else{
+            callback(null, null);
+          }
+          
+          
+        });
+      }
+    
 };
 
 module.exports = AdminDAO;
