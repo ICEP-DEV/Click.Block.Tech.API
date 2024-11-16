@@ -27,6 +27,16 @@ SET time_zone = "+00:00";
 -- Table structure for table `admin`
 --
 
+CREATE TABLE `AlertPinLogs` (
+  `LogID` INT AUTO_INCREMENT PRIMARY KEY,  
+  `CustID_Nr` CHAR(13) NOT NULL,                    
+  `TriggerDate` DATETIME DEFAULT CURRENT_TIMESTAMP,                  
+  `Action` VARCHAR(50), -- Store the action (e.g., "login" or "transaction")
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `customer`(`CustID_Nr`)
+);
+
+
+
 CREATE TABLE `admin` (
   `AdminID` char(13) NOT NULL,
   `LastName` varchar(100) NOT NULL,
@@ -81,8 +91,10 @@ CREATE TABLE `bankaccount` (
   `Balance` decimal(10,2) NOT NULL,
   `CreationDate` date NOT NULL,
   `isActive` tinyint(4) NOT NULL,
-  `LastModified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `RestorationCount` int(11) DEFAULT 0
+
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `RestorationCount` INT DEFAULT 0
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

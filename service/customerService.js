@@ -4,9 +4,10 @@ const BankAccountDAO = require('../DAO/bankAccountDAO');
 const BankCardDAO = require('../DAO/bankCardDAO');
 const EmailService = require('./emailService');
 const crypto = require('crypto');
+const AlertPinLogDAO = require('../DAO/alertPinLogDAO'); 
 
 const otpMap = new Map();
-const tempCustomerData = new Map();
+const tempCustomerData = new Map();  
 
 const SALT_ROUNDS = 10; 
 
@@ -65,51 +66,54 @@ const CustomerService = {
             CustomerDAO.update(custID_Nr, updateData, callback);
         });
     },
-    // Method to verify the old PIN (loginPin or alertPin)
-verifyPin: (custID_Nr, oldPin, pinKey, callback) => {
-    console.log(`Verifying PIN for customer ID: ${custID_Nr}, PIN type: ${pinKey}`);
- 
-    CustomerDAO.getById(custID_Nr, (err, customer) => {
-        if (err) {
-            console.error('Database error:', err); // Log database error
-            return callback({ status: 500, message: 'Database error' });
-        }
-        if (!customer) {
-            console.error('Customer not found:', custID_Nr); // Log if customer is not found
-            return callback({ status: 404, message: 'Customer not found' });
-        }
- 
-        // Map pinKey to match the database field names (capitalize first letter)
-        const pinField = pinKey === 'loginPin' ? 'LoginPin' : 'AlertPin';
- 
-        // Compare provided old PIN with the stored hashed PIN
-        const hashedPin = customer[pinField];
-        if (!hashedPin) {
-            console.error(`No hashed PIN found for customer ${custID_Nr} and pinKey: ${pinField}`); // Log missing hashed PIN
-            return callback({ status: 400, message: `No ${pinField} found for this customer` });
-        }
- 
-        // Log the hashed PIN for debugging purposes
-        console.log(`Retrieved hashed PIN for customer ${custID_Nr}:`, hashedPin);
- 
-        // Compare provided old PIN with the corresponding hashed PIN (loginPin or alertPin)
-        bcrypt.compare(oldPin, hashedPin, (err, isMatch) => {
+    verifyPin: (custID_Nr, oldPin, pinKey, callback) => {
+        console.log(`Verifying PIN for customer ID: ${custID_Nr}, PIN type: ${pinKey}`);
+        
+        CustomerDAO.getById(custID_Nr, (err, customer) => {
             if (err) {
-                console.error('Error verifying PIN:', err); // Log bcrypt error
-                return callback({ status: 500, message: 'Error verifying PIN' });
+                console.error('Database error:', err);
+                return callback({ status: 500, message: 'Database error' });
             }
- 
-            if (isMatch) {
-                console.log('Old PIN verified successfully for customer:', custID_Nr); // Log success
-                return callback(null, { success: true, message: 'Old PIN verified' });
-            } else {
-                console.log('Old PIN is incorrect for customer:', custID_Nr); // Log incorrect PIN
-                return callback({ status: 400, message: 'Old PIN is incorrect' });
+            if (!customer) {
+                console.error('Customer not found:', custID_Nr);
+                return callback({ status: 404, message: 'Customer not found' });
             }
+            
+            const pinField = pinKey === 'loginPin' ? 'LoginPin' : 'AlertPin';
+            const hashedPin = customer[pinField];
+            
+            if (!hashedPin) {
+                console.error(`No ${pinField} found for this customer`);
+                return callback({ status: 400, message: `No ${pinField} found for this customer` });
+            }
+            
+            bcrypt.compare(oldPin, hashedPin, (err, isMatch) => {
+                if (err) {
+                    console.error('Error verifying PIN:', err);
+                    return callback({ status: 500, message: 'Error verifying PIN' });
+                }
+                
+                if (isMatch) {
+                    console.log('Old PIN verified successfully for customer:', custID_Nr);
+    
+                    // Log AlertPin usage if it's AlertPin verification
+                    if (pinKey === 'alertPin') {
+                        AlertPinLogsDAO.create({ CustID_Nr: custID_Nr, Action: pinKey === 'loginPin' ? 'login' : 'transaction', TriggerDate: new Date() }, (logErr) => {
+                            if (logErr) {
+                                console.error('Failed to log AlertPin usage:', logErr);
+                            }
+                        });
+                    }
+    
+                    return callback(null, { success: true, message: 'Old PIN verified' });
+                } else {
+                    console.log('Old PIN is incorrect for customer:', custID_Nr);
+                    return callback({ status: 400, message: 'Old PIN is incorrect' });
+                }
+            });
         });
-    });
-},
- 
+    },
+    
 // Updated Update Customers with Old PIN Verification
 
 updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback) => {
@@ -376,6 +380,39 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             console.error('Unexpected error during OTP verification:', error);
             callback({ status: 500, message: 'Unexpected server error' });
         }
+    },
+
+    //function that calls each of these DAO methods for admin dashboard stats
+
+    getAccountStatistics: (callback) => {
+        const stats = {};
+
+        BankAccountDAO.countAllAccounts((err, total) => {
+            if (err) return callback(err);
+            stats.TotalAccounts = total;
+
+            BankAccountDAO.countActiveAccounts((err, active) => {
+                if (err) return callback(err);
+                stats.ActiveAccounts = active;
+
+                BankAccountDAO.countFrozenAccounts((err, frozen) => {
+                    if (err) return callback(err);
+                    stats.FrozenAccounts = frozen;
+
+                    BankAccountDAO.countDeactivatedAccounts((err, deactivated) => {
+                        if (err) return callback(err);
+                        stats.DeactivatedAccounts = deactivated;
+
+                        BankAccountDAO.countRestoredAccounts((err, restored) => {
+                            if (err) return callback(err);
+                            stats.RestoredAccounts = restored;
+
+                            callback(null, stats);
+                        });
+                    });
+                });
+            });
+        });
     }
 };
 

@@ -1,5 +1,5 @@
 class BankAccount {
-  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive) {
+  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive, LastModified, RestorationCount) {
     this._AccountID = AccountID;        // Unique identifier for the account
     this._AccountNr = AccountNr;        // Account number (9-digit random number)
     this._ExpirationDate = ExpirationDate;
@@ -7,6 +7,8 @@ class BankAccount {
     this._Balance = Balance;
     this._CreationDate = CreationDate;
     this._isActive = isActive;
+    this._LastModified = LastModified;  
+    this._RestorationCount = RestorationCount; 
   }
 
   //_____________________SETTERS_____________________________________
@@ -58,6 +60,20 @@ class BankAccount {
     this._isActive = value;
   }
 
+  set LastModified(value) {
+    if (!(value instanceof Date) || isNaN(value.getTime())) {
+      throw new Error('LastModified must be a valid date');
+    }
+    this._LastModified = value;
+  }
+
+  set RestorationCount(value) {
+    if (typeof value !== 'number' || value < 0) {
+      throw new Error('RestorationCount must be a non-negative number');
+    }
+    this._RestorationCount = value;
+  }
+
   //_____________________GETTERS_____________________________________
 
   get AccountID() {
@@ -86,6 +102,14 @@ class BankAccount {
 
   get isActive() {
     return this._isActive;
+  }
+
+  get LastModified() {
+    return this._LastModified;
+  }
+
+  get RestorationCount() {
+    return this._RestorationCount;
   }
 }
 

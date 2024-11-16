@@ -10,7 +10,7 @@ router.post('/upload', upload.fields([
 ]), supportingDocumentsController.uploadDocument);
 
 // Route for getting documents by customer ID
-router.get('/:customerID', supportingDocumentsController.getDocumentsByCustomer);
+router.get('/get_docs/:customerID', supportingDocumentsController.getDocumentsByCustomer);
 
 // Route for updating a document
 router.put('/update', upload.fields([
@@ -19,6 +19,6 @@ router.put('/update', upload.fields([
 ]), supportingDocumentsController.updateDocument);
 
 // Route for deleting documents by customer ID
-router.delete('/:customerID', supportingDocumentsController.deleteDocumentsByCustomer);
+router.delete('/delete_doc/:customerID', supportingDocumentsController.deleteDocumentsByCustomer);
 
 module.exports = router;
