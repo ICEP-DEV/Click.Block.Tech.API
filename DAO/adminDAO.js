@@ -1,6 +1,8 @@
 const db = require('../config/config');
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/admin');
+const Alert = require('../models/alert');
+const Location = require('../models/location');
 
 const AdminDAO = {
     create: (adminData, callback) => {
@@ -63,12 +65,6 @@ const AdminDAO = {
             }
         });
     },
-
-   
-
-
-
-
     // Method to fetch an admin by their ID
     getById: (adminID, callback) => {
         const sql = 'SELECT * FROM Admin WHERE AdminID = ?';
@@ -123,7 +119,60 @@ const AdminDAO = {
             console.log("Delete result:", result);
             callback(null, result);
         });
-    }
+    },
+
+    getAllAlerts: (callback) =>{
+        const sql = 'SELECT * FROM alert';
+
+        db.query(sql, (err, results) => {
+          if (err) {
+            console.error('Error retrieving alerts:', err);
+            return callback({ status: 500, message: 'Database error' });
+          }
+          if(results.length > 0){
+            const alerts = results.map(result => new Alert(
+                result.AlertID,
+                result.CustID_Nr,
+                result.AlertType,
+                result.SentDate,
+                result.LocationID,
+                result.Receiver,
+                result.Message
+            ))
+            callback(null, alerts);
+          }else{
+            callback(null, null);
+          }
+          
+          
+        });
+      },
+      getLocationByID: (locationID, callback)=>{
+        const sql = 'SELECT * FROM location WHERE LocationID = ?';
+        db.query(sql, [locationID], (err, result) =>{
+          if(err){
+            callback(err, null);
+          }else{
+            if(result.length > 0){
+              const location = new Location(
+              result[0].LocationID,
+              result[0].StreetAddress,
+              result[0].Suburb,
+              result[0].City,
+              result[0].Province,
+              result[0].PostalCode,
+              result[0].Country,
+              result[0].latitude,
+              result[0].longitude,
+              );
+              callback(null, location);
+            } else {
+              callback(null, null);  
+            }
+          }
+        });
+       },
+    
 };
 
 module.exports = AdminDAO;

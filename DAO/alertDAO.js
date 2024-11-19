@@ -18,7 +18,6 @@ const AlertDAO = {
                 return callback(new Error('Failed to create Alert:' + err.message));
             }
             callback(null, {id: result.insertId, ...alertData});
-
         });
       }
 }

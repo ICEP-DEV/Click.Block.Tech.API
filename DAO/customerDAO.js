@@ -165,7 +165,6 @@ const CustomerDAO = {
         console.error('Error retrieving customers:', err);
         return callback({ status: 500, message: 'Database error' });
       }
-
       const customers = results.map(result => new Customer(
         result.CustID_Nr,
         result.FirstName,

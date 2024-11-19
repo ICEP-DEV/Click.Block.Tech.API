@@ -8,6 +8,8 @@ router.post('/admin/login', AdminController.login);
 router.get('/admin/:id', AdminController.getAdmin);
 router.put('/admin/:id', AdminController.updateAdmin);
 router.delete('/admin/:id', AdminController.deleteAdmin);
+router.get('/getAll_Alert',AdminController.getAllAlerts);
+router.get('/getLocationbyID/:locationID', AdminController.getLocationByID);
 
 module.exports = router;
 

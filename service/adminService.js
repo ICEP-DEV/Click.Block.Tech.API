@@ -27,10 +27,9 @@ const AdminService = {
 
             callback(null, { success: true, message: 'Login successful', token, admin });
         });
+
+
     },
-
- 
-
 
     getAdminById: (adminID, callback) => {
         AdminDAO.getById(adminID, callback);
@@ -53,6 +52,13 @@ const AdminService = {
 
     deleteAdmin: (adminID, callback) => {
         AdminDAO.delete(adminID, callback);
+    },
+
+    getAllAlerts: (callback)=>{
+        AdminDAO.getAllAlerts(callback);
+    },
+    getLocationByID: (locationID, callback) =>{
+        AdminDAO.getLocationByID(locationID, callback);
     }
 };
 
