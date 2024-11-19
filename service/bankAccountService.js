@@ -135,7 +135,7 @@ const BankAccountService = {
   },
 
   getAccountActions: (callback) => {
-    BankAccountDAO.getAccountActionsy((err, results) => {
+    BankAccountDAO.getAccountActions((err, results) => {
       if (err) {
         return callback(new Error('Failed to retrieve account actions: ' + err.message));
       }
