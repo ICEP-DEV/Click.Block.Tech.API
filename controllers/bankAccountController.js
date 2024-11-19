@@ -64,15 +64,7 @@ const deleteAccount = (req, res) => {
 
 
 
-const getAccountActions = (req, res) => {
-  BankAccountService.getAccountActions((err, results) => {
-    if (err) {
-      console.error('Error in getAccountActions:', err);
-      return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
-    }
-    res.status(200).json(results);
-  });
-};
+
 
 
 // const getAccountActions = (req, res) => {
@@ -92,6 +84,14 @@ const getAccountActions = (req, res) => {
 //     }
 //   });
 // };
-
+const getAccountActions = (req, res) => {
+  BankAccountService.getAccountActions((err, results) => {
+    if (err) {
+      console.error('Error in getAccountActions:', err);
+      return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
+    }
+    res.status(200).json(results);
+  });
+};
 
 module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions };
