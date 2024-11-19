@@ -62,6 +62,15 @@ const AdminController = {
             }
             res.json({message: 'Successfully fetched alerts',result});
         });
+    },
+    getLocationByID: (req, res) =>{
+        const locationID = req.params.locationID
+        AdminService.getLocationByID(locationID,(err, result)=>{
+            if(err){
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({message: 'Successfully fetched location',result});
+        });
     }
 };
 

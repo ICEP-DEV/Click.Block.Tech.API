@@ -56,6 +56,9 @@ const AdminService = {
 
     getAllAlerts: (callback)=>{
         AdminDAO.getAllAlerts(callback);
+    },
+    getLocationByID: (locationID, callback) =>{
+        AdminDAO.getLocationByID(locationID, callback);
     }
 };
 
