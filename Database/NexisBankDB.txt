@@ -27,7 +27,9 @@ CREATE TABLE `BankAccount` (
   `AccountType` VARCHAR(50) NOT NULL,
   `Balance` DECIMAL(10, 2) NOT NULL,
   `CreationDate` DATE NOT NULL,
-  `isActive` TINYINT NOT NULL
+  `isActive` TINYINT NOT NULL,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `RestorationCount` INT DEFAULT 0
 );
 
 CREATE TABLE `Customer` (
@@ -94,12 +96,19 @@ CREATE TABLE `Alert` (
   `AlertID` INT AUTO_INCREMENT PRIMARY KEY,
   `CustID_Nr` CHAR(13) NOT NULL,
   `AlertType` VARCHAR(50) NOT NULL,
-  `SentDate` DATE NOT NULL,
+  `SentDate` TIMESTAMP NOT NULL,
   `LocationID` INT NOT NULL,
   `Receiver` VARCHAR(255) NOT NULL,
   `Message` TEXT NULL,
   FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`),
   FOREIGN KEY (`LocationID`) REFERENCES `Location`(`LocationID`)
+);
+CREATE TABLE `alertpinlogs` (
+  `LogID` int(11) NOT NULL,
+  `CustID_Nr` char(13) NOT NULL,
+  `TriggerDate` datetime DEFAULT current_timestamp(),
+  `Action` varchar(50) DEFAULT NULL,
+  FOREIGN KEY (`CustID_Nr`) REFERENCES `Customer`(`CustID_Nr`)
 );
 
 CREATE TABLE `Notification` (
