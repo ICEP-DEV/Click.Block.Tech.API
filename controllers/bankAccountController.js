@@ -64,15 +64,7 @@ const deleteAccount = (req, res) => {
 
 
 
-const getAccountActions = (req, res) => {
-  BankAccountService.getAccountActions((err, results) => {
-    if (err) {
-      console.error('Error in getAccountActions:', err);
-      return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
-    }
-    res.status(200).json(results);
-  });
-};
+
 
 
 // const getAccountActions = (req, res) => {
@@ -92,6 +84,42 @@ const getAccountActions = (req, res) => {
 //     }
 //   });
 // };
+const getAccountActions = (req, res) => {
+  BankAccountService.getAccountActions((err, results) => {
+    if (err) {
+      console.error('Error in getAccountActions:', err);
+      return res.status(500).json({ error: 'Failed to fetch account actions', message: err.message });
+    }
+    res.status(200).json(results);
+  });
+};
+
+const getAllCustomerDetails = (req, res) => {
+  BankAccountService.getAllCustomerDetails((err, results) => {
+      if (err) {
+          console.error('Error fetching customer details:', err);
+          return res.status(500).json({ error: 'Failed to fetch customer details', message: err.message });
+      }
+      res.status(200).json(results);
+  });
+};
+
+const getFilteredAccounts = (req, res) => {
+  const status = req.query.status; // Extract the `status` query parameter from the request
+
+  if (!status) {
+      return res.status(400).json({ error: 'Account status is required' });
+  }
+
+  BankAccountService.getFilteredAccounts(status, (err, results) => {
+      if (err) {
+          console.error('Error in getFilteredAccounts:', err);
+          return res.status(500).json({ error: 'Failed to fetch filtered accounts', message: err.message });
+      }
+
+      res.status(200).json(results);
+  });
+};
 
 
-module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions };
+module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions,getAllCustomerDetails,getFilteredAccounts };
