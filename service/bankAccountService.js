@@ -1,5 +1,14 @@
 const BankAccountDAO = require('../DAO/bankAccountDAO');
 
+const formatDate = (date) => {
+  const d = new Date(date);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${month}/${day}/${year}`;
+};
+
+
 const BankAccountService = {
   createAccount: (accountData, callback) => {
     // Ensure AccountType is provided
@@ -145,6 +154,39 @@ const BankAccountService = {
       callback(null, results);
     });
   },
+ 
+  //Get Customer Information
+getAllCustomerDetails: (callback) => {
+    BankAccountDAO.getAllCustomerDetails((err, results) => {
+        if (err) {
+            return callback(new Error('Failed to retrieve customer details: ' + err.message));
+        }
+
+        // Format the date in each result
+        const formattedResults = results.map((item) => ({
+            ...item,
+            "Registration Date": formatDate(item["Registration Date"]),
+        }));
+
+        callback(null, formattedResults);
+    });
+},
+
+// To Filter Accounts Based on their Account Status
+getFilteredAccounts: (status, callback) => {
+  BankAccountDAO.getAllCustomerDetails((err, results) => {
+      if (err) {
+          return callback(new Error('Failed to retrieve customer details: ' + err.message));
+      }
+
+      // Filter results based on the status
+      const filteredResults = results.filter(item => item["Account Status"].toLowerCase() === status.toLowerCase());
+
+      callback(null, filteredResults);
+  });
+},
+
+
 };
 
 module.exports = BankAccountService;
