@@ -29,6 +29,24 @@ class NotificationDao {
         });
     }
 
+    // Get the status of a notification by TransactionID
+    static getNotificationStatus(transactionId) {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT Status FROM Notification WHERE TransactionID = ?';
+            db.query(query, [transactionId], (error, results) => {
+                if (error) {
+                    console.error('Error fetching notification status:', error);
+                    return reject(error);
+                }
+                if (results.length > 0) {
+                    resolve(results[0].Status); // Return the status
+                } else {
+                    resolve(null); // No status found for this transaction
+                }
+            });
+        });
+    }
+
     static declineTransaction(transactionId) {
         return new Promise((resolve, reject) => {
             const query = `UPDATE Transaction SET Status = 'Declined', IsPanicTrigered = 1 WHERE TransactionID = ?`;

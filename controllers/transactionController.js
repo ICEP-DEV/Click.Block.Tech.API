@@ -1,4 +1,5 @@
 const TransactionService = require('../service/transactionService');
+const NotificationService = require('../service/notificationService'); // Import NotificationService
 
 class TransactionController {
   async processTransaction(req, res) {
@@ -13,27 +14,29 @@ class TransactionController {
 
   async approveTransaction(req, res) {
     try {
-      const { transactionId, action } = req.body;
-      console.log('Received transactionId:', transactionId, 'with action:', action);
-      
-      if (action !== 'approve' && action !== 'decline') {
-        return res.status(400).json({ error: 'Invalid action. Must be "approve" or "decline".' });
-      }
-  
-      if (action === 'approve') {
+      const { transactionId } = req.body;
+      console.log('Received transactionId:', transactionId);
+
+      // Get the notification status for the transaction
+      const notificationStatus = await NotificationService.getNotificationStatus(transactionId);
+      console.log('Notification status:', notificationStatus);
+
+      if (notificationStatus === 'Approved') {
         const result = await TransactionService.approveTransaction(transactionId);
         console.log('Transaction approval result:', result);
         res.status(200).json(result);
-      } else {
-        // Handle decline logic if necessary
+      } else if (notificationStatus === 'Declined') {
+        // Handle declined logic if needed
         res.status(200).json({ message: 'Transaction declined.' });
+      } else {
+        // Handle case if the status is neither 'Approved' nor 'Declined'
+        res.status(400).json({ error: 'Invalid notification status for this transaction.' });
       }
     } catch (error) {
       console.error('Error in approving transaction:', error.message);
       res.status(400).json({ error: error.message });
     }
   }
-  
 }
 
 module.exports = new TransactionController();

@@ -20,7 +20,7 @@ class TransactionService {
             return reject(new Error('Transaction cannot proceed as panic button was triggered.'));
           }
 
-          const validTransactionTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
+          const validTransactionTypes = ['CashTransfer', 'EFT', 'OnlinePurchase', 'CashPayment', 'PaymentOrder'];
           const status = validTransactionTypes.includes(transactionType) ? 'Pending' : 'Completed';
 
           if (status === 'Completed') {
@@ -103,7 +103,7 @@ class TransactionService {
             .then(() => {
                 console.log("Notification status updated to 'Approved' for transaction ID:", transactionID);
                 
-                const withdrawalTypes = ['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'];
+                const withdrawalTypes = ['CashTransfer', 'EFT', 'OnlinePurchase', 'CashPayment', 'PaymentOrder'];
                 if (withdrawalTypes.includes(transaction.TransactionType)) {
                     console.log(`Updating balance for transaction type: ${transaction.TransactionType}, Amount: ${transaction.TransactionAmount}`);
                     
@@ -168,7 +168,7 @@ class TransactionService {
       let newBalance = bankAccount.Balance;
       console.log('Current balance:', newBalance);
 
-      if (['Cash Transfer', 'EFT', 'Online Purchase', 'Cash Payment', 'Payment Order'].includes(transactionType)) {
+      if (['CashTransfer', 'EFT', 'OnlinePurchase', 'CashPayment', 'PaymentOrder'].includes(transactionType)) {
         newBalance -= transactionAmount;
       } else {
         newBalance += transactionAmount;

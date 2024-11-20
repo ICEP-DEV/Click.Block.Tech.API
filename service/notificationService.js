@@ -1,6 +1,13 @@
 const NotificationDao = require('../DAO/notificationDAO');
 
 class NotificationService {
+    static async getNotificationStatus(transactionId) {
+        try {
+            return await NotificationDao.getNotificationStatus(transactionId);
+        } catch (error) {
+            throw new Error('Error fetching notification status');
+        }
+    }
     // Approve a transaction by updating the notification status
     static async updateNotificationStatus(transactionId, status) {
         
