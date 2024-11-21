@@ -1,6 +1,6 @@
 class Customer {
 
-  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isVerified, PanicButtonStatus, AccountID) {
+  constructor(CustID_Nr, FirstName, LastName, PhoneNumber, Address, Email, DateOfBirth, LoginPin, AlertPin, isVerified, PanicButtonStatus, AccountID,LastLogin) {
     this._CustID_Nr = CustID_Nr; // this is the id number and serves as the PK
 
     this._FirstName = FirstName;
@@ -13,8 +13,8 @@ class Customer {
     this._AlertPin = AlertPin;
     this._isVerified = isVerified;
     this._PanicButtonStatus = PanicButtonStatus;
-
     this._AccountID = AccountID;
+    this._LastLogin = LastLogin
   }
 
 //_____________________SETTERS_____________________________________
@@ -104,7 +104,12 @@ class Customer {
     this._AccountID = value
   }
 
- 
+  set LastLogin(value) {
+    if (value !== null && !(value instanceof Date)) {
+      throw new Error('LastLogin must be a valid Date object or null');
+    }
+    this._LastLogin = value;
+  }
 
   //_______________________________GETTERS_________________________________
 
@@ -154,6 +159,9 @@ class Customer {
 
   get AccountID(){
     return this._AccountID;
+  }
+  get LastLogin() {
+    return this._LastLogin;
   }
 
 }

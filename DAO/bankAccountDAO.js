@@ -210,8 +210,14 @@ getAllCustomerDetails: (callback) => {
           CONCAT(SUBSTRING(customer.FirstName, 1, 1), '. ', customer.LastName) AS "Customer Details",
           DATE_FORMAT(bankaccount.CreationDate, '%m/%d/%Y') AS "Registration Date",
           CASE 
-              WHEN bankaccount.isActive = 1 THEN 'Active'
-              ELSE 'Inactive'
+              WHEN bankaccount.isActive = 1 THEN 
+                  CASE 
+                      WHEN bankaccount.RestorationCount > 0 THEN 'Restored'
+                      ELSE 'Active'
+                  END
+              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen'
+              WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 0 THEN 'Inactive'
+              ELSE 'Deactivated'
           END AS "Account Status"
       FROM 
           customer
@@ -219,6 +225,9 @@ getAllCustomerDetails: (callback) => {
           bankaccount ON customer.AccountID = bankaccount.AccountID;
   `;
 
+
+
+  
   db.query(query, (err, results) => {
       if (err) {
           console.error('Error fetching customer details:', err);
