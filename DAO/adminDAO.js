@@ -68,24 +68,24 @@ const AdminDAO = {
     // Method to fetch an admin by their ID
     getById: (adminID, callback) => {
         const sql = 'SELECT * FROM Admin WHERE AdminID = ?';
-
+    
         db.query(sql, [adminID], (err, result) => {
             if (err) {
                 console.error("Error retrieving admin:", err);
                 return callback({ status: 500, message: 'Database error' });
             }
-
+    
             if (result.length > 0) {
-                const admin = new Admin(
-                    result[0].AdminID,
-                    result[0].LastName,
-                    result[0].FirstName,
-                    result[0].PhoneNumber,
-                    result[0].Address,
-                    result[0].Email,
-                    result[0].DateOfBirth,
-                    result[0].LoginPin
-                );
+                const admin = {
+                    _AdminID: result[0].AdminID,
+                    _LastName: result[0].LastName,
+                    _FirstName: result[0].FirstName,
+                    _PhoneNumber: result[0].PhoneNumber,
+                    _Address: result[0].Address,
+                    _Email: result[0].Email,
+                    _DateOfBirth: result[0].DateOfBirth,
+                    _LoginPin: result[0].LoginPin
+                };
                 callback(null, admin);
             } else {
                 callback(null, null);
