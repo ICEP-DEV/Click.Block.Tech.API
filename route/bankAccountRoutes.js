@@ -14,6 +14,7 @@ router.get('/account-actions', getAccountActions);
 //Admin Stats : Customer Accounts Management
 router.get('/customers/details', getAllCustomerDetails);
 
+//Get All Customer details
 router.get('/accounts/filter', getFilteredAccounts);
 
 

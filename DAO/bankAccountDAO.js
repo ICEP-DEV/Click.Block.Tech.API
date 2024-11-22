@@ -206,19 +206,34 @@ const BankAccountDAO = {
 getAllCustomerDetails: (callback) => {
   const query = `
       SELECT 
-          customer.Email AS "Email Address",
-          CONCAT(SUBSTRING(customer.FirstName, 1, 1), '. ', customer.LastName) AS "Customer Details",
-          DATE_FORMAT(bankaccount.CreationDate, '%m/%d/%Y') AS "Registration Date",
-          CASE 
-              WHEN bankaccount.isActive = 1 THEN 'Active'
-              ELSE 'Inactive'
-          END AS "Account Status"
-      FROM 
-          customer
-      JOIN 
-          bankaccount ON customer.AccountID = bankaccount.AccountID;
+    customer.Email AS "Email Address",
+    CONCAT(SUBSTRING(customer.FirstName, 1, 1), '. ', customer.LastName) AS "Customer Details",
+    DATE_FORMAT(bankaccount.CreationDate, '%m/%d/%Y') AS "Registration Date",
+    CASE 
+        WHEN bankaccount.isActive = 1 THEN 
+            CASE 
+                WHEN bankaccount.RestorationCount > 0 THEN 'Restored'
+                ELSE 'Active'
+            END
+        WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 1 THEN 'Frozen'
+        WHEN bankaccount.isActive = 0 AND customer.PanicButtonStatus = 0 THEN 'Inactive'
+        ELSE 'Deactivated'
+    END AS "Account Status",
+    CASE 
+        WHEN DATE(customer.LastLogin) = CURDATE() THEN 
+            CONCAT('Today ', DATE_FORMAT(customer.LastLogin, '%l:%i %p'))
+        ELSE 
+            DATE_FORMAT(customer.LastLogin, '%m/%d/%y %l:%i %p')
+    END AS "Last Login"
+FROM 
+    customer
+JOIN 
+    bankaccount ON customer.AccountID = bankaccount.AccountID;
   `;
 
+
+
+  
   db.query(query, (err, results) => {
       if (err) {
           console.error('Error fetching customer details:', err);
