@@ -30,9 +30,6 @@ const AlertService = {
                 opt_email_alert.alertEmailService(location)
                 .then(() =>  callback(null, result))
                 .catch(emailErr => callback({ status: 500, message: 'Failed to send Emergency alert' + emailErr.message }));
-
-               
-                
             });
 
         }
@@ -48,6 +45,25 @@ const AlertService = {
                 callback(null, result);
             });
         }
-    }
+    },
+    updateLatLong: (locationID,updateData, callback)=>{
+      if(!updateData){
+        return callback(new Error('lat and long update data are required'));
+      }else{
+        AlertDAO.updateLatLong(locationID, updateData, (err,result)=>{
+            if(err){
+                return callback(new Error('Failed to update Lat Long Data' + err.message));
+            }
+            callback(null, result);
+        });
+      }
+    },
+    getAlertLocationID: (custID_Nr, callback) => {
+        if (!custID_Nr) return callback(new Error('Customer ID is required'));
+        
+        AlertDAO.getAlertLocationID(custID_Nr, callback);
+    },
+
+
 }
 module.exports = AlertService;
