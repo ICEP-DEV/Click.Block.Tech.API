@@ -3,6 +3,7 @@ const NotificationDao = require('../DAO/notificationDAO');
 class NotificationService {
     static async getNotificationStatus(transactionId) {
         try {
+
             return await NotificationDao.getNotificationStatus(transactionId);
         } catch (error) {
             throw new Error('Error fetching notification status');
@@ -36,8 +37,12 @@ class NotificationService {
             // Check if the transaction is already processed before proceeding
             const transaction = await NotificationDao.getTransactionStatus(transactionId);
             if (transaction && ['Approved', 'Declined', 'PanicTriggered'].includes(transaction.Status)) {
+               
                 throw new Error('Transaction has already been processed (cannot trigger panic again)');
+                
             }
+
+            
 
             // Decline the transaction and set panic-triggered status
             const transactionDecline = await NotificationDao.declineTransaction(transactionId);

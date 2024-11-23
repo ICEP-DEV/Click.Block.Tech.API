@@ -12,6 +12,8 @@ class TransactionController {
     }
   }
 
+
+
   async approveTransaction(req, res) {
     try {
       const { transactionId } = req.body;
@@ -37,6 +39,18 @@ class TransactionController {
       res.status(400).json({ error: error.message });
     }
   }
+
+  async getLatestPendingTransaction (req, res){
+    const { custID_Nr } = req.params; // Assuming custID_Nr is passed as a parameter in the URL
+
+    try {
+        const transactionID = await TransactionService.getLatestPendingTransaction(custID_Nr);
+        res.status(200).json({ transactionID });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+  
 }
 
 module.exports = new TransactionController();

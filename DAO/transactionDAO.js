@@ -1,4 +1,4 @@
-const db = require('../config/config'); 
+const db = require('../config/config');
 const BankAccount = require('../models/bankAccount'); // Assuming this model exists
 
 const TransactionDAO = {
@@ -26,7 +26,6 @@ const TransactionDAO = {
     });
   },
 
-  
   verifyPin: (customerID, pin, callback = () => {}) => {
     console.log('Verifying PIN for customerID:', customerID);
     const query = 'SELECT LoginPin FROM customer WHERE CustID_Nr = ? AND LoginPin = ?';
@@ -114,7 +113,6 @@ const TransactionDAO = {
       }
     });
   },
-  
 
   getBankAccountById: (accountId, callback = () => {}) => {
     console.log('Getting bank account by AccountID:', accountId);
@@ -148,6 +146,35 @@ const TransactionDAO = {
 
       console.log("Bank account balance updated successfully:", result);
       callback(null, result.affectedRows); // Return the number of affected rows
+    });
+  },
+
+  getLatestPendingTransactionByCustID: (custID_Nr, callback = () => {}) => {
+    console.log('Fetching latest pending transaction for customer:', custID_Nr);
+    const query = `
+      SELECT t.TransactionID
+      FROM Transaction t
+      JOIN BankAccount b ON t.AccountID = b.AccountID
+      JOIN Customer c ON b.AccountID = c.AccountID
+      WHERE c.CustID_Nr = ?
+      AND t.Status = 'pending'
+      ORDER BY t.TransactionDate DESC
+      LIMIT 1;
+    `;
+
+    db.query(query, [custID_Nr], (err, results) => {
+      if (err) {
+        console.error('Error fetching latest pending transaction:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
+
+      if (results.length === 0) {
+        console.log('No pending transactions found for customer:', custID_Nr);
+        return callback({ status: 404, message: 'No pending transactions found' });
+      }
+      
+      console.log('Latest pending transaction found for customer:', custID_Nr, 'TransactionID:', results[0].TransactionID);
+      callback(null, results[0].TransactionID); // Return the TransactionID
     });
   }
 };

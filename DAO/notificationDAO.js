@@ -91,6 +91,7 @@ class NotificationDao {
                     return reject(error);
                 }
                 if (results.length > 0) {
+                    console.log("piddddddddddddd",results[0]);
                     resolve(results[0]);
                 } else {
                     resolve(null); // No customer found

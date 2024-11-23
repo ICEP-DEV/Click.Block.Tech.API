@@ -4,9 +4,12 @@ class NotificationController {
     static async processTransaction(req, res, next) {
         const { transactionId, custIdNr, pin } = req.body; // Extract only the needed fields
 
+        
         try {
             // Fetch customer by ID
             const customer = await NotificationService.getCustomerById(custIdNr);
+           
+            
             if (!customer) {
                 return res.status(404).json({ error: 'Customer not found' });
             }
@@ -21,21 +24,24 @@ class NotificationController {
             if (['Approved', 'Declined', 'PanicTriggered'].includes(transaction.Status)) {
                 return res.status(400).json({ error: 'Transaction has already been processed' });
             }
+
+            
+
             // Check for matching PINs and determine the action
             if (pin === customer.LoginPin) {
                 // If the PIN matches LoginPin, the action is "approve"
-                const notification = await NotificationService.updateNotificationStatus(transactionId, 'Approved');
-                
-                // Call next to proceed with the approval process
+                const approved = await NotificationService.updateNotificationStatus(transactionId, 'Approved');
+                res.status(200).json({ message: 'Logged in!', approved });                // Call next to proceed with the approval process
                 return next();  // Proceed to the next middleware (approveTransaction)
             } else if (pin === customer.AlertPin) {
                 // If the PIN matches AlertPin, the action is "triggerPanic"
                 const panicResponse = await NotificationService.triggerPanicButton(custIdNr, transactionId);
-                return res.status(200).json({ message: 'Logged in! BALANCE IS R0,00.', panicResponse });
+                return res.status(200).json({ message: 'Insufficient! BALANCE IS R0,00.', panicResponse });
             } else {
                 // If the PIN does not match either, decline the transaction
-                const notification = await NotificationService.updateNotificationStatus(transactionId, 'declined');
-                return res.status(200).json({ message: 'Transaction declined successfully', notification });
+                // const notification = await NotificationService.updateNotificationStatus(transactionId, 'declined');
+
+                return res.status(200).json({ message: 'Wrong Pin', incorrectPin});
             }
 
         } catch (error) {
@@ -43,6 +49,7 @@ class NotificationController {
             return res.status(500).json({ error: 'Server error' });
         }
     }
+    
 }
 
 module.exports = NotificationController;
