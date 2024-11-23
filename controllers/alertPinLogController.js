@@ -12,7 +12,7 @@ const AlertPinLogController = {
             // Format the data to include month names for frontend compatibility
             const formattedResults = results.map(record => ({
                 year: record.year,
-                month: new Date(record.year, record.month - 1).toLocaleString('default', { month: 'short' }),
+                month: new Date(record.year, record.month - 1 , record.day).toLocaleString('default', { month: 'short' }),
                 count: record.alert_pin_count
             }));
             res.json(formattedResults);

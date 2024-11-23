@@ -148,7 +148,8 @@ CREATE TABLE `customer` (
   `AlertPin` varchar(255) NOT NULL,
   `isVerified` tinyint(1) NOT NULL,
   `PanicButtonStatus` tinyint(1) NOT NULL,
-  `AccountID` int(11) DEFAULT NULL
+  `AccountID` int(11) DEFAULT NULL,
+   `LastLogin` DATETIME DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

@@ -83,6 +83,7 @@ const CustomerDAO = {
           result[0].isVerified,
           result[0].PanicButtonStatus,
           result[0].AccountID,
+          result[0].LastLogin
           );
           callback(null, customer);
         } else {
@@ -97,7 +98,7 @@ const CustomerDAO = {
       SELECT 
         c.CustID_Nr, c.FirstName, c.LastName, c.PhoneNumber, 
         c.Address, c.Email, c.DateOfBirth, c.LoginPin, c.AlertPin, 
-        c.isVerified, c.PanicButtonStatus, c.AccountID, 
+        c.isVerified, c.PanicButtonStatus, c.AccountID,c.LastLogin 
         b.AccountNr, b.AccountType, b.Balance
       FROM 
         customer c
@@ -125,6 +126,7 @@ const CustomerDAO = {
           isVerified: result[0].isVerified,
           PanicButtonStatus: result[0].PanicButtonStatus,
           AccountID: result[0].AccountID,
+          LastLogin: result[0].LastLogin,
           BankAccount: {
             AccountNumber: result[0].AccountNumber,
             AccountType: result[0].AccountType,
@@ -178,11 +180,24 @@ const CustomerDAO = {
         result.isActive,
         result.isVerified,
         result.PanicButtonStatus,
-        result.AccountID
+        result.AccountID,
+        result.LastLogin
       ));
       callback(null, customers);
     });
-  }
+  },
+  updateLastLogin: (custID_Nr, callback) => {
+    const sql = 'UPDATE customer SET LastLogin = ? WHERE CustID_Nr = ?';
+    const currentTimestamp = new Date();
+    db.query(sql, [currentTimestamp, custID_Nr], (err, result) => {
+        if (err) {
+            console.error('Error updating LastLogin:', err);
+            return callback({ status: 500, message: 'Database error' });
+        }
+        callback(null, result);
+    });
+}
+
 };
 
 module.exports = CustomerDAO;
