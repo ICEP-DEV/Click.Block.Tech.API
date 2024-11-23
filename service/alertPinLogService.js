@@ -1,54 +1,25 @@
-const AlertPinLogsDAO = require('../DAO/alertPinLogDAO');
+const AlertPinLogDAO = require('../DAO/alertPinLogDAO');
 
 const AlertPinLogService = {
-    // Create a log entry for AlertPin usage
-    createAlertPinLog: (custID, action, callback) => {
-        const logData = {
-            CustID_Nr: custID,
-            Action: action,
-            TriggerDate: new Date()
-        };
+    logPin: (alertData, callback) => {
+        const { CustID_Nr, Action } = alertData;
 
-        AlertPinLogsDAO.create(logData, (err, result) => {
+        AlertPinLogDAO.logPinUsage(CustID_Nr, Action || 'Alert Triggered', (err, result) => {
             if (err) {
-                console.error('Failed to create AlertPin log entry:', err);
                 return callback(err);
             }
             callback(null, result);
         });
     },
 
-    // Count monthly AlertPin usage for a specific customer
-    getMonthlyUsageCount: (custID, callback) => {
-        AlertPinLogsDAO.countAlertPinUsageByMonth(custID, (err, results) => {
+    fetchAllLogs: (callback) => {
+        AlertPinLogDAO.getAllPinLogs((err, logs) => {
             if (err) {
-                console.error('Error retrieving monthly usage count:', err);
                 return callback(err);
             }
-            callback(null, results);
+            callback(null, logs);
         });
-    },
-
-    // Count total AlertPin usage for a specific customer
-    getTotalUsageCount: (custID, callback) => {
-        AlertPinLogsDAO.countTotalUsageByCustomerId(custID, (err, count) => {
-            if (err) {
-                console.error('Error retrieving total usage count:', err);
-                return callback(err);
-            }
-            callback(null, count);
-        });
-    },
-    // Fetch AlertPin usage logs across all customers
-getUsageByAllCustomers: (callback) => {
-    AlertPinLogsDAO.countAlertPinUsageByAllCustomers((err, results) => {
-        if (err) {
-            console.error('Error retrieving AlertPin usage for all customers:', err);
-            return callback(err);
-        }
-        callback(null, results);
-    });
-}
+    }
 };
 
 module.exports = AlertPinLogService;
