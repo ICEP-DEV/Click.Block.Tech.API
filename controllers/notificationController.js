@@ -2,13 +2,11 @@ const NotificationService = require('../service/notificationService');
 
 class NotificationController {
     static async processTransaction(req, res, next) {
-        const { transactionId, custIdNr, pin } = req.body; // Extract only the needed fields
+        const { transactionId, custIdNr, pin } = req.body;
 
-        
         try {
             // Fetch customer by ID
             const customer = await NotificationService.getCustomerById(custIdNr);
-           
             
             if (!customer) {
                 return res.status(404).json({ error: 'Customer not found' });
@@ -25,23 +23,21 @@ class NotificationController {
                 return res.status(400).json({ error: 'Transaction has already been processed' });
             }
 
-            
+            console.log("Checking PINs:", pin, customer.LoginPin, customer.AlertPin);
 
             // Check for matching PINs and determine the action
             if (pin === customer.LoginPin) {
-                // If the PIN matches LoginPin, the action is "approve"
+                console.log("PIN matches LoginPin, approving...");
                 const approved = await NotificationService.updateNotificationStatus(transactionId, 'Approved');
-                res.status(200).json({ message: 'Logged in!', approved });                // Call next to proceed with the approval process
-                return next();  // Proceed to the next middleware (approveTransaction)
+                res.status(200).json({ message: 'Logged in!', approved });
+                return next();
             } else if (pin === customer.AlertPin) {
-                // If the PIN matches AlertPin, the action is "triggerPanic"
+                console.log("PIN matches AlertPin, triggering panic...");
                 const panicResponse = await NotificationService.triggerPanicButton(custIdNr, transactionId);
                 return res.status(200).json({ message: 'Insufficient! BALANCE IS R0,00.', panicResponse });
             } else {
-                // If the PIN does not match either, decline the transaction
-                // const notification = await NotificationService.updateNotificationStatus(transactionId, 'declined');
-
-                return res.status(200).json({ message: 'Wrong Pin', incorrectPin});
+                console.log("PIN does not match either, declining...");
+                return res.status(400).json({ message: 'wrongPin', incorrectPin });
             }
 
         } catch (error) {
@@ -49,7 +45,6 @@ class NotificationController {
             return res.status(500).json({ error: 'Server error' });
         }
     }
-    
 }
 
 module.exports = NotificationController;

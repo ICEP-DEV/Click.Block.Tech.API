@@ -86,7 +86,6 @@ class TransactionService {
         
         console.log('Fetched transaction:', transaction);
 
-  
         if (!transaction) {
           const error = new Error(`Transaction with ID ${transactionID} not found.`);
           console.error(error);
@@ -190,40 +189,27 @@ class TransactionService {
     });
   }
 
-  getLatestPendingTransaction = (custID_Nr, callback) => {
-    // Make sure callback is a function before proceeding
+  getLatestPendingTransaction(custID_Nr) {
+    return new Promise((resolve, reject) => {
+      // Calling DAO layer to fetch the data
+      TransactionDAO.getLatestPendingTransactionByCustID(custID_Nr)
+        .then(results => {
+          // Check if we got any results and return the transaction ID
+          if (results.length === 0) {
+            return resolve(null); // No pending transaction found
+          }
   
-    TransactionDAO.getLatestPendingTransactionByCustID(custID_Nr, (err, results) => {
-      if (err) {
-        return callback(new Error('Error retrieving latest pending transaction.'));
-      }
-  
-      console.log('Query Results:', results); // Log the entire results to debug
-  
-      // Check if results is empty or undefined
-      if (!results || results.length === 0) {
-        return callback(new Error('No pending transactions found for the customer.'));
-      }
-  
-      // Ensure that results[0] exists before accessing its properties
-      const transaction = results[0];
-      if (!transaction) {
-        return callback(new Error('Transaction data not found.'));
-      }
-  
-      console.log('TransactionID:', transaction.TransactionID); // Log TransactionID for debugging
-  
-      // Ensure that the TransactionID is valid
-      if (transaction && transaction.TransactionID) {
-        callback(null, transaction.TransactionID); // Return TransactionID to the callback
-      } else {
-        callback(new Error('No valid TransactionID found.'));
-      }
+          const transactionID = results[0].TransactionID;
+          resolve(transactionID); // Return the found transaction ID
+        })
+        .catch(err => {
+          reject(new Error('Error fetching transaction: ' + err.message)); // Reject in case of DAO layer failure
+        });
     });
-  };
-  
- 
+  }
 
+
+ 
 }
 
 module.exports = new TransactionService();

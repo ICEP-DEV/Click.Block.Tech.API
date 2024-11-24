@@ -96,8 +96,7 @@ app.get("/get_popup/:account_id",(req, res)=>{
       console.log(err);
       return;
     }
-    console.log(result);
-    
+   
     if (result.length > 0) {
       res.send({success: true });
     }

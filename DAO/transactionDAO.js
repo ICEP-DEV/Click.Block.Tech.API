@@ -149,34 +149,41 @@ const TransactionDAO = {
     });
   },
 
-  getLatestPendingTransactionByCustID: (custID_Nr, callback = () => {}) => {
-    console.log('Fetching latest pending transaction for customer:', custID_Nr);
-    const query = `
-      SELECT t.TransactionID
-      FROM Transaction t
-      JOIN BankAccount b ON t.AccountID = b.AccountID
-      JOIN Customer c ON b.AccountID = c.AccountID
-      WHERE c.CustID_Nr = ?
-      AND t.Status = 'pending'
-      ORDER BY t.TransactionDate DESC
-      LIMIT 1;
-    `;
-
-    db.query(query, [custID_Nr], (err, results) => {
-      if (err) {
-        console.error('Error fetching latest pending transaction:', err);
-        return callback({ status: 500, message: 'Database error' });
-      }
-
-      if (results.length === 0) {
-        console.log('No pending transactions found for customer:', custID_Nr);
-        return callback({ status: 404, message: 'No pending transactions found' });
-      }
-      
-      console.log('Latest pending transaction found for customer:', custID_Nr, 'TransactionID:', results[0].TransactionID);
-      callback(null, results[0].TransactionID); // Return the TransactionID
+  getLatestPendingTransactionByCustID: (custID_Nr) => {
+    return new Promise((resolve, reject) => {
+      console.log('Fetching latest pending transaction for customer:', custID_Nr);
+  
+      const query = `
+        SELECT t.TransactionID
+        FROM Transaction t
+        JOIN BankAccount b ON t.AccountID = b.AccountID
+        JOIN Customer c ON b.AccountID = c.AccountID
+        WHERE c.CustID_Nr = ?
+        AND t.Status = 'pending'
+        ORDER BY t.TransactionDate DESC
+        LIMIT 1;
+      `;
+  
+      db.query(query, [custID_Nr], (err, results) => {
+        if (err) {
+          console.error('Error fetching latest pending transaction:', err);
+          return reject({ status: 500, message: 'Database error' });
+        }
+  
+        if (results.length === 0) {
+          console.log('No pending transactions found for customer:', custID_Nr);
+          return reject({ status: 404, message: 'No pending transactions found' });
+        }
+  
+        console.log('Transaction:', results);
+        console.log('Latest pending transaction found for customer:', custID_Nr, 'TransactionID:', results[0].TransactionID);
+  
+        // Resolve the Promise with the result (TransactionID)
+        resolve(results);
+      });
     });
   }
+  
 };
 
 module.exports = TransactionDAO;
