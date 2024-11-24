@@ -98,7 +98,7 @@ const CustomerDAO = {
       SELECT 
         c.CustID_Nr, c.FirstName, c.LastName, c.PhoneNumber, 
         c.Address, c.Email, c.DateOfBirth, c.LoginPin, c.AlertPin, 
-        c.isVerified, c.PanicButtonStatus, c.AccountID,c.LastLogin 
+        c.isVerified, c.PanicButtonStatus, c.AccountID,
         b.AccountNr, b.AccountType, b.Balance
       FROM 
         customer c
