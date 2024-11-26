@@ -122,7 +122,7 @@ const AdminDAO = {
     },
 
     getAllAlerts: (callback) =>{
-        const sql = 'SELECT * FROM alert';
+        const sql = 'SELECT * FROM alert ';
 
         db.query(sql, (err, results) => {
           if (err) {
@@ -172,6 +172,19 @@ const AdminDAO = {
           }
         });
        },
+
+       updateCustomerPanicStatus(custIdNr, callback) {
+        const query = `UPDATE Customer SET PanicButtonStatus = 0 WHERE CustID_Nr = ?`;
+    
+        db.query(query, [custIdNr], (error, results) => {
+            if (error) {
+                console.error('Error updating PanicButtonStatus:', error);
+                return callback(error, null);
+            }
+            callback(null, { message: 'PanicButtonStatus updated to 1 for customer' });
+        });
+    }
+    
     
 };
 

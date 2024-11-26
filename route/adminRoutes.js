@@ -10,6 +10,7 @@ router.put('/admin/:id', AdminController.updateAdmin);
 router.delete('/admin/:id', AdminController.deleteAdmin);
 router.get('/getAll_Alert',AdminController.getAllAlerts);
 router.get('/getLocationbyID/:locationID', AdminController.getLocationByID);
+router.patch('/updatePanicStatus/:custIdNr', AdminController.updateCustomerPanicStatus);
 
 module.exports = router;
 
