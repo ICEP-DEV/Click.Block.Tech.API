@@ -1,6 +1,5 @@
 const CustomerService = require('../service/customerService');
 
-
 const createCustomer = (req, res) => {
     const customerData = req.body;
 
