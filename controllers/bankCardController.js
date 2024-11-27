@@ -95,6 +95,27 @@ const getCustCardByAccountID= (req, res) => {
   });
 };
 
+//Deactivate Card
+const deactivateCardsByCustomer = (req, res) => {
+  const { CustID_Nr } = req.params;
+
+  if (!CustID_Nr) {
+    return res.status(400).json({ error: 'Customer ID is required' });
+  }
+
+  BankCardService.deactivateCardsByCustomer(CustID_Nr, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (result) {
+      res.status(200).json({ message: 'Bank cards deactivated successfully' });
+    } else {
+      res.status(404).json({ message: 'No bank cards found for the given customer ID' });
+    }
+  });
+};
+
 
 module.exports = {
   createBankCard,
@@ -103,4 +124,5 @@ module.exports = {
   deleteBankCard,
   getCardsByAccountID,
   getCustCardByAccountID,
+  deactivateCardsByCustomer
 };
