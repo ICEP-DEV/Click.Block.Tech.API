@@ -361,7 +361,8 @@ module.exports = {
     comparePINSAlert,
     updatePanicStatus,
     getAccountStatistics,
-    getCustByAccID 
+    getCustByAccID,
+    updateLastLogin
 
 };
 

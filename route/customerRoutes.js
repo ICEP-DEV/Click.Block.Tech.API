@@ -2,10 +2,8 @@ const express = require('express');
 
 const { createCustomer, getCustomer, getAccountID, verifyOtp, updateCustomerStep, getCustomerByAccNr,verifyOldPin,
     updateCustomerDetails, createAlertPin, comparePINS,comparePINSAlert, updatePanicStatus,
-    getAccountStatistics,
-    getCustByAccID
-    getAccountStatistics,updateLastLogin
-} = require('../controllers/customerController');
+    getCustByAccID,
+    getAccountStatistics,updateLastLogin } = require('../controllers/customerController');
 
 
 const router = express.Router();
