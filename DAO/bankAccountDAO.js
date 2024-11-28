@@ -132,7 +132,11 @@ const BankAccountDAO = {
   },
 
   countDeactivatedAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS deactivated FROM bankaccount WHERE isActive = 0';
+    const query = `SELECT COUNT(*) AS deactivated 
+    FROM bankaccount 
+    INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
+      WHERE bankaccount.isActive = 0 AND customer.PanicButtonStatus = 0
+    `;
     db.query(query, (err, results) => {
         if (err) {
             console.error(err);

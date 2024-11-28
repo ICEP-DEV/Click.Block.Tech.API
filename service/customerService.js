@@ -306,15 +306,19 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
                         return callback({ status: 500, message: 'Database error' });
                     }
                 }
+
                 const customerID = customerData.CustID_Nr;
                 console.log('Customer created with ID:', customerID);
                 const cardExpirDate = new Date();
                 cardExpirDate.setFullYear(cardExpirDate.getFullYear() + 7);
+
+                // Format the balance with a space as the thousands separator
+         const formattedBalance = new Intl.NumberFormat('en-US', { useGrouping: true }).format(500000);
                 const newBankAccount = {
                     AccountNr: generateRandomAccountNumber(),
                     AccountType: 'Savings',
                     ExpirationDate: cardExpirDate,
-                    Balance: 0,
+                    Balance: formattedBalance,
                     CreationDate: new Date(),
                     isActive: 1,
 
@@ -417,7 +421,27 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
                 });
             });
         });
+    },
+    updateLastLogin: (custID_Nr, callback) => {
+        if (!custID_Nr) return callback(new Error('Customer ID is required'));
+        
+        // Call the DAO method to update the last login timestamp
+        CustomerDAO.updateLastLogin(custID_Nr, (err, result) => {
+            if (err) {
+                console.error('Error updating last login:', err); // Log the error
+                return callback(err); // Return the error via callback
+            }
+    
+            if (result.affectedRows === 0) {
+                console.error('No customer found with the provided ID:', custID_Nr); // Log no matching customer
+                return callback(new Error('No customer found with the provided ID'));
+            }
+    
+            console.log('Last login updated successfully for customer:', custID_Nr);
+            callback(null, { success: true, message: 'Last login updated successfully' });
+        });
     }
+    
 };
 
 function generateRandomAccountNumber() {

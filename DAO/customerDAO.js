@@ -214,7 +214,7 @@ const CustomerDAO = {
   },
   updateLastLogin: (custID_Nr, callback) => {
     const sql = 'UPDATE customer SET LastLogin = ? WHERE CustID_Nr = ?';
-    const currentTimestamp = new Date();
+    const currentTimestamp = new Date(); // Current timestamp
     db.query(sql, [currentTimestamp, custID_Nr], (err, result) => {
         if (err) {
             console.error('Error updating LastLogin:', err);
@@ -223,6 +223,7 @@ const CustomerDAO = {
         callback(null, result);
     });
 },
+
 
 
 };

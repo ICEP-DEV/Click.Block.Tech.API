@@ -131,7 +131,27 @@ getCustCardDetailsByAccountID: (AccountID, callback) => {
     }
     callback(null, null); // Customer not found
   });
+},
+
+// Deactivating Card
+deactivateCardsByCustomer: (CustID_Nr, callback) => {
+  const sql = `
+    UPDATE bankcard 
+    SET IsActive = 0
+    WHERE AccountID IN (
+      SELECT AccountID 
+      FROM customer 
+      WHERE CustID_Nr = ?
+    )`;
+
+  db.query(sql, [CustID_Nr], (err, result) => {
+    if (err) {
+      return callback(new Error('Failed to deactivate cards: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Returns true if one or more rows were updated
+  });
 }
+
 
 };
 

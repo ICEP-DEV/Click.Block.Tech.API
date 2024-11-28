@@ -72,6 +72,14 @@ const comparePINS = (req, res) =>{
                     if (result) {
                     // Passwords match, authentication successful
                     console.log('Remote PINS match');
+                     // Update LastLogin timestamp
+                     CustomerService.updateLastLogin(customer.CustID_Nr, (err, updateResult) => {
+                        if (err) {
+                            console.error('Failed to update LastLogin:', err.message);
+                        } else {
+                            console.log('LastLogin updated successfully');
+                        }
+                    });
                     res.status(200).send(result);
                     } else {
                     // Passwords don't match, authentication failed
@@ -122,7 +130,18 @@ const comparePINSAlert = (req, res) =>{
              
                     if (result) {
                     // Passwords match, authentication successful
+                    
                     console.log('Alert PINS match');
+
+                    // Update LastLogin timestamp
+                    CustomerService.updateLastLogin(customer.CustID_Nr, (err, updateResult) => {
+                        if (err) {
+                            console.error('Failed to update LastLogin:', err.message);
+                        } else {
+                            console.log('LastLogin updated successfully');
+                        }
+                    });
+
                     res.status(200).send(result);
                     } else {
                     // Passwords don't match, authentication failed
@@ -314,6 +333,18 @@ const getAccountStatistics = (req, res) => {
         res.status(200).send(stats);
     });
 };
+
+const updateLastLogin = (req, res) => {
+    const custID_Nr = req.params.custID_Nr;
+
+    CustomerService.updateLastLogin(custID_Nr, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        }
+        res.status(200).send({ message: 'LastLogin updated successfully', result });
+    });
+};
+
 
 
 module.exports = {

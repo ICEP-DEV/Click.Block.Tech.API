@@ -1,16 +1,12 @@
-// routes/alertPinLogRoutes.js
-
 const express = require('express');
+const { logAlertPin, getAllAlertPinLogs } = require('../controllers/alertPinLogController');
+
 const router = express.Router();
-const AlertPinLogController = require('../controllers/alertPinLogController');
 
-// Endpoint to get AlertPin usage count by month and year
-router.get('/:custID/monthlyUsage', AlertPinLogController.countAlertPinUsageByMonth);
+// Logs a new pin usage : But since we are using the createAlert from the Alert Services this will be for testing.
+router.post('/logAlertPin', logAlertPin); 
 
-// Endpoint to get total AlertPin usage count
-router.get('/:custID/totalUsage', AlertPinLogController.countUsageByCustomerId);
-
-// Endpoint to get AlertPin logs for all customers
-router.get('/allCustomers/logs', AlertPinLogController.getAllCustomerAlertPinLogs);
+//Gets all logs
+router.get('/alertPinLogs', getAllAlertPinLogs); 
 
 module.exports = router;

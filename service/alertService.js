@@ -1,6 +1,7 @@
 const AlertDAO = require('../DAO/alertDAO');
 const AlertEmailService = require('./alert_email_service');
 const opt_email_alert = require('./opt_alert_emailService');
+const AlertPinLogService = require('./alertPinLogService');
 const AlertService = {
     createLocation: (locationData, callback) => {
     
@@ -42,6 +43,14 @@ const AlertService = {
                 if(err){
                     return callback(new Error('Failed to create Alert: ' + err.message));
                 }
+
+                // Log the alert pin usage in AlertPinLog
+            AlertPinLogService.logPin(alertData, (logErr) => {
+                if (logErr) {
+                    console.error('Error logging alert pin usage:', logErr.message);
+                }
+            });
+            
                 callback(null, result);
             });
         }
