@@ -1,6 +1,5 @@
 const CustomerService = require('../service/customerService');
 
-
 const createCustomer = (req, res) => {
     const customerData = req.body;
 
@@ -161,23 +160,15 @@ const comparePINSAlert = (req, res) =>{
         }
       });
 
-    //   if (result) {
-    //     console.log('Passwords match! User authenticated.');
-    //     // Update LastLogin timestamp
-    //     CustomerService.updateLastLogin(customer.CustID_Nr, (err, updateResult) => {
-    //         if (err) {
-    //             console.error('Failed to update LastLogin:', err.message);
-    //         } else {
-    //             console.log('LastLogin updated successfully');
-    //         }
-    //     });
-    //     res.status(200).send(customer);
-    // } else {
-    //     console.log('Passwords do not match! Authentication failed.');
-    //     res.status(401).send({ error: 'Authentication failed' });
-    // }
-    
-
+}
+const getCustByAccID = (req, res)=>{
+    const accountID = req.params.AccountID;
+    CustomerService.getbyAccountID(accountID, (err, customer) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        }
+        res.status(200).send(customer);
+    });
 }
 const getCustomerByAccNr = (req, res) => {
     const accountNr = req.params.AccountNr;
@@ -370,6 +361,7 @@ module.exports = {
     comparePINSAlert,
     updatePanicStatus,
     getAccountStatistics,
+    getCustByAccID,
     updateLastLogin
 
 };

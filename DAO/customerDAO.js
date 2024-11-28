@@ -1,5 +1,6 @@
 const db = require('../config/config');
 const BankAccount = require('../models/bankAccount');
+const BankCard = require('../models/bankCard');
 const Customer = require('../models/customer');
 
 const CustomerDAO = {
@@ -63,6 +64,31 @@ const CustomerDAO = {
       }
     });
   },
+  getAccountIDbyCardNum: (cardNum,callback)=>{
+    const sql = 'SELECT * FROM bankcard WHERE CardNumber = ?';
+    db.query(sql, [cardNum], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+
+        if (result.length > 0) {
+          const bankCard = new BankCard(
+            result[0].CardID,
+            result[0].AccountID,
+            result[0].CardNumber,
+            result[0].CardType,
+            result[0].ExpirationDate,
+            result[0].CVV,
+            result[0].IsActive,
+          );
+    
+          callback(null, bankCard);
+        } else {
+          callback(null, null);  
+        }
+      }
+    });
+  },
    getCustomerByAccID: (accountID, callback)=>{
     const sql = 'SELECT * FROM customer WHERE AccountID = ?';
     db.query(sql, [accountID], (err, result) =>{
@@ -95,10 +121,10 @@ const CustomerDAO = {
 
     getById: (custID_Nr, callback) => {
     const sql = `
-      SELECT 
+       SELECT 
         c.CustID_Nr, c.FirstName, c.LastName, c.PhoneNumber, 
         c.Address, c.Email, c.DateOfBirth, c.LoginPin, c.AlertPin, 
-        c.isVerified, c.PanicButtonStatus, c.AccountID,c.LastLogin 
+        c.isVerified, c.PanicButtonStatus, c.AccountID,c.LastLogin, 
         b.AccountNr, b.AccountType, b.Balance
       FROM 
         customer c
@@ -196,7 +222,8 @@ const CustomerDAO = {
         }
         callback(null, result);
     });
-}
+},
+
 
 
 };

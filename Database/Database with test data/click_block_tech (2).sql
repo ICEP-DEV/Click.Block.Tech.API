@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2024 at 12:15 PM
+-- Generation Time: Nov 28, 2024 at 11:37 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -116,7 +116,7 @@ CREATE TABLE `bankaccount` (
 --
 
 INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) VALUES
-(5, '1731970803', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:32:45', 1),
+(5, '1731970803', '2031-11-19', 'Savings', 10000.00, '2024-11-19', 1, '2024-11-28 10:05:38', 1),
 (6, '1731971109', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
 (7, '1731971310', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
 (8, '1731971447', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
@@ -200,10 +200,10 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`CustID_Nr`, `LastName`, `FirstName`, `PhoneNumber`, `Address`, `Email`, `DateOfBirth`, `LoginPin`, `AlertPin`, `isVerified`, `PanicButtonStatus`, `AccountID`, `LastLogin`) VALUES
-('0301013570082', 'Manaka', 'Mpho', '0763542678', '123 Main St', 'MphoManaka@gmail.com', '2003-01-01', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 1, 5, '2024-11-23 15:50:04'),
-('0603028511088', 'Sithole', 'Ntsako', '07998736527', '123 Main St', 'NtsakoSithole@gmail.com', '2006-03-02', '$2a$10$4N7zkuA33ZbsvmTYkfo3Ge9FXZz7ULHh8vsMUCR8TlYNNZZxYBL7e', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 1, 7, '2024-11-21 10:03:04'),
-('8203025652084', 'Baleni', 'Aviwe', '0799088376', '123 Main St', 'AviweBaleni@gmail.com', '1982-03-02', '$2a$10$1iO9SBvM8ulBktPafnWR6.48/r2fPHa2Ax2cl2I5vqaSpcofLEVHm', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 0, 8, '2024-11-20 10:03:14'),
-('9403025087088', 'Mkha', 'Akhona', '0635728926', '123 Main St', 'AkhonaMK@gmail.com', '1994-03-02', '$2a$10$SMJ5n78eb9ay/clyTs8duuoSsrOOp4hGP4ptRhcJPbpce0H2URn8W', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 0, 6, '2024-11-23 15:52:39');
+('0301013570082', 'Manaka', 'Mpho', '0763542678', '123 Main St', 'MphoManaka@gmail.com', '2003-01-01', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', '', 0, 0, 5, '2024-11-28 11:38:54'),
+('0603028511088', 'Sithole', 'Ntsako', '07998736527', '123 Main St', 'NtsakoSithole@gmail.com', '2006-03-02', '$2a$10$4N7zkuA33ZbsvmTYkfo3Ge9FXZz7ULHh8vsMUCR8TlYNNZZxYBL7e', '', 0, 0, 7, '2024-11-21 10:03:04'),
+('8203025652084', 'Baleni', 'Aviwe', '0799088376', '123 Main St', 'AviweBaleni@gmail.com', '1982-03-02', '$2a$10$1iO9SBvM8ulBktPafnWR6.48/r2fPHa2Ax2cl2I5vqaSpcofLEVHm', '', 0, 0, 8, '2024-11-20 10:03:14'),
+('9403025087088', 'Mkha', 'Akhona', '0635728926', '123 Main St', 'AkhonaMK@gmail.com', '1994-03-02', '$2a$10$SMJ5n78eb9ay/clyTs8duuoSsrOOp4hGP4ptRhcJPbpce0H2URn8W', '', 0, 0, 6, '2024-11-23 15:52:39');
 
 -- --------------------------------------------------------
 
@@ -272,8 +272,7 @@ CREATE TABLE `transaction` (
   `TransactionDate` date NOT NULL,
   `TransactionAmount` decimal(10,2) NOT NULL,
   `Status` varchar(50) NOT NULL,
-  `IsPanicTrigered` tinyint(1) DEFAULT NULL,
-  `LocationID` int(11) NOT NULL
+  `IsPanicTrigered` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -356,8 +355,7 @@ ALTER TABLE `supportingdocument`
 --
 ALTER TABLE `transaction`
   ADD PRIMARY KEY (`TransactionID`),
-  ADD KEY `AccountID` (`AccountID`),
-  ADD KEY `LocationID` (`LocationID`);
+  ADD KEY `AccountID` (`AccountID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -403,7 +401,7 @@ ALTER TABLE `location`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `supportingdocument`
@@ -415,7 +413,7 @@ ALTER TABLE `supportingdocument`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123456790;
+  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -469,8 +467,7 @@ ALTER TABLE `supportingdocument`
 -- Constraints for table `transaction`
 --
 ALTER TABLE `transaction`
-  ADD CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `bankaccount` (`AccountID`),
-  ADD CONSTRAINT `transaction_ibfk_2` FOREIGN KEY (`LocationID`) REFERENCES `location` (`LocationID`);
+  ADD CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `bankaccount` (`AccountID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

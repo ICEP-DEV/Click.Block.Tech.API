@@ -97,7 +97,21 @@ const BankCardService = {
       }
       callback(null, result);
     });
-  }
+  },
+//Deactivate card 
+  deactivateCardsByCustomer: (CustID_Nr, callback) => {
+    if (!CustID_Nr) {
+      return callback(new Error('Customer ID is required'));
+    }
+  
+    BankCardDAO.deactivateCardsByCustomer(CustID_Nr, (err, result) => {
+      if (err) {
+        return callback(new Error('Failed to deactivate cards: ' + err.message));
+      }
+      callback(null, result);
+    });
+  },
+  
 };
 
 module.exports = BankCardService;

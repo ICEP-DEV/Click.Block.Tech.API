@@ -79,9 +79,7 @@ CREATE TABLE `Transaction` (
   `TransactionAmount` DECIMAL(10, 2) NOT NULL,
   `Status` VARCHAR(50) NOT NULL,
   `IsPanicTrigered` BOOLEAN NULL,
-  `LocationID` INT NOT NULL,
   FOREIGN KEY (`AccountID`) REFERENCES `BankAccount`(`AccountID`),
-  FOREIGN KEY (`LocationID`) REFERENCES `Location`(`LocationID`)
 );
 
 CREATE TABLE `SupportingDocument` (
