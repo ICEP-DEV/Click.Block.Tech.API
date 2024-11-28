@@ -46,6 +46,10 @@ const CustomerService = {
         if(!accountID) return callback(new Error('Account ID ir required'));
         CustomerDAO.getCustomerByAccID(accountID,callback);
     },
+    getAccIDByCardNum:(cardNum,callback)=>{
+        if(!cardNum)return callback(new Error('Card Number is required'));
+        CustomerDAO.getAccountIDbyCardNum(cardNum,callback);
+    },
 
     getCustomerById: (custID_Nr, callback) => {
         if (!custID_Nr) return callback(new Error('Customer ID is required'));

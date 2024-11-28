@@ -8,7 +8,6 @@ class Alert {
       this._Receiver = Receiver;        
       this._Message = Message;          
     }
-  
     //_____________________SETTERS_____________________________________
   
     set AlertID(value) {

@@ -9,9 +9,10 @@ const bankCardRoutes =  require('./route/bankCardRoutes');
 const alertPinLogRoutes = require('./route/alertPinLogRoutes');
 const adminRoutes = require('./route/adminRoutes');
 const contactMeMessageRoutes = require('./route/contactMeMessageRoute');
-
+const transactionRoute = require('./route/transactionRoutes');
+const atmRouter = require('./route/atmRoutes');
 const alertRoutes = require('./route/alertRoutes');
-
+const notificationRoutes = require('./route/notificationRoutes');
 
 const app = express();
 
@@ -34,6 +35,12 @@ app.use('/api', bankCardRoutes);
 //alert pin stats route
 app.use('/api', alertPinLogRoutes);
 app.use('/api', contactMeMessageRoutes);
+app.use('/api', transactionRoute);
+
+//atm route
+app.use('/api', atmRouter);
+//notification
+app.use('/api',notificationRoutes);
 
 
 
