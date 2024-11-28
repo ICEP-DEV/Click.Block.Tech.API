@@ -42,20 +42,6 @@ const TransactionDAO = {
     });
   },
 
-  createTransaction: (transactionData, callback = () => {}) => {
-    console.log('Creating transaction with data:', transactionData);
-    const query = 'INSERT INTO transaction SET ?';
-
-    db.query(query, transactionData, (err, result) => {
-      if (err) {
-        console.error('Error creating transaction:', err);
-        return callback({ status: 500, message: 'Database error' });
-      }
-
-      console.log("Transaction created successfully:", result);
-      callback(null, result.insertId); // Return the newly created transaction ID
-    });
-  },
 
   updateTransactionStatus: (transactionId, status, callback = () => {}) => {
     console.log('Updating transaction status for transactionId:', transactionId, 'to status:', status);

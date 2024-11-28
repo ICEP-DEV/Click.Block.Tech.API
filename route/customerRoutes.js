@@ -2,7 +2,8 @@ const express = require('express');
 
 const { createCustomer, getCustomer, getAccountID, verifyOtp, updateCustomerStep, getCustomerByAccNr,verifyOldPin,
     updateCustomerDetails, createAlertPin, comparePINS,comparePINSAlert, updatePanicStatus,
-    getAccountStatistics
+    getAccountStatistics,
+    getCustByAccID
 } = require('../controllers/customerController');
 
 
@@ -26,6 +27,7 @@ router.put('/customers/:custID_Nr',updateCustomerDetails);
 
 // New route to retrieve account statistics
 router.get('/customers/statistics', getAccountStatistics);
+router.get('/getCustByAccID/:AccountID',getCustByAccID);
 
 module.exports = router;
 

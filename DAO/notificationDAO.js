@@ -28,7 +28,22 @@ const NotificationDAO = {
               ));
               callback(null, notification);
           });
-    }
+    },
+    
+    updateNotificationStatus: (status,transactionId, callback = () => {}) => {
+      
+      const query = 'UPDATE notification SET Status = ? WHERE TransactionID = ?';
+  
+      db.query(query, [status, transactionId], (err, result) => {
+        if (err) {
+          console.error('Error updating notification status:', err);
+          return callback({ status: 500, message: 'Database error' });
+        }
+  
+        console.log("Notification status updated successfully:", result);
+        callback(null, result.affectedRows); // Return the number of affected rows
+      });
+    },
 }  
 
 module.exports = NotificationDAO;

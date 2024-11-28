@@ -222,7 +222,8 @@ const CustomerDAO = {
         }
         callback(null, result);
     });
-}
+},
+
 
 };
 

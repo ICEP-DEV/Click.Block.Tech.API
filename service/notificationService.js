@@ -16,6 +16,11 @@ const NotificationService = {
     
         NotificationDao.getNotificationsByStatus(status, callback);
        
+    },
+    updateNotificationStatus(status,transactionId, callback){
+        
+        NotificationDao.updateNotificationStatus(status,transactionId, callback);
+        
     }
 }
 module.exports = NotificationService;

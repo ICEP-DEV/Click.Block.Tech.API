@@ -142,6 +142,15 @@ const comparePINSAlert = (req, res) =>{
       });
 
 }
+const getCustByAccID = (req, res)=>{
+    const accountID = req.params.AccountID;
+    CustomerService.getbyAccountID(accountID, (err, customer) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        }
+        res.status(200).send(customer);
+    });
+}
 const getCustomerByAccNr = (req, res) => {
     const accountNr = req.params.AccountNr;
     const loginPin = req.params.LoginPin;
@@ -320,7 +329,8 @@ module.exports = {
     comparePINS,
     comparePINSAlert,
     updatePanicStatus,
-    getAccountStatistics
+    getAccountStatistics,
+    getCustByAccID 
 
 };
 

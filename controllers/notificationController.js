@@ -29,4 +29,15 @@ const getNotificationByStatus = (req,res)=>{
     res.status(201).send(result);
    });
 }
-module.exports = {createNotification, getNotificationByStatus}
+
+const updateNotificationStatus = (req,res)=>{
+    const {status, transactionID} = req.body;
+    NotificationService.updateNotificationStatus(status,transactionID, (err, result)=>{
+        if(err){
+            return res.status(500).send({ error: err.message });
+        }
+        res.status(200).json({message: "Notification updated"})
+    });
+    
+}
+module.exports = {createNotification, getNotificationByStatus, updateNotificationStatus}
