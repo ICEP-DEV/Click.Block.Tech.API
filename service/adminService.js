@@ -66,6 +66,10 @@ const AdminService = {
             if (err) return callback(err);
             callback(null, result);
         });
+    },
+
+    getActivatedPanic: (callback) => {
+        AdminDAO.getActivatedPanic(callback);
     }
 };
 

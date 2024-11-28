@@ -146,7 +146,8 @@ const AdminDAO = {
           
           
         });
-      },
+    },
+
       getLocationByID: (locationID, callback)=>{
         const sql = 'SELECT * FROM location WHERE LocationID = ?';
         db.query(sql, [locationID], (err, result) =>{
@@ -174,7 +175,10 @@ const AdminDAO = {
        },
 
        updateCustomerPanicStatus(custIdNr, callback) {
-        const query = `UPDATE Customer SET PanicButtonStatus = 0 WHERE CustID_Nr = ?`;
+        const query = `UPDATE Customer 
+                    INNER JOIN BankAccount ON Customer.AccountID = BankAccount.AccountID
+                    SET Customer.PanicButtonStatus = 0
+                    WHERE Customer.CustID_Nr = ?;`;
     
         db.query(query, [custIdNr], (error, results) => {
             if (error) {
@@ -182,10 +186,47 @@ const AdminDAO = {
                 return callback(error, null);
             }
             callback(null, { message: 'PanicButtonStatus updated to 1 for customer' });
-        });
-    }
-    
-    
+        })},
+
+    getActivatedPanic(callback) {
+
+    const sql = `
+        SELECT 
+            a.AlertID,
+            c.CustID_Nr,
+            a.AlertType,
+            a.SentDate,
+            a.LocationID,
+            a.Receiver,
+            a.Message
+        FROM Customer c
+        JOIN Alert a ON c.CustID_Nr = a.CustID_Nr
+        WHERE c.PanicButtonStatus = 1;
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+          console.error('Error retrieving alerts:', err);
+          return callback({ status: 500, message: 'Database error' });
+        }
+        if(results.length > 0){
+          const alerts = results.map(result => new Alert(
+              result.AlertID,
+              result.CustID_Nr,
+              result.AlertType,
+              result.SentDate,
+              result.LocationID,
+              result.Receiver,
+              result.Message
+          ))
+          callback(null, alerts);
+        }else{
+          callback(null, null);
+        }
+        
+        
+      });
+    }    
 };
 
 module.exports = AdminDAO;

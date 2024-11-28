@@ -82,7 +82,18 @@ const AdminController = {
             }
             res.json({ message: 'Customer PanicButtonStatus updated successfully', result });
         });
-    }
+    },
+
+   
+    getActivatedPanic: (req, res) => {
+        AdminService.getActivatedPanic((err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({ message: 'Successfully fetched alerts', result });
+        });
+    },
+
 };
 
 module.exports = AdminController;
