@@ -56,6 +56,32 @@ const transactionService = require('../service/transactionService');
     });
   }
 
+  const updateAccountBalance = (req, res)=>{
+    const {accountID, requestedAmount} = req.body;
+    transactionService.getBankAccount(accountID, (result)=>{
+      
+        const availableBalance = result.Balance;
+        console.log(typeof(requestedAmount));
+        const newBalance = availableBalance - requestedAmount;
+        transactionService.updateAccountBalance(accountID, newBalance,(result)=>{
+         
+        });
+        res.status(200).json(result);
+    });
+  }
+  const getTransactionByID = (req, res)=>{
+    const transactionID = req.params.transactionID;
+ transactionService.getTransactionByID(transactionID, (result)=>{
+      res.status(200).json(result);
+  });
+  }
+const updateTransacPanicStatus = (req, res)=>{
+  const {transactionId, status} = req.body;
+
+  transactionService.updateTransacPanicStatus(transactionId, status, (result)=>{
+    res.status(200).json(result);
+  })
+}
 
 
-  module.exports = {createTransaction, getTransactionsByAccID, updateTransactionStatus, getBankAccount}
+  module.exports = {updateTransacPanicStatus,createTransaction, getTransactionsByAccID, updateTransactionStatus, getBankAccount, updateAccountBalance,getTransactionByID}

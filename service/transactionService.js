@@ -84,6 +84,39 @@ class TransactionService {
       
     })
   }
+
+  updateAccountBalance(accountID, newBalance, callback){
+    TransactionDAO.updateBankAccountBalance(accountID, newBalance, (err, result)=>{
+      if(err){
+        console.error('updating status:', err);
+        return callback(new Error('Failed to update transaction status.'));
+      }
+    })
+  } 
+  getTransactionByID(transactionID, callback){
+    TransactionDAO.getTransactionById(transactionID, (err, transaction)=>{
+      if (err) {
+        console.error('Error fetching transaction:', err);
+        return callback(new Error('Failed to retrieve transaction.'));
+      }
+      if (!transaction) {
+        console.error('Transaction not found for ID:', transactionID);
+        return callback(new Error('Transaction not found.'));
+      }
+      return callback(transaction);
+    })
+  }
+
+  updateTransacPanicStatus(transactionId, status, callback){
+    TransactionDAO.updateTransacPanicStatus(transactionId, status, (err, result)=>{
+      if(err){
+        console.error('Error updating transaction panic status:', err);
+        return callback(new Error('Failed to update transaction panic status.'));
+      }
+      return callback(result);
+    });
+  }
+
 }
 
 module.exports = new TransactionService();

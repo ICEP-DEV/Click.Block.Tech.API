@@ -135,7 +135,21 @@ const TransactionDAO = {
       console.log("Bank account balance updated successfully:", result);
       callback(null, result.affectedRows); // Return the number of affected rows
     });
-  }
+  },
+  updateTransacPanicStatus: (transactionID, status, callback = () => {}) => {
+   
+    const query = 'UPDATE transaction SET IsPanicTrigered = ? WHERE TransactionID = ?';
+
+    db.query(query, [status, transactionID], (err, result) => {
+      if (err) {
+        console.error('Error updating transaction panic status:', err);
+        return callback({ status: 500, message: 'Database error' });
+      }
+
+      console.log("Transaction Panic Status updated successfully:", result);
+      callback(null, result.affectedRows);
+    });
+  },
 };
 
 module.exports = TransactionDAO;
