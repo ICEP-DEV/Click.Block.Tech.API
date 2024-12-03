@@ -6,13 +6,13 @@ const transactionService = require('../service/transactionService');
     const {transactionType, transactionAmount, accountID } = req.body;
     try {
       const status = "pending";
-      const dateNow = new Date();
+      
      TransactionService.createTransaction(transactionType, transactionAmount,status,dateNow,accountID,(transacResult)=>{
       if(transacResult){
         NotificationService.createNotification({
           TransactionID: transacResult.transactionID,
           NotificationType: transactionType,
-          SentDate: dateNow,
+          SentDate: new Date(),   
           status: status
         },(err, result)=>{
           if(err){

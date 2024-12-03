@@ -1,4 +1,6 @@
 const CustomerService = require('../service/customerService');
+const transactionService = require('../service/transactionService');
+const ContactMeMessageService = require('../service/contactMeMessageService');
 
 const createCustomer = (req, res) => {
     const customerData = req.body;
@@ -346,6 +348,33 @@ const updateLastLogin = (req, res) => {
 };
 
 
+//Fetching Customer Details
+
+
+const getCustomerInfo = (req, res) => {
+    const { custID_Nr } = req.params;
+
+    if (!custID_Nr) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
+
+    CustomerService.getCustomerInfo(custID_Nr, (err, customerInfo) => {
+      if (err) {
+        console.error(`Error fetching customer info for ID ${custID_Nr}:`, err);
+        return res.status(500).json({ error: 'An error occurred while fetching customer details.' });
+      }
+
+      if (!customerInfo) {
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+
+      res.status(200).json(customerInfo);
+    });
+  };
+
+
+
+
 
 module.exports = {
     createCustomer,
@@ -362,7 +391,7 @@ module.exports = {
     updatePanicStatus,
     getAccountStatistics,
     getCustByAccID,
-    updateLastLogin
-
+    updateLastLogin,
+    getCustomerInfo
 };
 

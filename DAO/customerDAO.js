@@ -2,6 +2,8 @@ const db = require('../config/config');
 const BankAccount = require('../models/bankAccount');
 const BankCard = require('../models/bankCard');
 const Customer = require('../models/customer');
+const ContactMeMessages = require('../models/contactMeMessage');
+const Transactions = require('../models/transaction')
 
 const CustomerDAO = {
   create: (customerData, callback) => {
@@ -224,8 +226,97 @@ const CustomerDAO = {
     });
 },
 
+// Get customer details
+getCustomerDetails: (custID_Nr, callback) => {
+  const sql = `
+    SELECT 
+      c.FirstName AS firstName, 
+      c.LastName AS lastName, 
+      c.Email AS email, 
+      c.PhoneNumber AS phoneNumber, 
+      c.LastLogin AS lastLogin, 
+      c.Address AS address, 
+      b.CreationDate AS registeredOn
+    FROM 
+      Customer c
+    LEFT JOIN 
+      BankAccount b ON c.AccountID = b.AccountID
+    WHERE 
+      c.CustID_Nr = ?;
+  `;
 
+  db.query(sql, [custID_Nr], (err, result) => {
+    if (err) {
+      console.error("Error fetching customer details:", err);
+      return callback(new Error("Database error while fetching customer details"), null);
+    }
 
+    if (result.length > 0) {
+      const customerDetails = result[0];
+      return callback(null, customerDetails);
+    } else {
+      return callback(null, null);
+    }
+  });
+},
+
+// Get messages by customer ID
+getMessagesByCustomerId: (custID_Nr, callback) => {
+  const sql = `
+    SELECT 
+      cm.SentTime AS time
+    FROM 
+      ContactMeMessage cm
+    WHERE 
+      cm.CustID_Nr = ?;
+  `;
+
+  db.query(sql, [custID_Nr], (err, result) => {
+    if (err) {
+      console.error("Error fetching messages:", err);
+      return callback(new Error("Database error while fetching messages"), null);
+    }
+
+    const messages = result.map(row => ({
+      type: 'Support Message',
+      time: row.time
+    }));
+
+    return callback(null, messages);
+  });
+},
+
+// Get transactions by customer ID
+getTransactionsByCustomerId: (custID_Nr, callback) => {
+  const sql = `
+    SELECT 
+      t.TransactionType AS type, 
+      t.TransactionDate AS date
+    FROM 
+      Transaction t
+    INNER JOIN 
+      BankAccount b ON t.AccountID = b.AccountID
+    INNER JOIN 
+      Customer c ON b.AccountID = c.AccountID
+    WHERE 
+      c.CustID_Nr = ?;
+  `;
+
+  db.query(sql, [custID_Nr], (err, result) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      return callback(new Error("Database error while fetching transactions"), null);
+    }
+
+    const transactions = result.map(row => ({
+      type: row.type,
+      date: row.date
+    }));
+
+    return callback(null, transactions);
+  });
+},
 };
+
 
 module.exports = CustomerDAO;

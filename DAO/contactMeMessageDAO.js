@@ -4,8 +4,8 @@ const ContactMeMessageDAO = {
   create: (newMessage, callback) => {
     const sql = `
       INSERT INTO contactmemessage 
-      (CustID_Nr, FullNames, PhoneNumber, Email, MessageDescription, Status, AdminID) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      (CustID_Nr, FullNames, PhoneNumber, Email, MessageDescription, Status, AdminID, SentTime) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     db.query(sql, [
       newMessage.CustID_Nr,
@@ -14,7 +14,8 @@ const ContactMeMessageDAO = {
       newMessage.Email,
       newMessage.MessageDescription,
       newMessage.Status || 'pending',
-      newMessage.AdminID || null
+      newMessage.AdminID || null,
+      new Date() // Sets the SentTime to the current date and time
     ], (err, result) => {
       if (err) return callback(new Error('Failed to create message: ' + err.message));
       callback(null, result.insertId);
@@ -28,6 +29,7 @@ const ContactMeMessageDAO = {
       callback(null, result.length ? result[0] : null);
     });
   },
+
 
   updateStatus: (MessageID, status, callback) => {
     const sql = 'UPDATE contactmemessage SET Status = ? WHERE MessageID = ?';

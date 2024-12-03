@@ -161,17 +161,17 @@ CREATE TABLE `contactmemessage` (
   `Email` varchar(100) NOT NULL,
   `MessageDescription` varchar(255) DEFAULT NULL,
   `Status` varchar(10) NOT NULL,
-  `AdminID` char(13) DEFAULT NULL
+  `AdminID` char(13) DEFAULT NULL,
+  `SentTime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Dumping data for table `contactmemessage`
 --
 
-INSERT INTO `contactmemessage` (`MessageID`, `CustID_Nr`, `FullNames`, `PhoneNumber`, `Email`, `MessageDescription`, `Status`, `AdminID`) VALUES
-(4, '0301013570082', 'Mpho Manaka', '0799800273', 'MphoManaka@gmail.com', 'Can\'t Log In .', 'Pending', '3288841753'),
-(5, '8203025652084', 'Aviwe Baleni', '0799800273', 'AviweBaleni@gmail.com', 'Can\'t Log In .', 'Pending', '3288841753'),
-(6, '8203025652084', 'Aviwe Baleni', '0799800273', 'AviweBaleni@gmail.com', 'App Not Working.', 'Pending', '3288841753');
+INSERT INTO `contactmemessage` (`MessageID`, `CustID_Nr`, `FullNames`, `PhoneNumber`, `Email`, `MessageDescription`, `Status`, `AdminID`, `SentTime`) VALUES
+(4, '0301013570082', 'Mpho Manaka', '0799800273', 'MphoManaka@gmail.com', 'Can\'t Log In .', 'Pending', '3288841753', '2024-12-03 11:12:19'),
+(5, '8203025652084', 'Aviwe Baleni', '0799800273', 'AviweBaleni@gmail.com', 'Can\'t Log In .', 'Pending', '3288841753', '2024-12-03 11:12:19'),
+(6, '8203025652084', 'Aviwe Baleni', '0799800273', 'AviweBaleni@gmail.com', 'App Not Working.', 'Pending', '3288841753', '2024-12-03 11:12:19');
 
 -- --------------------------------------------------------
 
@@ -269,7 +269,7 @@ CREATE TABLE `transaction` (
   `TransactionID` int(11) NOT NULL,
   `AccountID` int(11) NOT NULL,
   `TransactionType` varchar(50) NOT NULL,
-  `TransactionDate` date NOT NULL,
+  `TransactionDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `TransactionAmount` decimal(10,2) NOT NULL,
   `Status` varchar(50) NOT NULL,
   `IsPanicTrigered` tinyint(1) DEFAULT NULL

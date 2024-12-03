@@ -25,7 +25,7 @@ class TransactionService {
             null,
             accountID,
             transactionType,
-            date,
+            null, //this is to get the CurrentDate and Time
             transactionAmount,
             status,
             0
