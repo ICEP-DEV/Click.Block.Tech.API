@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2024 at 11:37 AM
+-- Generation Time: Dec 03, 2024 at 11:40 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -56,7 +56,7 @@ CREATE TABLE `alert` (
   `AlertID` int(11) NOT NULL,
   `CustID_Nr` char(13) NOT NULL,
   `AlertType` varchar(50) NOT NULL,
-  `SentDate` date NOT NULL,
+  `SentDate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `LocationID` int(11) NOT NULL,
   `Receiver` varchar(255) NOT NULL,
   `Message` text DEFAULT NULL
@@ -67,10 +67,11 @@ CREATE TABLE `alert` (
 --
 
 INSERT INTO `alert` (`AlertID`, `CustID_Nr`, `AlertType`, `SentDate`, `LocationID`, `Receiver`, `Message`) VALUES
-(1, '0301013570082', 'Panic', '2024-11-09', 1, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
-(2, '8203025652084', 'Panic', '2024-11-09', 2, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
-(1234567893, '8203025652084', 'Emergency', '2024-11-09', 1, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
-(1234567894, '9403025087088', 'Emergency', '2024-11-09', 3, 'Emergency Services', 'User needs immediate assistance at the provided location.');
+(1, '0301013570082', 'Panic', '2024-11-27 04:13:15', 1, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
+(2, '8203025652084', 'Panic', '2024-11-08 22:00:00', 2, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
+(1234567893, '8203025652084', 'Emergency', '2024-11-08 22:00:00', 1, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
+(1234567894, '9403025087088', 'Emergency', '2024-11-08 22:00:00', 3, 'Emergency Services', 'User needs immediate assistance at the provided location.'),
+(1234567896, '9403025087088', 'Emergency', '2024-11-08 22:00:00', 3, 'Emergency Services', 'User needs immediate assistance at the provided location.');
 
 -- --------------------------------------------------------
 
@@ -91,7 +92,8 @@ CREATE TABLE `alertpinlogs` (
 
 INSERT INTO `alertpinlogs` (`LogID`, `CustID_Nr`, `TriggerDate`, `Action`) VALUES
 (5, '8203025652084', '2024-11-23 17:39:33', 'Alert Triggered'),
-(6, '9403025087088', '2024-11-23 17:42:35', 'Alert Triggered');
+(6, '9403025087088', '2024-11-23 17:42:35', 'Alert Triggered'),
+(7, '9403025087088', '2024-11-26 11:40:44', 'Alert Triggered');
 
 -- --------------------------------------------------------
 
@@ -116,7 +118,7 @@ CREATE TABLE `bankaccount` (
 --
 
 INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) VALUES
-(5, '1731970803', '2031-11-19', 'Savings', 10000.00, '2024-11-19', 1, '2024-11-28 10:05:38', 1),
+(5, '1731970803', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:32:45', 1),
 (6, '1731971109', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
 (7, '1731971310', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
 (8, '1731971447', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
@@ -143,9 +145,9 @@ CREATE TABLE `bankcard` (
 
 INSERT INTO `bankcard` (`CardID`, `AccountID`, `CardNumber`, `CardType`, `ExpirationDate`, `CVV`, `IsActive`) VALUES
 (5, 5, '5478434791209107', 'debit', '2025-11-18', '494', 1),
-(6, 6, '5478864953928026', 'debit', '2027-11-18', '693', 1),
+(6, 6, '5478864953928026', 'debit', '2027-11-18', '693', 0),
 (7, 7, '5478995619569719', 'debit', '2027-11-18', '401', 1),
-(8, 8, '5478847681250517', 'debit', '2027-11-18', '405', 1);
+(8, 8, '5478847681250517', 'debit', '2027-11-18', '405', 0);
 
 -- --------------------------------------------------------
 
@@ -164,6 +166,7 @@ CREATE TABLE `contactmemessage` (
   `AdminID` char(13) DEFAULT NULL,
   `SentTime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Dumping data for table `contactmemessage`
 --
@@ -200,10 +203,10 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`CustID_Nr`, `LastName`, `FirstName`, `PhoneNumber`, `Address`, `Email`, `DateOfBirth`, `LoginPin`, `AlertPin`, `isVerified`, `PanicButtonStatus`, `AccountID`, `LastLogin`) VALUES
-('0301013570082', 'Manaka', 'Mpho', '0763542678', '123 Main St', 'MphoManaka@gmail.com', '2003-01-01', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', '', 0, 0, 5, '2024-11-28 11:38:54'),
-('0603028511088', 'Sithole', 'Ntsako', '07998736527', '123 Main St', 'NtsakoSithole@gmail.com', '2006-03-02', '$2a$10$4N7zkuA33ZbsvmTYkfo3Ge9FXZz7ULHh8vsMUCR8TlYNNZZxYBL7e', '', 0, 0, 7, '2024-11-21 10:03:04'),
-('8203025652084', 'Baleni', 'Aviwe', '0799088376', '123 Main St', 'AviweBaleni@gmail.com', '1982-03-02', '$2a$10$1iO9SBvM8ulBktPafnWR6.48/r2fPHa2Ax2cl2I5vqaSpcofLEVHm', '', 0, 0, 8, '2024-11-20 10:03:14'),
-('9403025087088', 'Mkha', 'Akhona', '0635728926', '123 Main St', 'AkhonaMK@gmail.com', '1994-03-02', '$2a$10$SMJ5n78eb9ay/clyTs8duuoSsrOOp4hGP4ptRhcJPbpce0H2URn8W', '', 0, 0, 6, '2024-11-23 15:52:39');
+('0301013570082', 'Manaka', 'Mpho', '0763542678', '123 Main St', 'MphoManaka@gmail.com', '2003-01-01', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 1, 5, '2024-11-23 15:50:04'),
+('0603028511088', 'Sithole', 'Ntsako', '07998736527', '123 Main St', 'NtsakoSithole@gmail.com', '2006-03-02', '$2a$10$4N7zkuA33ZbsvmTYkfo3Ge9FXZz7ULHh8vsMUCR8TlYNNZZxYBL7e', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 1, 7, '2024-11-21 10:03:04'),
+('8203025652084', 'Baleni', 'Aviwe', '0799088376', '123 Main St', 'AviweBaleni@gmail.com', '1982-03-02', '$2a$10$1iO9SBvM8ulBktPafnWR6.48/r2fPHa2Ax2cl2I5vqaSpcofLEVHm', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 0, 8, '2024-11-20 10:03:14'),
+('9403025087088', 'Mkha', 'Akhona', '0635728926', '123 Main St', 'AkhonaMK@gmail.com', '1994-03-02', '$2a$10$SMJ5n78eb9ay/clyTs8duuoSsrOOp4hGP4ptRhcJPbpce0H2URn8W', '$2a$10$X6T5a7ybwZT8VcFFWpmDH.bYVqBjSA5I8Xc0ipbq4Df5DOxVfWO4q', 0, 0, 6, '2024-11-23 15:52:39');
 
 -- --------------------------------------------------------
 
@@ -269,11 +272,20 @@ CREATE TABLE `transaction` (
   `TransactionID` int(11) NOT NULL,
   `AccountID` int(11) NOT NULL,
   `TransactionType` varchar(50) NOT NULL,
-  `TransactionDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `TransactionDate` datetime NOT NULL DEFAULT current_timestamp(),
   `TransactionAmount` decimal(10,2) NOT NULL,
   `Status` varchar(50) NOT NULL,
-  `IsPanicTrigered` tinyint(1) DEFAULT NULL
+  `IsPanicTrigered` tinyint(1) DEFAULT NULL,
+  `LocationID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction`
+--
+
+INSERT INTO `transaction` (`TransactionID`, `AccountID`, `TransactionType`, `TransactionDate`, `TransactionAmount`, `Status`, `IsPanicTrigered`, `LocationID`) VALUES
+(123456790, 5, 'Withdraw', '2024-11-21 00:00:00', 200.00, 'Pending', 0, 1),
+(123456791, 6, 'Withdraw', '2024-12-02 00:00:00', 100.00, 'Approved', 0, 2);
 
 --
 -- Indexes for dumped tables
@@ -355,7 +367,8 @@ ALTER TABLE `supportingdocument`
 --
 ALTER TABLE `transaction`
   ADD PRIMARY KEY (`TransactionID`),
-  ADD KEY `AccountID` (`AccountID`);
+  ADD KEY `AccountID` (`AccountID`),
+  ADD KEY `LocationID` (`LocationID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -365,13 +378,13 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `alert`
 --
 ALTER TABLE `alert`
-  MODIFY `AlertID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1234567895;
+  MODIFY `AlertID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1234567897;
 
 --
 -- AUTO_INCREMENT for table `alertpinlogs`
 --
 ALTER TABLE `alertpinlogs`
-  MODIFY `LogID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `LogID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `bankaccount`
@@ -401,7 +414,7 @@ ALTER TABLE `location`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `supportingdocument`
@@ -413,7 +426,7 @@ ALTER TABLE `supportingdocument`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `TransactionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123456792;
 
 --
 -- Constraints for dumped tables
@@ -467,7 +480,8 @@ ALTER TABLE `supportingdocument`
 -- Constraints for table `transaction`
 --
 ALTER TABLE `transaction`
-  ADD CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `bankaccount` (`AccountID`);
+  ADD CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `bankaccount` (`AccountID`),
+  ADD CONSTRAINT `transaction_ibfk_2` FOREIGN KEY (`LocationID`) REFERENCES `location` (`LocationID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
