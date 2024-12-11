@@ -1,4 +1,5 @@
 const CustomerService = require('../service/customerService');
+const ForgotPinService = require('../service/forgotPasswordService');
 const transactionService = require('../service/transactionService');
 const ContactMeMessageService = require('../service/contactMeMessageService');
 
@@ -372,11 +373,54 @@ const getCustomerInfo = (req, res) => {
     });
   };
 
+  const updatePin = async (req, res) => {
+    const { custID_Nr, newPin } = req.body;
+
+    if (!custID_Nr || !newPin) {
+        return res.status(400).json({ message: 'custID_Nr and new PIN are required.' });
+    }
+
+    try {
+        await ForgotPinService.updatePin(custID_Nr, newPin); // Service updates the PIN
+        res.status(200).json({ message: 'PIN updated successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const sendOtp = async (req, res) => {
+    const { Email } = req.body;
+
+    if (!Email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    try {
+        const otp = await ForgotPinService.generateAndSendOtp(Email); // Service generates and sends OTP
+        res.status(200).json({ message: 'OTP sent. Verify it.', otp }); // Remove `otp` in production for security
+    } catch (error) {
+        res.status(500).json({ message: `Failed to send OTP: ${error.message}` });
+    }
+};
+
+const verifyOtpFP = (req, res) => {
+    const { Email, otp } = req.body;
+
+    ForgotPinService.verifyOtpFP(Email, otp, (err, result) => {
+        if (err) {
+            return res.status(err.status || 500).send({ error: err.message });
+        }
+        res.sendStatus(200).send(result);
+    });
+};
 
 
 
 
 module.exports = {
+    verifyOtpFP,
+    sendOtp,
+    updatePin,
     createCustomer,
     updateCustomerStep,
     verifyOtp,
