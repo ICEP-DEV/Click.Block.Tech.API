@@ -403,15 +403,15 @@ const sendOtp = async (req, res) => {
     }
 };
 
-const verifyOtpFP = (req, res) => {
+const verifyOtpFP = async (req, res) => {
     const { Email, otp } = req.body;
 
-    ForgotPinService.verifyOtpFP(Email, otp, (err, result) => {
-        if (err) {
-            return res.status(err.status || 500).send({ error: err.message });
-        }
-        res.sendStatus(200).send(result);
-    });
+    try {
+        await ForgotPinService.verifyOtpFP(Email, otp); // Service verifies OTP
+        res.status(200).json({ message: 'OTP verified successfully.' });
+    } catch (error) {
+        res.status(400).json({ message: `Failed to verify OTP: ${error.message}` });
+    }
 };
 
 

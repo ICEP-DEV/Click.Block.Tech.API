@@ -168,23 +168,16 @@ const CustomerDAO = {
     });
   },
 
-  updatePin: (custID_Nr, newPin, callback) => {
-    const sql = 'UPDATE customer SET LoginPin = ? WHERE CustID_Nr = ?';
-  
-    db.query(sql, [newPin, custID_Nr], (err, result) => {
+  // Assuming this is in customerDAO.js
+updatePin : (custID_Nr, newPin, callback) => {
+  const query = 'UPDATE Customer SET loginPin = ? WHERE CustID_Nr = ?';
+  db.query(query, [newPin, custID_Nr], (err, result) => {
       if (err) {
-        console.error("Error updating PIN:", err);
-        return callback({ status: 500, message: 'Database error' });
+          return callback(err); // Pass error to callback
       }
-  
-      if (result.affectedRows === 0) {
-        return callback({ status: 404, message: 'Customer not found' });
-      }
-  
-      console.log("PIN updated successfully for customer:", custID_Nr);
-      callback(null, { status: 200, message: 'PIN updated successfully' });
-    });
-  },
+      callback(null, { message: 'PIN updated successfully!' }); // Pass success message to callback
+  });
+},
 
   update: (custID_Nr, updateData, callback) => {
     const sql = 'UPDATE customer SET ? WHERE CustID_Nr = ?';
