@@ -213,6 +213,7 @@ getAllCustomerDetails: (callback) => {
   const query = `
       SELECT 
     customer.Email AS "Email Address",
+    customer.CustID_Nr,
     CONCAT(SUBSTRING(customer.FirstName, 1, 1), '. ', customer.LastName) AS "Customer Details",
     DATE_FORMAT(bankaccount.CreationDate, '%m/%d/%Y') AS "Registration Date",
     CASE 
