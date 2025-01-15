@@ -12,7 +12,7 @@ const transactionService = require('../service/transactionService');
         NotificationService.createNotification({
           TransactionID: transacResult.transactionID,
           NotificationType: transactionType,
-          SentDate: dateNow,
+          SentDate: dateNow,   
           status: status
         },(err, result)=>{
           if(err){

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const AdminDAO = require('../DAO/adminDAO');
+const CustomerDAO = require('../DAO/customerDAO'); // Add this to access the CustomerDAO
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -27,8 +28,6 @@ const AdminService = {
 
             callback(null, { success: true, message: 'Login successful', token, admin });
         });
-
-
     },
 
     getAdminById: (adminID, callback) => {
@@ -54,11 +53,23 @@ const AdminService = {
         AdminDAO.delete(adminID, callback);
     },
 
-    getAllAlerts: (callback)=>{
+    getAllAlerts: (callback) => {
         AdminDAO.getAllAlerts(callback);
     },
-    getLocationByID: (locationID, callback) =>{
+
+    getLocationByID: (locationID, callback) => {
         AdminDAO.getLocationByID(locationID, callback);
+    },
+
+    updateCustomerPanicStatus: (custIdNr, callback) => {
+        AdminDAO.updateCustomerPanicStatus(custIdNr, (err, result) => {
+            if (err) return callback(err);
+            callback(null, result);
+        });
+    },
+
+    getActivatedPanic: (callback) => {
+        AdminDAO.getActivatedPanic(callback);
     }
 };
 

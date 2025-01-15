@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const CustomerDAO = require('../DAO/customerDAO');
 const BankAccountDAO = require('../DAO/bankAccountDAO');
 const BankCardDAO = require('../DAO/bankCardDAO');
+const Transaction = require('../DAO/transactionDAO');
+const ContactMeMessage = require('../DAO/contactMeMessageDAO');
 const EmailService = require('./emailService');
 const crypto = require('crypto');
 const AlertPinLogDAO = require('../DAO/alertPinLogDAO'); 
@@ -433,16 +435,47 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
             }
     
             if (result.affectedRows === 0) {
-                console.error('No customer found with the provided ID:', custID_Nr); // Log no matching customer
+                console.error('No customer found with the provided ID:', custID_Nr); 
                 return callback(new Error('No customer found with the provided ID'));
             }
     
             console.log('Last login updated successfully for customer:', custID_Nr);
             callback(null, { success: true, message: 'Last login updated successfully' });
         });
-    }
+    },
+
     
-};
+    getCustomerInfo: (custID_Nr, callback) => {
+        CustomerDAO.getCustomerDetails(custID_Nr, (err, customerDetails) => {
+          if (err) return callback(err, null);
+          if (!customerDetails) return callback(null, null);
+    
+          // Fetch messages and transactions in parallel
+          CustomerDAO.getMessagesByCustomerId(custID_Nr, (err, messages) => {
+            if (err) return callback(err, null);
+    
+            CustomerDAO.getTransactionsByCustomerId(custID_Nr, (err, transactions) => {
+              if (err) return callback(err, null);
+    
+              // Build the response object
+              const response = {
+                name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+                email: customerDetails.email,
+                phoneNumber: customerDetails.phoneNumber,
+                address: customerDetails.address,
+                registeredOn: customerDetails.registeredOn,
+                lastLogin: customerDetails.lastLogin,
+                requests: messages,
+                recentActivityLog: transactions
+              };
+    
+              callback(null, response);
+            });
+          });
+        });
+      },
+    };
+    
 
 function generateRandomAccountNumber() {
     return Date.now().toString();

@@ -55,23 +55,45 @@ const AdminController = {
         });
     },
 
-    getAllAlerts: (req, res) =>{
-        AdminService.getAllAlerts((err, result)=>{
-            if(err){
+    getAllAlerts: (req, res) => {
+        AdminService.getAllAlerts((err, result) => {
+            if (err) {
                 return res.status(err.status || 500).json(err);
             }
-            res.json({message: 'Successfully fetched alerts',result});
+            res.json({ message: 'Successfully fetched alerts', result });
         });
     },
-    getLocationByID: (req, res) =>{
-        const locationID = req.params.locationID
-        AdminService.getLocationByID(locationID,(err, result)=>{
-            if(err){
+
+    getLocationByID: (req, res) => {
+        const locationID = req.params.locationID;
+        AdminService.getLocationByID(locationID, (err, result) => {
+            if (err) {
                 return res.status(err.status || 500).json(err);
             }
-            res.json({message: 'Successfully fetched location',result});
+            res.json({ message: 'Successfully fetched location', result });
         });
-    }
+    },
+
+    updateCustomerPanicStatus: (req, res) => {
+        const custIdNr = req.params.custIdNr;
+        AdminService.updateCustomerPanicStatus(custIdNr, (err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({ message: 'Customer PanicButtonStatus updated successfully', result });
+        });
+    },
+
+   
+    getActivatedPanic: (req, res) => {
+        AdminService.getActivatedPanic((err, result) => {
+            if (err) {
+                return res.status(err.status || 500).json(err);
+            }
+            res.json({ message: 'Successfully fetched alerts', result });
+        });
+    },
+
 };
 
 module.exports = AdminController;

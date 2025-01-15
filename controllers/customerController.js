@@ -1,4 +1,7 @@
 const CustomerService = require('../service/customerService');
+const ForgotPinService = require('../service/forgotPasswordService');
+const transactionService = require('../service/transactionService');
+const ContactMeMessageService = require('../service/contactMeMessageService');
 
 const createCustomer = (req, res) => {
     const customerData = req.body;
@@ -346,8 +349,78 @@ const updateLastLogin = (req, res) => {
 };
 
 
+//Fetching Customer Details
+
+
+const getCustomerInfo = (req, res) => {
+    const { custID_Nr } = req.params;
+
+    if (!custID_Nr) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
+
+    CustomerService.getCustomerInfo(custID_Nr, (err, customerInfo) => {
+      if (err) {
+        console.error(`Error fetching customer info for ID ${custID_Nr}:`, err);
+        return res.status(500).json({ error: 'An error occurred while fetching customer details.' });
+      }
+
+      if (!customerInfo) {
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+
+      res.status(200).json(customerInfo);
+    });
+  };
+
+  const updatePin = async (req, res) => {
+    const { custID_Nr, newPin } = req.body;
+
+    if (!custID_Nr || !newPin) {
+        return res.status(400).json({ message: 'custID_Nr and new PIN are required.' });
+    }
+
+    try {
+        await ForgotPinService.updatePin(custID_Nr, newPin); // Service updates the PIN
+        res.status(200).json({ message: 'PIN updated successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const sendOtp = async (req, res) => {
+    const { Email } = req.body;
+
+    if (!Email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    try {
+        const otp = await ForgotPinService.generateAndSendOtp(Email); // Service generates and sends OTP
+        res.status(200).json({ message: 'OTP sent. Verify it.', otp }); // Remove `otp` in production for security
+    } catch (error) {
+        res.status(500).json({ message: `Failed to send OTP: ${error.message}` });
+    }
+};
+
+const verifyOtpFP = async (req, res) => {
+    const { Email, otp } = req.body;
+
+    try {
+        await ForgotPinService.verifyOtpFP(Email, otp); // Service verifies OTP
+        res.status(200).json({ message: 'OTP verified successfully.' });
+    } catch (error) {
+        res.status(400).json({ message: `Failed to verify OTP: ${error.message}` });
+    }
+};
+
+
+
 
 module.exports = {
+    verifyOtpFP,
+    sendOtp,
+    updatePin,
     createCustomer,
     updateCustomerStep,
     verifyOtp,
@@ -362,7 +435,7 @@ module.exports = {
     updatePanicStatus,
     getAccountStatistics,
     getCustByAccID,
-    updateLastLogin
-
+    updateLastLogin,
+    getCustomerInfo
 };
 

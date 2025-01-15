@@ -105,7 +105,8 @@ const BankAccountDAO = {
   },
 
   countActiveAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
+    const query = 'SELECT COUNT(*) AS active FROM customer WHERE PanicButtonStatus = 0';
+    // const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     db.query(query, (err, results) => {
         if (err) {
             console.error(err);
@@ -135,8 +136,9 @@ const BankAccountDAO = {
     const query = `SELECT COUNT(*) AS deactivated 
     FROM bankaccount 
     INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
-      WHERE bankaccount.isActive = 0 AND customer.PanicButtonStatus = 0
+      WHERE customer.PanicButtonStatus = 1
     `;
+    
     db.query(query, (err, results) => {
         if (err) {
             console.error(err);
@@ -211,6 +213,7 @@ getAllCustomerDetails: (callback) => {
   const query = `
       SELECT 
     customer.Email AS "Email Address",
+    customer.CustID_Nr,
     CONCAT(SUBSTRING(customer.FirstName, 1, 1), '. ', customer.LastName) AS "Customer Details",
     DATE_FORMAT(bankaccount.CreationDate, '%m/%d/%Y') AS "Registration Date",
     CASE 
