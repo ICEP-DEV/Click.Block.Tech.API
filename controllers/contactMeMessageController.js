@@ -4,16 +4,17 @@ const createMessage = (req, res) => {
   const messageData = req.body;
   ContactMeMessageService.createMessage(messageData, (err, messageID) => {
     if (err) return res.status(500).json({ error: 'Failed to create message', message: err.message });
-    res.status(201).json({ MessageID: messageID });
+    res.status(201).json({ MessageID: messageID, SentTime: new Date() }); // Include SentTime in the response
   });
 };
+
 
 const getMessage = (req, res) => {
   const MessageID = req.params.messageID;
   ContactMeMessageService.getMessageById(MessageID, (err, result) => {
     if (err) return res.status(500).json({ error: 'Failed to retrieve message', message: err.message });
     if (!result) return res.status(404).json({ error: 'Message not found' });
-    res.status(200).json(result);
+    res.status(200).json(result); // Ensure SentTime is included in the response
   });
 };
 
