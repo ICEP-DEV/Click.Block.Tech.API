@@ -43,6 +43,19 @@ const transactionService = require('../service/transactionService');
     }
   }
 
+  const getAllTransactionsByAccID = (req, res) =>{
+    try{
+      const accountID = req.params.accountID;
+   
+      transactionService.getAllTransactionByAccID(accountID, (result)=>{
+          
+      res.status(201).send(result);
+      })
+    }catch(err){
+      console.log(err);
+    }
+  }
+
  const updateTransactionStatus = (req, res)=> {
     const {status, transactionID} = req.body;
      transactionService.updateTransactionStatus(status, transactionID);
@@ -84,4 +97,4 @@ const updateTransacPanicStatus = (req, res)=>{
 }
 
 
-  module.exports = {updateTransacPanicStatus,createTransaction, getTransactionsByAccID, updateTransactionStatus, getBankAccount, updateAccountBalance,getTransactionByID}
+  module.exports = {updateTransacPanicStatus,createTransaction, getTransactionsByAccID, getAllTransactionsByAccID, updateTransactionStatus, getBankAccount, updateAccountBalance,getTransactionByID}

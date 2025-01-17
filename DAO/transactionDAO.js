@@ -32,6 +32,7 @@ const TransactionDAO = {
     const query = 'INSERT INTO transaction SET ?';
 
     db.query(query, transactionData, (err, result) => {
+
         if (err) {
             console.error('Error creating pending transaction:', err);
             return callback({ status: 500, message: 'Database error' });
@@ -39,6 +40,7 @@ const TransactionDAO = {
 
         console.log("Pending transaction created successfully:", result);
         callback(null, result.insertId); // Return the newly created transaction ID
+
     });
   },
 
@@ -102,6 +104,34 @@ const TransactionDAO = {
       callback(null, transactions);
     });
   },
+
+  getAllTransactionsByAccID: (accountID, callback) => {
+    console.log('Fetching transactions for AccountID:', accountID);
+  
+    const query = 'SELECT * FROM transaction WHERE AccountID = ?';
+    db.query(query, [accountID], (err, results) => {
+      if (err) {
+        console.error('Error retrieving transactions by AccountID:', err);
+        // Ensure the callback is called correctly
+        return callback({ status: 500, message: 'Database error' }, null);
+      }
+  
+      const transactions = results.map(result => new Transaction(
+        result.TransactionID,
+        result.AccountID,
+        result.TransactionType,
+        result.TransactionDate,
+        result.TransactionAmount,
+        result.Status,
+        result.IsPanicTrigered
+      ));
+  
+      console.log('Transactions retrieved:', transactions.length);
+      return callback(null, transactions); // Call with null error when successful
+    });
+  },
+  
+
   getBankAccountById: (accountId, callback = () => {}) => {
     console.log('Getting bank account by AccountID:', accountId);
     const query = 'SELECT * FROM bankaccount WHERE AccountID = ?';

@@ -40,6 +40,7 @@ class TransactionService {
       
       });
   }
+
   getTransactionByAccID(accountID,transStatus, callback){
     if(!accountID || !transStatus){
       const error = new Error('Account ID is required');
@@ -54,6 +55,19 @@ class TransactionService {
     });
   }
   
+  getAllTransactionByAccID(accountID,callback){
+    if(!accountID ){
+      const error = new Error('Account ID is required');
+      return callback(error, null);
+    }
+    TransactionDAO.getAllTransactionsByAccID(accountID, (err, transactions) => {
+      if(err){
+        console.error('Error fetching transactions:', err);
+        return callback(err, null);
+      }
+      return callback(transactions);
+    });
+  }
   
   // Update bank account balance
   getBankAccount(accountID, callback) {
