@@ -5,7 +5,7 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
     user: 'clickblocktechemergencyalert@gmail.com', 
-    pass: 'neme tezw vxme gcsm' 
+    pass: 'eqrw jysc mvxe ppqg' 
   }
 });
 
