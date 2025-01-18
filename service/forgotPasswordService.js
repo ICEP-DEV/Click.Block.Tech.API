@@ -97,8 +97,30 @@ CustomerDAO.getAll = () => {
     });
 };
 
+const getCustomerEmail = (Email) => {
+    return new Promise((resolve, reject) => {
+        if (!Email) {
+            return reject(new Error('Email is required'));
+        }
+
+        CustomerDAO.findCustomerByEmail(Email)
+            .then((customer) => {
+                if (!customer) {
+                    return resolve(null); 
+                }
+
+                resolve(customer); 
+            })
+            .catch((err) => {
+                reject(err); 
+            });
+    });
+};
+
+
 module.exports = {
     generateAndSendOtp,
     verifyOtpFP,
-    updatePin
+    updatePin, 
+    getCustomerEmail
 };

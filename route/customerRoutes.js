@@ -2,7 +2,7 @@ const express = require('express');
 
 const { createCustomer, getCustomer, getAccountID, verifyOtp, updateCustomerStep, getCustomerByAccNr,verifyOldPin,
     updateCustomerDetails, createAlertPin, comparePINS,comparePINSAlert, updatePanicStatus,
-    getCustByAccID,
+    getCustByAccID,getCustomerEmail,
     getAccountStatistics,updateLastLogin,getCustomerInfo, sendOtp, updatePin , verifyOtpFP} = require('../controllers/customerController');
 
 const router = express.Router();
@@ -38,6 +38,8 @@ router.get('/getCustomerDetails/:custID_Nr', getCustomerInfo);
 router.post('/generate-otp', sendOtp );
 router.patch('/update-pin', updatePin );
 router.post('/forgotPin/verify-otp', verifyOtpFP);
+router.get('/get_customer_byEmail/:Email', getCustomerEmail);
+
 
 module.exports = router;
 

@@ -297,6 +297,24 @@ getMessagesByCustomerId: (custID_Nr, callback) => {
   });
 },
 
+findCustomerByEmail: (Email) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM Customer WHERE Email = ?';
+
+    db.query(query, [Email], (err, results) => {
+      if (err) {
+        return reject(err); // Reject with an error
+      }
+
+      if (results.length === 0) {
+        return resolve(null); // No customer found
+      }
+     
+      resolve(results[0]); // Return the first customer
+    });
+  });
+},
+
 // Get transactions by customer ID
 getTransactionsByCustomerId: (custID_Nr, callback) => {
   const sql = `
