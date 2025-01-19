@@ -309,7 +309,7 @@ findCustomerByEmail: (Email) => {
       if (results.length === 0) {
         return resolve(null); // No customer found
       }
-     
+     git 
       resolve(results[0]); // Return the first customer
     });
   });
