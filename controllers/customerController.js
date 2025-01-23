@@ -433,6 +433,8 @@ const verifyOtpFP = async (req, res) => {
     }
 };
 
+//Get Customer Details With Associated Alert Triggers
+
 
 
 

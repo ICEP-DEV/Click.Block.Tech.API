@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAccount, getAccount, updateAccount, deleteAccount ,getAccountActions,getAllCustomerDetails,getFilteredAccounts} = require('../controllers/bankAccountController');
+const { createAccount, getAccount, updateAccount, deleteAccount ,getAccountActions,getAllCustomerDetails,getFilteredAccounts,freezeAccount,deactivateAccount} = require('../controllers/bankAccountController');
 
 const router = express.Router();
 
@@ -16,6 +16,12 @@ router.get('/customers/details', getAllCustomerDetails);
 
 //Get All Customer details
 router.get('/accounts/filter', getFilteredAccounts);
+
+//Freezing bank account
+router.put('/bankaccount/freeze/:accountID', freezeAccount);
+ 
+// Deactive Bank Account
+router.put('/bankaccount/deactivate/:accountID', deactivateAccount);
 
 
 

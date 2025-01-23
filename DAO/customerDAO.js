@@ -345,6 +345,8 @@ getTransactionsByCustomerId: (custID_Nr, callback) => {
     return callback(null, transactions);
   });
 },
+
+//Customer details with associated Alert Logs
 };
 
 

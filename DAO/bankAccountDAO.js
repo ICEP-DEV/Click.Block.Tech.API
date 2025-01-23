@@ -248,7 +248,35 @@ JOIN
       }
       callback(null, results);
   });
-}
+},
+
+
+freezeAccount: (accountID, callback) => {
+  const sql = `
+    UPDATE bankaccount
+    INNER JOIN customer ON bankaccount.AccountID = customer.AccountID
+    SET bankaccount.isActive = 0, customer.PanicButtonStatus = 1
+    WHERE bankaccount.AccountID = ?;
+  `;
+ 
+  db.query(sql, [accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to freeze account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
+updateToDeactivedAccount: (accountID, updateData, callback) => {
+  const sql = 'UPDATE bankaccount SET ? WHERE AccountID = ?';
+  db.query(sql, [updateData, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to update account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
 
 
 };

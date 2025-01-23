@@ -33,6 +33,8 @@ router.put('/customers/last-login/:custID_Nr', updateLastLogin);
 // Route to get customer details along with messages and transactions
 router.get('/getCustomerDetails/:custID_Nr', getCustomerInfo);
 
+//Get Customer Details By Customer id 
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 router.post('/generate-otp', sendOtp );
