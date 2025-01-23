@@ -347,6 +347,65 @@ getTransactionsByCustomerId: (custID_Nr, callback) => {
 },
 
 //Customer details with associated Alert Logs
+getCustomerDetailsWithAlerts : (custID_Nr, callback) => {
+  const sql = `
+    SELECT
+      c.FirstName, c.LastName, c.Email, c.PhoneNumber, c.Address,
+    ap.CustID_Nr AS "Id Number",
+    YEAR(ap.TriggerDate) AS "year",
+    DATE_FORMAT(ap.TriggerDate, '%d %b') AS "date",
+    COUNT(*) AS "count",
+    a.SentDate,
+    CASE WHEN b.isActive = 0 AND c.PanicButtonStatus = 1 THEN 'Frozen Account' ELSE 'Active' END AS Frozen,
+    l.StreetAddress AS ActivityLocation
+FROM customer c
+LEFT JOIN alertpinlogs ap ON c.CustID_Nr = ap.CustID_Nr
+LEFT JOIN alert a ON c.CustID_Nr = a.CustID_Nr
+LEFT JOIN bankaccount b ON c.AccountID = b.AccountID
+LEFT JOIN location l ON a.LocationID = l.LocationID
+WHERE c.CustID_Nr = ?
+GROUP BY c.CustID_Nr, YEAR(ap.TriggerDate), DATE_FORMAT(ap.TriggerDate, '%Y-%m-%d'), a.SentDate
+  `;
+ 
+ 
+ 
+  db.query(sql, [custID_Nr], (err, result) => {
+    if (err) {
+      return callback(err);
+    }
+    if (result.length === 0) {
+      return callback(new Error('Customer not found or no logs available'));
+    }
+ 
+    // Process the result
+    const customerDetails = result[0];
+    const painiButtonActivation = result.map(log => ({
+      "Id Number": log["Id Number"],
+      year: log.year,
+      date: log.date,
+      count: log.count
+    }));
+ 
+    const recentActivation = result.map(log => ({
+      "Alert Triggered": `${log.SentDate} (10:05)`,
+      "Frozen": `${log.Frozen} (10:06)`,
+      "Activity Location": log.ActivityLocation,
+      "Current Location": log.CurrentLocation,
+      "Alert to SAPS": log.AlertToSAPS === '1' ? 'Yes' : 'No'
+    }));
+ 
+    const response = {
+      fullname: `${customerDetails.FirstName} ${customerDetails.LastName}`,
+      "Email Address": customerDetails.Email,
+      "Phone Number": customerDetails.PhoneNumber,
+      "Physical Address": customerDetails.Address,
+      painiButtonActivation,
+      recentActivation
+    };
+ 
+    callback(null, response);
+  });
+},
 };
 
 
