@@ -3,7 +3,7 @@ const express = require('express');
 const { createCustomer, getCustomer, getAccountID, verifyOtp, updateCustomerStep, getCustomerByAccNr,verifyOldPin,
     updateCustomerDetails, createAlertPin, comparePINS,comparePINSAlert, updatePanicStatus,
     getCustByAccID,getCustomerEmail,
-    getAccountStatistics,updateLastLogin,getCustomerInfo, sendOtp, updatePin , verifyOtpFP} = require('../controllers/customerController');
+    getAccountStatistics,updateLastLogin,getCustomerInfo, getCustomerDetails,sendOtp, updatePin , verifyOtpFP} = require('../controllers/customerController');
 
 const router = express.Router();
 
@@ -34,6 +34,7 @@ router.put('/customers/last-login/:custID_Nr', updateLastLogin);
 router.get('/getCustomerDetails/:custID_Nr', getCustomerInfo);
 
 //Get Customer Details By Customer id 
+router.get('/customerDetailsAlert/:custID_Nr', getCustomerDetails)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
