@@ -391,7 +391,7 @@ GROUP BY c.CustID_Nr, YEAR(ap.TriggerDate), DATE_FORMAT(ap.TriggerDate, '%Y-%m-%
       "Frozen": `${log.Frozen} (10:06)`,
       "Activity Location": log.ActivityLocation,
       "Current Location": log.CurrentLocation,
-      "Alert to SAPS": log.AlertToSAPS === '1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111' ? 'Yes' : 'No'
+      "Alert to SAPS": log.AlertToSAPS === '1' ? 'Yes' : 'No'
     }));
  
     const response = {
