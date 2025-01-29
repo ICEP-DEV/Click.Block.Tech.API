@@ -8,7 +8,7 @@ router.get('/contactmessages/:messageID', getMessage);
 router.put('/contactmessages/:messageID/status', updateMessageStatus);
 router.delete('/contactmessages/:messageID', deleteMessage);
 router.get('/messages', getAllMessages);
-router.get('/chatbotResponse/', getChatBotResponse);
+router.put('/chatbotResponse/', getChatBotResponse);
 //Get all contact messages
 
 

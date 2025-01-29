@@ -8,7 +8,7 @@ const AlertDAO = {
           if (err) {
             return callback(new Error('Failed to create location: ' + err.message));
           }
-          callback(null, { id: result.insertId, ...locationData });
+          callback(null, { id: result.insertId, ...locationData});
         });
       },
 

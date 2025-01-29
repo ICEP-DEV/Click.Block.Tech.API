@@ -2,7 +2,6 @@ const AlertService = require('../service/alertService');
 
 const createLocation = (req, res) =>{
     const locationData = req.body;
-
     AlertService.createLocation(locationData, (err, result)=>{
         if(err){
             console.error('Error creating Location',err);
