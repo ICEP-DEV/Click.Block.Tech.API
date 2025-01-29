@@ -187,6 +187,37 @@ getFilteredAccounts: (status, callback) => {
 },
 
 
+freezeAccount : (accountID, callback) => {
+  if (!accountID) {
+    return callback(new Error('Account ID is required'));
+  }
+ 
+  BankAccountDAO.freezeAccount(accountID, (err, result) => {
+    if (err) {
+      return callback(new Error('Failed to freeze account: ' + err.message));
+    }
+    if (!result) {
+      return callback(new Error('Account freeze operation failed'));
+    }
+    callback(null, result);
+  });
+},
+deactivateAccount: (accountID, callback) => {
+  if (!accountID) {
+    return callback(new Error('Account ID is required'));
+  }
+ 
+  BankAccountDAO.updateToDeactivedAccount(accountID, { isActive: 0 }, (err, result) => {
+    if (err) {
+      return callback(new Error('Failed to deactivate account: ' + err.message));
+    }
+    if (!result) {
+      return callback(new Error('Account not found or already deactivated'));
+    }
+    callback(null, result); // Pass true if deactivation was successful
+  });
+},
+
 };
 
 module.exports = BankAccountService;

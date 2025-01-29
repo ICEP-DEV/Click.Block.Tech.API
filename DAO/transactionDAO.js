@@ -166,8 +166,9 @@ const TransactionDAO = {
       callback(null, result.affectedRows); // Return the number of affected rows
     });
   },
+
   updateTransacPanicStatus: (transactionID, status, callback = () => {}) => {
-   
+    
     const query = 'UPDATE transaction SET IsPanicTrigered = ? WHERE TransactionID = ?';
 
     db.query(query, [status, transactionID], (err, result) => {
@@ -180,6 +181,22 @@ const TransactionDAO = {
       callback(null, result.affectedRows);
     });
   },
+
+  getTransactionsByAccountId: (accID, startDate, endDate, callback = () => {}) => {
+    const query = `
+      SELECT * FROM transaction 
+      WHERE AccountID = ? 
+        AND TransactionDate BETWEEN ? AND ?
+    `;
+  
+    db.query(query, [accID, startDate, endDate], (err, rows) => {
+      if (err) {
+        return callback({ status: 500, message: 'Database error' }, null);
+      }
+      callback(null, rows);
+    });
+  },
+
 };
 
 module.exports = TransactionDAO;

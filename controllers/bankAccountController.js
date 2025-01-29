@@ -121,5 +121,42 @@ const getFilteredAccounts = (req, res) => {
   });
 };
 
+  //Freeze Bank Account 
 
-module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions,getAllCustomerDetails,getFilteredAccounts };
+  const freezeAccount = (req, res) => {
+    const accountID = req.params.accountID;
+   
+    console.log('Freezing account with ID:', accountID);
+   
+    BankAccountService.freezeAccount(accountID, (err, result) => {
+      if (err) {
+        console.error('Error in freezeAccount:', err);
+        return res.status(500).json({ error: 'Failed to freeze account', message: err.message });
+      }
+      res.status(200).json({ message: 'Account frozen successfully', result });
+    });
+  };
+
+
+  //Deactivate Bank Account
+  const deactivateAccount = (req, res) => {
+    const accountID = req.params.accountID;
+   
+    console.log('Deactivating account with ID:', accountID);
+   
+    BankAccountService.deactivateAccount(accountID, (err, result) => {
+      if (err) {
+        console.error('Error in deactivateAccount:', err);
+        return res.status(500).json({ error: 'Failed to deactivate account', message: err.message });
+      }
+      if (result) {
+        res.status(200).json({ message: 'Account deactivated successfully', result });
+      } else {
+        res.status(404).json({ error: 'Account not found or already deactivated' });
+      }
+    });
+  };
+
+
+
+module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions,getAllCustomerDetails,getFilteredAccounts,freezeAccount ,deactivateAccount};

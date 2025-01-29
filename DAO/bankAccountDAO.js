@@ -105,7 +105,7 @@ const BankAccountDAO = {
   },
 
   countActiveAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS active FROM customer WHERE PanicButtonStatus = 0';
+    const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     // const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     db.query(query, (err, results) => {
         if (err) {
@@ -136,7 +136,7 @@ const BankAccountDAO = {
     const query = `SELECT COUNT(*) AS deactivated 
     FROM bankaccount 
     INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
-      WHERE customer.PanicButtonStatus = 1
+      WHERE customer.PanicButtonStatus = 0 AND bankaccount.isActive = 0
     `;
     
     db.query(query, (err, results) => {
@@ -248,7 +248,35 @@ JOIN
       }
       callback(null, results);
   });
-}
+},
+
+
+freezeAccount: (accountID, callback) => {
+  const sql = `
+    UPDATE bankaccount
+    INNER JOIN customer ON bankaccount.AccountID = customer.AccountID
+    SET bankaccount.isActive = 0, customer.PanicButtonStatus = 1
+    WHERE bankaccount.AccountID = ?;
+  `;
+ 
+  db.query(sql, [accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to freeze account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
+updateToDeactivedAccount: (accountID, updateData, callback) => {
+  const sql = 'UPDATE bankaccount SET ? WHERE AccountID = ?';
+  db.query(sql, [updateData, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to update account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
 
 
 };
