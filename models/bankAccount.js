@@ -5,6 +5,7 @@ class BankAccount {
     this._ExpirationDate = ExpirationDate;
     this._AccountType = AccountType;
     this._Balance = Balance;
+    this._TransactionLimit = TransactionLimit;
     this._CreationDate = CreationDate;
     this._isActive = isActive;
     this._LastModified = LastModified;  
@@ -44,6 +45,13 @@ class BankAccount {
       throw new Error('Balance must be a non-negative number');
     }
     this._Balance = value;
+  }
+
+  set TransactionLimit(value) {
+    if (typeof value !== 'number' || value < 0) {
+      throw new Error('TransactionLimit must be a non-negative number');
+    }
+    this._TransactionLimit = value;
   }
 
   set CreationDate(value) {
@@ -94,6 +102,10 @@ class BankAccount {
 
   get Balance() {
     return this._Balance;
+  }
+  
+  get TransactionLimit() {
+    return this._TransactionLimit;
   }
 
   get CreationDate() {

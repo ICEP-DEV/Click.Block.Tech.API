@@ -111,6 +111,7 @@ CREATE TABLE `bankaccount` (
   `ExpirationDate` date DEFAULT NULL,
   `AccountType` varchar(50) NOT NULL,
   `Balance` decimal(10,2) NOT NULL,
+  `TransactionLimit` decimal(10,2) NOT NULL DEFAULT 0.00,
   `CreationDate` date NOT NULL,
   `isActive` tinyint(4) NOT NULL,
   `LastModified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -121,11 +122,13 @@ CREATE TABLE `bankaccount` (
 -- Dumping data for table `bankaccount`
 --
 
-INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) VALUES
-(5, '1731970803', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2025-01-24 07:18:31', 0),
-(6, '1731971109', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
-(7, '1731971310', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
-(8, '1731971447', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
+INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `TransactionLimit`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) 
+VALUES
+(5, '1731970803', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2025-01-24 07:18:31', 0),
+(6, '1731971109', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
+(7, '1731971310', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
+(8, '1731971447', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
+
 
 -- --------------------------------------------------------
 
