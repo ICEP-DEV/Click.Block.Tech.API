@@ -309,7 +309,7 @@ findCustomerByEmail: (Email) => {
       if (results.length === 0) {
         return resolve(null); // No customer found
       }
-     git 
+     
       resolve(results[0]); // Return the first customer
     });
   });
@@ -385,18 +385,18 @@ getCustomerDetailsWithAlerts: (AccountNr, callback) => {
     }));
 
     const recentActivation = result.map(log => ({
-      "Alert Triggered": `${log.SentDate} (10:05)`,
-      "Frozen": `${log.Frozen} (10:06)`,
-      "Activity Location": log.ActivityLocation,
-      "Current Location": log.CurrentLocation,
-      "Alert to SAPS": log.AlertToSAPS === '1' ? 'Yes' : 'No'
+      AlertTriggered: `${log.SentDate} (10:05)`,
+      Frozen: `${log.Frozen} (10:06)`,
+      ActivityLocation: log.ActivityLocation,
+      CurrentLocation: log.CurrentLocation,
+      AlerttoSAPS: log.AlertToSAPS === '1' ? 'Yes' : 'No'
     }));
 
     const response = {
       fullname: `${customerDetails.FirstName} ${customerDetails.LastName}`,
-      "Email Address": customerDetails.Email,
-      "Phone Number": customerDetails.PhoneNumber,
-      "Physical Address": customerDetails.Address,
+      EmailAddress: customerDetails.Email,
+      PhoneNumber: customerDetails.PhoneNumber,
+      PhysicalAddress: customerDetails.Address,
       painiButtonActivation,
       recentActivation
     };

@@ -1,10 +1,11 @@
 class BankAccount {
-  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive, LastModified, RestorationCount) {
+  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance,TransactionLimit ,CreationDate, isActive, LastModified, RestorationCount) {
     this._AccountID = AccountID;        // Unique identifier for the account
     this._AccountNr = AccountNr;        // Account number (9-digit random number)
     this._ExpirationDate = ExpirationDate;
     this._AccountType = AccountType;
     this._Balance = Balance;
+    this._TransactionLimit = TransactionLimit;
     this._CreationDate = CreationDate;
     this._isActive = isActive;
     this._LastModified = LastModified;  
@@ -44,6 +45,13 @@ class BankAccount {
       throw new Error('Balance must be a non-negative number');
     }
     this._Balance = value;
+  }
+
+  set TransactionLimit(value) {
+    if (typeof value !== 'number' || value < 0) {
+      throw new Error('TransactionLimit must be a non-negative number');
+    }
+    this._TransactionLimit = value;
   }
 
   set CreationDate(value) {
@@ -94,6 +102,10 @@ class BankAccount {
 
   get Balance() {
     return this._Balance;
+  }
+  
+  get TransactionLimit() {
+    return this._TransactionLimit;
   }
 
   get CreationDate() {
