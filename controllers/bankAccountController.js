@@ -156,7 +156,36 @@ const getFilteredAccounts = (req, res) => {
       }
     });
   };
+  
+  const setTransactionLimit = (req, res) => {
+    const { accountID, transactionLimit } = req.body;
+  
+    if (!accountID || typeof transactionLimit !== 'number' || transactionLimit < 0) {
+      return res.status(400).json({ error: 'Invalid input. AccountID and a non-negative TransactionLimit are required' });
+    }
+  
+    BankAccountService.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(200).json({ message: 'Transaction limit updated successfully' });
+    });
+  };
+  
+  const getTransactionLimit = (req, res) => {
+    const { accountID } = req.params;
+  
+    if (!accountID) {
+      return res.status(400).json({ error: 'AccountID is required' });
+    }
+  
+    BankAccountService.fetchTransactionLimit(accountID, (err, limit) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(200).json({ transactionLimit: limit });
+    });
+  };
 
 
-
-module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions,getAllCustomerDetails,getFilteredAccounts,freezeAccount ,deactivateAccount};
+module.exports = { createAccount, getAccount, updateAccount, deleteAccount, getAccountActions,getAllCustomerDetails,getFilteredAccounts,freezeAccount ,deactivateAccount,setTransactionLimit, getTransactionLimit};

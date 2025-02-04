@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 23, 2025 at 09:41 AM
+-- Generation Time: Jan 29, 2025 at 02:15 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -111,6 +111,7 @@ CREATE TABLE `bankaccount` (
   `ExpirationDate` date DEFAULT NULL,
   `AccountType` varchar(50) NOT NULL,
   `Balance` decimal(10,2) NOT NULL,
+  `TransactionLimit` decimal(10,2) NOT NULL DEFAULT 0.00,
   `CreationDate` date NOT NULL,
   `isActive` tinyint(4) NOT NULL,
   `LastModified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -121,11 +122,13 @@ CREATE TABLE `bankaccount` (
 -- Dumping data for table `bankaccount`
 --
 
-INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) VALUES
-(5, '1731970803', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2025-01-15 07:17:31', 1),
-(6, '1731971109', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
-(7, '1731971310', '2031-11-19', 'Savings', 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
-(8, '1731971447', '2031-11-19', 'Savings', 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
+INSERT INTO `bankaccount` (`AccountID`, `AccountNr`, `ExpirationDate`, `AccountType`, `Balance`, `TransactionLimit`, `CreationDate`, `isActive`, `LastModified`, `RestorationCount`) 
+VALUES
+(5, '1731970803', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2025-01-24 07:18:31', 0),
+(6, '1731971109', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2024-11-18 23:35:20', 0),
+(7, '1731971310', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 0, '2024-11-18 23:35:15', 0),
+(8, '1731971447', '2031-11-19', 'Savings', 0.00, 0.00, '2024-11-19', 1, '2024-11-18 23:10:47', 0);
+
 
 -- --------------------------------------------------------
 
@@ -285,8 +288,6 @@ CREATE TABLE `supportingdocument` (
 INSERT INTO `supportingdocument` (`SuppDocsID`, `CustID_Nr`, `ID_Document`, `Selfie_With_ID`) VALUES
 (2, '0301013570082', 'ID_Document-1732872447328-868417645.pdf', 'Selfie_With_ID-1732872447350-980390999.jpg');
 
-
-
 -- --------------------------------------------------------
 
 --
@@ -301,7 +302,7 @@ CREATE TABLE `transaction` (
   `TransactionAmount` decimal(10,2) NOT NULL,
   `Status` varchar(50) NOT NULL,
   `IsPanicTrigered` tinyint(1) DEFAULT NULL
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `transaction`
@@ -395,7 +396,6 @@ ALTER TABLE `supportingdocument`
 ALTER TABLE `transaction`
   ADD PRIMARY KEY (`TransactionID`),
   ADD KEY `AccountID` (`AccountID`);
- 
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -435,19 +435,19 @@ ALTER TABLE `contactmemessage`
 -- AUTO_INCREMENT for table `location`
 --
 ALTER TABLE `location`
-  MODIFY `LocationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `LocationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NotificationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `supportingdocument`
 --
 ALTER TABLE `supportingdocument`
-  MODIFY `SuppDocsID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `SuppDocsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `transaction`

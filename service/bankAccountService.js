@@ -218,6 +218,51 @@ deactivateAccount: (accountID, callback) => {
   });
 },
 
+// Method to set transaction limit for an account
+setTransactionLimit: (accountID, TransactionLimit, callback) => {
+  if (!accountID || limit < 0) {
+    return callback(new Error('Valid account ID and non-negative limit are required'));
+  }
+
+  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
+  db.query(sql, [limit, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to set transaction limit: ' + err.message));
+    }
+    // Ensure that at least one row was updated
+    if (result.affectedRows > 0) {
+      return callback(null, { accountID, transactionLimit: TransactionLimit });
+    }
+    return callback(new Error('Account not found or no changes made'));
+  });
+},
+
+// Method to set transaction limit for an account
+updateTransactionLimit: (accountID, transactionLimit, callback) => {
+  if (!accountID || transactionLimit < 0) {
+    return callback(new Error('Valid account ID and non-negative limit are required'));
+  }
+
+  BankAccountDAO.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, success);
+  });
+},
+
+// Method to get transaction limit for an account
+fetchTransactionLimit: (accountID, callback) => {
+  BankAccountDAO.getTransactionLimit(accountID, (err, limit) => {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, limit);
+  });
+},
+
+ 
 };
 
 module.exports = BankAccountService;
