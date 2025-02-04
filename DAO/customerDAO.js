@@ -357,7 +357,7 @@ getCustomerDetailsWithAlerts: (AccountNr, callback) => {
       COUNT(*) AS "count",
       a.SentDate,
       CASE WHEN b.isActive = 0 AND c.PanicButtonStatus = 1 THEN 'Frozen Account' ELSE 'Active' END AS Frozen,
-      l.StreetAddress AS ActivityLocation
+      l.StreetAddress AS ActivityLocation ,l.latitude,l.longitude
     FROM customer c
     LEFT JOIN alertpinlogs ap ON c.CustID_Nr = ap.CustID_Nr
     LEFT JOIN alert a ON c.CustID_Nr = a.CustID_Nr
@@ -388,6 +388,8 @@ getCustomerDetailsWithAlerts: (AccountNr, callback) => {
       AlertTriggered: `${log.SentDate} (10:05)`,
       Frozen: `${log.Frozen} (10:06)`,
       ActivityLocation: log.ActivityLocation,
+      latitude:log.latitude,
+      longitude:log.longitude,
       CurrentLocation: log.CurrentLocation,
       AlerttoSAPS: log.AlertToSAPS === '1' ? 'Yes' : 'No'
     }));
