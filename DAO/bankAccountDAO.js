@@ -281,23 +281,24 @@ updateToDeactivedAccount: (accountID, updateData, callback) => {
   });
 },
 
-// Setting the Customer Transaction limit
-setTransactionLimit: (accountID, transactionLimit, callback) => {
-  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE accountID = ?';
+ // Updating the Customer Transaction Limit
+ updateTransactionLimit: (accountID, transactionLimit, callback) => {
+  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
   db.query(sql, [transactionLimit, accountID], (err, result) => {
     if (err) {
       console.error(err);
       return callback(new Error('Failed to set transaction limit: ' + err.message));
     }
     if (result.affectedRows === 0) {
-      return callback(new Error('Account not found'));
+      return callback(new Error('Account not found or no changes made'));
     }
     callback(null, true);
   });
 },
 
+// Retrieving the Customer Transaction Limit
 getTransactionLimit: (accountID, callback) => {
-  const sql = 'SELECT TransactionLimit FROM bankaccount WHERE accountID = ?';
+  const sql = 'SELECT TransactionLimit FROM bankaccount WHERE AccountID = ?';
   db.query(sql, [accountID], (err, result) => {
     if (err) {
       console.error(err);
@@ -310,5 +311,6 @@ getTransactionLimit: (accountID, callback) => {
   });
 },
 };
+
 
 module.exports = BankAccountDAO;

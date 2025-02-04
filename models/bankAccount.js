@@ -1,5 +1,5 @@
 class BankAccount {
-  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance, CreationDate, isActive, LastModified, RestorationCount) {
+  constructor(AccountID, AccountNr, ExpirationDate, AccountType, Balance,TransactionLimit ,CreationDate, isActive, LastModified, RestorationCount) {
     this._AccountID = AccountID;        // Unique identifier for the account
     this._AccountNr = AccountNr;        // Account number (9-digit random number)
     this._ExpirationDate = ExpirationDate;

@@ -238,12 +238,13 @@ setTransactionLimit: (accountID, TransactionLimit, callback) => {
   });
 },
 
+// Method to set transaction limit for an account
 updateTransactionLimit: (accountID, transactionLimit, callback) => {
-  if (transactionLimit < 0) {
-    return callback(new Error('Transaction limit must be a non-negative number'));
+  if (!accountID || transactionLimit < 0) {
+    return callback(new Error('Valid account ID and non-negative limit are required'));
   }
 
-  bankAccountDAO.setTransactionLimit(accountID, transactionLimit, (err, success) => {
+  BankAccountDAO.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
     if (err) {
       return callback(err);
     }
@@ -251,14 +252,17 @@ updateTransactionLimit: (accountID, transactionLimit, callback) => {
   });
 },
 
+// Method to get transaction limit for an account
 fetchTransactionLimit: (accountID, callback) => {
-  bankAccountDAO.getTransactionLimit(accountID, (err, limit) => {
+  BankAccountDAO.getTransactionLimit(accountID, (err, limit) => {
     if (err) {
       return callback(err);
     }
     callback(null, limit);
   });
-}
+},
+
+ 
 };
 
 module.exports = BankAccountService;

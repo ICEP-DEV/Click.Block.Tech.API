@@ -156,29 +156,30 @@ const getFilteredAccounts = (req, res) => {
       }
     });
   };
-  const setTransactionLimit =(req, res) => {
+  
+  const setTransactionLimit = (req, res) => {
     const { accountID, transactionLimit } = req.body;
-
-    if (!accountID || typeof transactionLimit !== 'number') {
-      return res.status(400).json({ error: 'Invalid input. AccountID and TransactionLimit are required' });
+  
+    if (!accountID || typeof transactionLimit !== 'number' || transactionLimit < 0) {
+      return res.status(400).json({ error: 'Invalid input. AccountID and a non-negative TransactionLimit are required' });
     }
-
-    bankAccountService.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+  
+    BankAccountService.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
       res.status(200).json({ message: 'Transaction limit updated successfully' });
     });
   };
-
+  
   const getTransactionLimit = (req, res) => {
     const { accountID } = req.params;
-
+  
     if (!accountID) {
       return res.status(400).json({ error: 'AccountID is required' });
     }
-
-    bankAccountService.fetchTransactionLimit(accountID, (err, limit) => {
+  
+    BankAccountService.fetchTransactionLimit(accountID, (err, limit) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }

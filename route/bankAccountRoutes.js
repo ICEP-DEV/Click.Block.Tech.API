@@ -26,8 +26,11 @@ router.put('/deactivateBankaccount/deactivate/:accountID', deactivateAccount);
 // Set transaction limit for an account
 router.put('/updateBankaccount/transaction-limit', setTransactionLimit);
 
+
 // Get the current transaction limit for an account
-router.get('/bankaccount/:accountID/transaction-limit',getTransactionLimit);
+router.get('/bankaccount/:accountID/transaction-limit', getTransactionLimit);
+
+
 
 
 
