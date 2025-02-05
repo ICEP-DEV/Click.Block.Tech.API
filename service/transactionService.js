@@ -20,6 +20,18 @@ class TransactionService {
         const transactionID = -1;
         return callback({ transactionID, message: 'Transaction cannot proceed as account is disabled.' });
       }
+      // Fetch balance and transaction limit from the bank account
+    const { balance, transactionLimit } = bankAccount; 
+
+    // New Check: Ensure the transaction amount does not exceed the transaction limit
+    if (transactionAmount > transactionLimit) {
+      return callback({ status: 400, message: `Transaction declined. Amount exceeds your transaction limit of ${transactionLimit}.` });
+    }
+
+    // New Check: Ensure there are enough funds in the account for the transaction
+    if (transactionAmount > balance) {
+      return callback({ status: 400, message: 'Transaction declined. Insufficient funds.' });
+    }
 
       const pendingTransaction = new Transaction(
         null,
