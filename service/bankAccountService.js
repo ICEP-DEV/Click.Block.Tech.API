@@ -1,5 +1,5 @@
 const BankAccountDAO = require('../DAO/bankAccountDAO');
-
+const {  sendAccountInfoEmail } = require('./sendAccountInfo_email');
 const formatDate = (date) => {
   const d = new Date(date);
   const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -42,7 +42,9 @@ const BankAccountService = {
           // Set balance to provided amount or default to 0
           accountData.Balance = accountData.Balance >= 0 ? accountData.Balance : 0; 
           accountData.isActive = true;
-
+          sendAccountInfoEmail(accountData)
+                           .then(() =>  callback(null, result))
+                           .catch(emailErr => callback({ status: 500, message: 'Failed to send account information' + emailErr.message }));
           // Call DAO to save the new account
           BankAccountDAO.create(accountData, (err, result) => {
             if (err) {
