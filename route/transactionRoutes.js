@@ -1,5 +1,5 @@
 const express = require('express');
-const {updateTransacPanicStatus,getTransactionByID,updateAccountBalance,createTransaction, getAllTransactionsByAccID,getTransactionsByAccID, updateTransactionStatus, getBankAccount, fetchTransactions}= require('../controllers/transactionController');
+const {updateTransacPanicStatus,getTransactionByID,updateAccountBalance,createTransaction, getAllTransactionsByAccID,getTransactionsByAccID, updateTransactionStatus, getBankAccount, fetchTransactions, sendEmailWithPdf}= require('../controllers/transactionController');
 
 
 const router = express.Router();
@@ -16,5 +16,6 @@ router.put('/updateTransacPanicStatus', updateTransacPanicStatus);
 router.get('/getAllTransactionByAccID/:accountID', getAllTransactionsByAccID);
 
 router.get('/generate-statement', fetchTransactions);
+router.post('/send-email-with-pdf', sendEmailWithPdf);
 
 module.exports = router;

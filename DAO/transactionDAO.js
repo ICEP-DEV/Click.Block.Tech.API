@@ -125,7 +125,8 @@ const TransactionDAO = {
         result.Status,
         result.IsPanicTrigered
       ));
-  
+
+    
       console.log('Transactions retrieved:', transactions.length);
       return callback(null, transactions); // Call with null error when successful
     });

@@ -1,5 +1,7 @@
 const TransactionService = require('../service/transactionService');
 const NotificationService = require('../service/notificationService');
+const emailService = require('../service/emailService');
+
 
 const createTransaction = (req, res) => {
   const { transactionType, transactionAmount, accountID } = req.body;
@@ -41,8 +43,10 @@ const getTransactionsByAccID = (req, res) => {
 const getAllTransactionsByAccID = (req, res) => {
   try {
     const accountID = req.params.accountID;
+   
     TransactionService.getAllTransactionByAccID(accountID, (result) => {
-      res.status(201).send(result);
+      res.status(200).send(result);
+
     });
   } catch (err) {
     console.log(err);
@@ -101,6 +105,21 @@ const fetchTransactions = (req, res) => {
   });
 };
 
+const sendEmailWithPdf = async (req, res) => {
+  try {
+    const { email, pdfBase64 } = req.body;
+    if (!email || !pdfBase64) {
+      return res.status(400).json({ message: 'Email and PDF are required' });
+    }
+
+    await emailService.sendEmailWithPdf(email, pdfBase64);
+    res.json({ message: 'Email with PDF sent successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error sending email' });
+  }
+};
+
 module.exports = {
   updateTransacPanicStatus,
   createTransaction,
@@ -110,5 +129,6 @@ module.exports = {
   getBankAccount,
   updateAccountBalance,
   getTransactionByID,
-  fetchTransactions
+  fetchTransactions,
+  sendEmailWithPdf
 };
