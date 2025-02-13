@@ -28,6 +28,7 @@ const BankAccountDAO = {
           result[0].ExpirationDate,
           result[0].AccountType,
           result[0].Balance,
+          result[0].TransactionLimit,
           result[0].CreationDate,
           result[0].isActive,
           result[0].LastModified,
@@ -52,6 +53,7 @@ const BankAccountDAO = {
         result[0].ExpirationDate,
         result[0].AccountType,
         result[0].Balance,
+        result[0].TransactionLimit,
         result[0].CreationDate,
         result[0].isActive,
         result[0].LastModified,
@@ -267,6 +269,7 @@ freezeAccount: (accountID, callback) => {
     callback(null, result.affectedRows > 0); // Return true if rows were updated
   });
 },
+
 updateToDeactivedAccount: (accountID, updateData, callback) => {
   const sql = 'UPDATE bankaccount SET ? WHERE AccountID = ?';
   db.query(sql, [updateData, accountID], (err, result) => {
@@ -278,7 +281,36 @@ updateToDeactivedAccount: (accountID, updateData, callback) => {
   });
 },
 
+ // Updating the Customer Transaction Limit
+ updateTransactionLimit: (accountID, transactionLimit, callback) => {
+  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
+  db.query(sql, [transactionLimit, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to set transaction limit: ' + err.message));
+    }
+    if (result.affectedRows === 0) {
+      return callback(new Error('Account not found or no changes made'));
+    }
+    callback(null, true);
+  });
+},
 
+// Retrieving the Customer Transaction Limit
+getTransactionLimit: (accountID, callback) => {
+  const sql = 'SELECT TransactionLimit FROM bankaccount WHERE AccountID = ?';
+  db.query(sql, [accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to get transaction limit: ' + err.message));
+    }
+    if (result.length === 0) {
+      return callback(new Error('Account not found'));
+    }
+    callback(null, result[0].TransactionLimit);
+  });
+},
 };
+
 
 module.exports = BankAccountDAO;
