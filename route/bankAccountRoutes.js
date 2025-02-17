@@ -24,7 +24,7 @@ router.put('/freezeBankaccount/freeze/:accountID', freezeAccount);
 router.put('/deactivateBankaccount/deactivate/:accountID', deactivateAccount);
 
 // Set transaction limit for an account
-router.put('/updateBankaccount/transaction-limit', setTransactionLimit);
+router.put('/updateBankaccount/transaction-limit/:custid_nr', setTransactionLimit);
 
 
 // Get the current transaction limit for an account

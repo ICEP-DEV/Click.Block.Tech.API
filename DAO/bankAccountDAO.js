@@ -281,6 +281,21 @@ updateToDeactivedAccount: (accountID, updateData, callback) => {
   });
 },
 
+getAccountIDByCustomerID: (custid_nr, callback) => {
+  const sql = 'SELECT AccountID FROM customer WHERE CustID_Nr = ?';
+
+  db.query(sql, [custid_nr], (err, result) => {
+    if (err) {
+      console.error('Database Error:', err);
+      return callback(new Error('Failed to fetch AccountID: ' + err.message));
+    }
+    if (result.length === 0 || !result[0].AccountID) {
+      return callback(new Error('Customer not found or no associated account'));
+    }
+    callback(null, result[0].AccountID);
+  });
+},
+
  // Updating the Customer Transaction Limit
  updateTransactionLimit: (accountID, transactionLimit, callback) => {
   const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
@@ -295,6 +310,7 @@ updateToDeactivedAccount: (accountID, updateData, callback) => {
     callback(null, true);
   });
 },
+
 
 // Retrieving the Customer Transaction Limit
 getTransactionLimit: (accountID, callback) => {

@@ -239,16 +239,26 @@ setTransactionLimit: (accountID, TransactionLimit, callback) => {
 },
 
 // Method to set transaction limit for an account
-updateTransactionLimit: (accountID, transactionLimit, callback) => {
-  if (!accountID || transactionLimit < 0) {
-    return callback(new Error('Valid account ID and non-negative limit are required'));
+updateTransactionLimitByCustomerID: (custid_nr, transactionLimit, callback) => {
+  if (!custid_nr || transactionLimit < 0) {
+    return callback(new Error('Valid customer ID and non-negative limit are required'));
   }
 
-  BankAccountDAO.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+  // Step 1: Get AccountID from Customer table
+  BankAccountDAO.getAccountIDByCustomerID(custid_nr, (err, accountID) => {
     if (err) {
       return callback(err);
     }
-    callback(null, success);
+
+    console.log('Retrieved AccountID:', accountID);
+
+    // Step 2: Update Transaction Limit for the retrieved AccountID
+    BankAccountDAO.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, success);
+    });
   });
 },
 
