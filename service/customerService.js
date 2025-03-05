@@ -5,8 +5,10 @@ const BankCardDAO = require('../DAO/bankCardDAO');
 const Transaction = require('../DAO/transactionDAO');
 const ContactMeMessage = require('../DAO/contactMeMessageDAO');
 const EmailService = require('./emailService');
+const custInfoEmail = require('./sendAccountInfo_email');
 const crypto = require('crypto');
 const AlertPinLogDAO = require('../DAO/alertPinLogDAO'); 
+const { sendAccountInfoEmail } = require('./sendAccountInfo_email');
 
 const otpMap = new Map();
 const tempCustomerData = new Map();  
@@ -328,6 +330,16 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
                 };
 
                 BankAccountDAO.create(newBankAccount, (accountErr, bankAccountResult) => {
+                    //sending customer account information via email
+                    console.log(newBankAccount)
+                    try{
+                        custInfoEmail.sendAccountInfoEmail(Email, newBankAccount)
+                    }catch(err){
+                       callback({ status: 500, message: 'Failed to send Account information: ' + emailErr.message })
+                    }
+                  
+
+                  
                     if (accountErr) {
                         console.error('Error creating bank account:', accountErr);
                         return callback({ status: 500, message: 'Failed to create bank account' });

@@ -45,7 +45,7 @@ class TransactionService {
           console.error('Error saving pending transaction:', err);
           return callback({ status: 500, message: 'Error saving pending transaction' });
         }
-        return callback(null, { transactionID, message: 'Transaction created and awaiting approval' });
+        return callback(transactionID,null);
       });
     });
   }
@@ -62,7 +62,7 @@ class TransactionService {
         return callback({ status: 500, message: 'Error fetching transactions' });
       }
 
-      return callback(null, transactions);
+      return callback(transactions,null);
     });
   }
 
@@ -97,8 +97,8 @@ class TransactionService {
       if (!bankAccount) {
         return callback({ status: 404, message: 'Bank account not found' });
       }
-
-      return callback(null, bankAccount);
+     
+      return callback(bankAccount,null);
     });
   }
 
@@ -113,7 +113,6 @@ class TransactionService {
         console.error('Error updating status:', err);
         return callback({ status: 500, message: 'Failed to update transaction status' });
       }
-
       return callback(null, result);
     });
   }
@@ -130,7 +129,7 @@ class TransactionService {
         return callback({ status: 500, message: 'Failed to update account balance' });
       }
 
-      return callback(null, result);
+      return callback(result,null);
     });
   }
 
@@ -150,7 +149,7 @@ class TransactionService {
         return callback({ status: 404, message: 'Transaction not found' });
       }
 
-      return callback(null, transaction);
+      return callback(transaction,null);
     });
   }
 
@@ -166,7 +165,7 @@ class TransactionService {
         return callback({ status: 500, message: 'Failed to update transaction panic status' });
       }
 
-      return callback(null, result);
+      return callback(result,null);
     });
   }
 
@@ -182,7 +181,7 @@ class TransactionService {
         return callback({ status: 500, message: 'Error fetching transactions' });
       }
 
-      return callback(null, transactions);
+      return callback(transactions,null);
     });
   }
 
