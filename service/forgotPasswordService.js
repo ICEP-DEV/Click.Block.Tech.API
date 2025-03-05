@@ -3,7 +3,8 @@ const tempCustomerData = new Map(); // Temporary customer storage (use a databas
 const EmailService = require('./emailService'); // Email service
 const CustomerDAO = require('../DAO/customerDAO');
 const crypto = require('crypto');
-
+const bcrypt = require('bcryptjs');
+const saltRounds = 10; // Number of salt rounds for bcrypt
 
 const generateAndSendOtp = async (Email) => {
     const otp = crypto.randomInt(100000, 999999).toString();
@@ -50,16 +51,26 @@ const verifyOtpFP = (Email, otp) => {
 
 // Update customer PIN using Promises
 const updatePin = (custID_Nr, newPin) => {
-    return new Promise((resolve, reject) => {
-        CustomerDAO.updatePin(custID_Nr, newPin, (err, response) => {
-            if (err) {
-                console.error('Error updating PIN:', err.message);
-                reject(new Error(`Failed to update PIN: ${err.message}`)); // Reject on error
-            } else {
-                console.log(response.message);
-                resolve(response.message); // Resolve on success
-            }
-        });
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Hash the new PIN
+            const hashedPin = await bcrypt.hash(newPin, saltRounds);
+            console.log(`Hashed PIN: ${hashedPin}`); // Log hashed PIN (avoid in production)
+
+            // Update the hashed PIN in the database
+            CustomerDAO.updatePin(custID_Nr, hashedPin, (err, response) => {
+                if (err) {
+                    console.error('Error updating PIN:', err.message);
+                    reject(new Error(`Failed to update PIN: ${err.message}`));
+                } else {
+                    console.log(response.message);
+                    resolve(response.message); // Resolve on success
+                }
+            });
+        } catch (error) {
+            console.error('Error hashing PIN:', error.message);
+            reject(new Error(`Failed to hash PIN: ${error.message}`));
+        }
     });
 };
 
@@ -86,8 +97,30 @@ CustomerDAO.getAll = () => {
     });
 };
 
+const getCustomerEmail = (Email) => {
+    return new Promise((resolve, reject) => {
+        if (!Email) {
+            return reject(new Error('Email is required'));
+        }
+
+        CustomerDAO.findCustomerByEmail(Email)
+            .then((customer) => {
+                if (!customer) {
+                    return resolve(null); 
+                }
+
+                resolve(customer); 
+            })
+            .catch((err) => {
+                reject(err); 
+            });
+    });
+};
+
+
 module.exports = {
     generateAndSendOtp,
     verifyOtpFP,
-    updatePin
+    updatePin, 
+    getCustomerEmail
 };

@@ -189,6 +189,92 @@ getFilteredAccounts: (status, callback) => {
 },
 
 
+freezeAccount : (accountID, callback) => {
+  if (!accountID) {
+    return callback(new Error('Account ID is required'));
+  }
+ 
+  BankAccountDAO.freezeAccount(accountID, (err, result) => {
+    if (err) {
+      return callback(new Error('Failed to freeze account: ' + err.message));
+    }
+    if (!result) {
+      return callback(new Error('Account freeze operation failed'));
+    }
+    callback(null, result);
+  });
+},
+deactivateAccount: (accountID, callback) => {
+  if (!accountID) {
+    return callback(new Error('Account ID is required'));
+  }
+ 
+  BankAccountDAO.updateToDeactivedAccount(accountID, { isActive: 0 }, (err, result) => {
+    if (err) {
+      return callback(new Error('Failed to deactivate account: ' + err.message));
+    }
+    if (!result) {
+      return callback(new Error('Account not found or already deactivated'));
+    }
+    callback(null, result); // Pass true if deactivation was successful
+  });
+},
+
+// Method to set transaction limit for an account
+setTransactionLimit: (accountID, TransactionLimit, callback) => {
+  if (!accountID || limit < 0) {
+    return callback(new Error('Valid account ID and non-negative limit are required'));
+  }
+
+  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
+  db.query(sql, [limit, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to set transaction limit: ' + err.message));
+    }
+    // Ensure that at least one row was updated
+    if (result.affectedRows > 0) {
+      return callback(null, { accountID, transactionLimit: TransactionLimit });
+    }
+    return callback(new Error('Account not found or no changes made'));
+  });
+},
+
+// Method to set transaction limit for an account
+updateTransactionLimitByCustomerID: (custid_nr, transactionLimit, callback) => {
+  if (!custid_nr || transactionLimit < 0) {
+    return callback(new Error('Valid customer ID and non-negative limit are required'));
+  }
+
+  // Step 1: Get AccountID from Customer table
+  BankAccountDAO.getAccountIDByCustomerID(custid_nr, (err, accountID) => {
+    if (err) {
+      return callback(err);
+    }
+
+    console.log('Retrieved AccountID:', accountID);
+
+    // Step 2: Update Transaction Limit for the retrieved AccountID
+    BankAccountDAO.updateTransactionLimit(accountID, transactionLimit, (err, success) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, success);
+    });
+  });
+},
+
+// Method to get transaction limit for an account
+fetchTransactionLimit: (accountID, callback) => {
+  BankAccountDAO.getTransactionLimit(accountID, (err, limit) => {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, limit);
+  });
+},
+
+ 
 };
 
 module.exports = BankAccountService;

@@ -28,6 +28,7 @@ const BankAccountDAO = {
           result[0].ExpirationDate,
           result[0].AccountType,
           result[0].Balance,
+          result[0].TransactionLimit,
           result[0].CreationDate,
           result[0].isActive,
           result[0].LastModified,
@@ -52,6 +53,7 @@ const BankAccountDAO = {
         result[0].ExpirationDate,
         result[0].AccountType,
         result[0].Balance,
+        result[0].TransactionLimit,
         result[0].CreationDate,
         result[0].isActive,
         result[0].LastModified,
@@ -105,7 +107,7 @@ const BankAccountDAO = {
   },
 
   countActiveAccounts: (callback) => {
-    const query = 'SELECT COUNT(*) AS active FROM customer WHERE PanicButtonStatus = 0';
+    const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     // const query = 'SELECT COUNT(*) AS active FROM bankaccount WHERE isActive = 1';
     db.query(query, (err, results) => {
         if (err) {
@@ -136,7 +138,7 @@ const BankAccountDAO = {
     const query = `SELECT COUNT(*) AS deactivated 
     FROM bankaccount 
     INNER JOIN customer ON bankaccount.AccountID = customer.AccountID 
-      WHERE customer.PanicButtonStatus = 1
+      WHERE customer.PanicButtonStatus = 0 AND bankaccount.isActive = 0
     `;
     
     db.query(query, (err, results) => {
@@ -248,9 +250,83 @@ JOIN
       }
       callback(null, results);
   });
-}
+},
 
 
+freezeAccount: (accountID, callback) => {
+  const sql = `
+    UPDATE bankaccount
+    INNER JOIN customer ON bankaccount.AccountID = customer.AccountID
+    SET bankaccount.isActive = 0, customer.PanicButtonStatus = 1
+    WHERE bankaccount.AccountID = ?;
+  `;
+ 
+  db.query(sql, [accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to freeze account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
+
+updateToDeactivedAccount: (accountID, updateData, callback) => {
+  const sql = 'UPDATE bankaccount SET ? WHERE AccountID = ?';
+  db.query(sql, [updateData, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to update account: ' + err.message));
+    }
+    callback(null, result.affectedRows > 0); // Return true if rows were updated
+  });
+},
+
+getAccountIDByCustomerID: (custid_nr, callback) => {
+  const sql = 'SELECT AccountID FROM customer WHERE CustID_Nr = ?';
+
+  db.query(sql, [custid_nr], (err, result) => {
+    if (err) {
+      console.error('Database Error:', err);
+      return callback(new Error('Failed to fetch AccountID: ' + err.message));
+    }
+    if (result.length === 0 || !result[0].AccountID) {
+      return callback(new Error('Customer not found or no associated account'));
+    }
+    callback(null, result[0].AccountID);
+  });
+},
+
+ // Updating the Customer Transaction Limit
+ updateTransactionLimit: (accountID, transactionLimit, callback) => {
+  const sql = 'UPDATE bankaccount SET TransactionLimit = ? WHERE AccountID = ?';
+  db.query(sql, [transactionLimit, accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to set transaction limit: ' + err.message));
+    }
+    if (result.affectedRows === 0) {
+      return callback(new Error('Account not found or no changes made'));
+    }
+    callback(null, true);
+  });
+},
+
+
+// Retrieving the Customer Transaction Limit
+getTransactionLimit: (accountID, callback) => {
+  const sql = 'SELECT TransactionLimit FROM bankaccount WHERE AccountID = ?';
+  db.query(sql, [accountID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return callback(new Error('Failed to get transaction limit: ' + err.message));
+    }
+    if (result.length === 0) {
+      return callback(new Error('Account not found'));
+    }
+    callback(null, result[0].TransactionLimit);
+  });
+},
 };
+
 
 module.exports = BankAccountDAO;

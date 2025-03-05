@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAccount, getAccount, updateAccount, deleteAccount ,getAccountActions,getAllCustomerDetails,getFilteredAccounts} = require('../controllers/bankAccountController');
+const { createAccount, getAccount, updateAccount, deleteAccount ,getAccountActions,getAllCustomerDetails,getFilteredAccounts,freezeAccount,deactivateAccount,setTransactionLimit,getTransactionLimit} = require('../controllers/bankAccountController');
 
 const router = express.Router();
 
@@ -16,6 +16,21 @@ router.get('/customers/details', getAllCustomerDetails);
 
 //Get All Customer details
 router.get('/accounts/filter', getFilteredAccounts);
+
+//Freezing bank account
+router.put('/freezeBankaccount/freeze/:accountID', freezeAccount);
+ 
+// Deactive Bank Account
+router.put('/deactivateBankaccount/deactivate/:accountID', deactivateAccount);
+
+// Set transaction limit for an account
+router.put('/updateBankaccount/transaction-limit/:custid_nr', setTransactionLimit);
+
+
+// Get the current transaction limit for an account
+router.get('/bankaccount/:accountID/transaction-limit', getTransactionLimit);
+
+
 
 
 

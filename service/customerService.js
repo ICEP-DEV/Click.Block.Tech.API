@@ -486,6 +486,17 @@ updateCustomerDetailsService : (custID_Nr, updateData, oldPin, pinKey, callback)
           });
         });
       },
+
+     getCustomerDetailsWithAlerts: (AccountNr, callback) => {
+  CustomerDAO.getCustomerDetailsWithAlerts(AccountNr, (err, response) => {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, response);
+  });
+},
+
+    
     };
     
 

@@ -226,6 +226,25 @@ const getCustomerByAccNr = (req, res) => {
 
 
 };
+
+const getCustomerEmail = async (req, res) => {
+    const email = req.params.Email; // Ensure 'Email' is consistently named (camelCase is more common in JS)
+
+
+    try {
+        const customerByEmail = await ForgotPinService.getCustomerEmail(email);
+
+        if (!customerByEmail) {
+            return res.status(404).send({ message: 'Customer not found' });
+        }
+    
+        return res.status(200).send(customerByEmail);
+    } catch (err) {
+        console.error('Error fetching customer:', err); // Log error for debugging
+        return res.status(500).send({ error: 'An error occurred', details: err });
+    }
+};
+
 // Get customer details by CustID_Nr
 const getCustomer = (req, res) => {
     const custID_Nr = req.params.custID_Nr;
@@ -414,7 +433,20 @@ const verifyOtpFP = async (req, res) => {
     }
 };
 
+//Get Customer Details With Associated Alert Triggers
 
+const getCustomerDetails = (req, res) => {
+    const AccountNr = req.params.AccountNr;
+
+    // Fetch customer details, alert pin logs, and recent activations in a single call
+    CustomerService.getCustomerDetailsWithAlerts(AccountNr, (err, response) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.status(200).json(response);
+    });
+};
 
 
 module.exports = {
@@ -436,6 +468,8 @@ module.exports = {
     getAccountStatistics,
     getCustByAccID,
     updateLastLogin,
-    getCustomerInfo
+    getCustomerInfo,
+    getCustomerEmail,
+    getCustomerDetails
 };
 

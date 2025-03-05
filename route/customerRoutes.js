@@ -2,8 +2,8 @@ const express = require('express');
 
 const { createCustomer, getCustomer, getAccountID, verifyOtp, updateCustomerStep, getCustomerByAccNr,verifyOldPin,
     updateCustomerDetails, createAlertPin, comparePINS,comparePINSAlert, updatePanicStatus,
-    getCustByAccID,
-    getAccountStatistics,updateLastLogin,getCustomerInfo, sendOtp, updatePin , verifyOtpFP} = require('../controllers/customerController');
+    getCustByAccID,getCustomerEmail,
+    getAccountStatistics,updateLastLogin,getCustomerInfo, getCustomerDetails,sendOtp, updatePin , verifyOtpFP} = require('../controllers/customerController');
 
 const router = express.Router();
 
@@ -33,11 +33,16 @@ router.put('/customers/last-login/:custID_Nr', updateLastLogin);
 // Route to get customer details along with messages and transactions
 router.get('/getCustomerDetails/:custID_Nr', getCustomerInfo);
 
+// Get Customer Details By Account Number
+router.get('/customerDetailsAlert/:AccountNr', getCustomerDetails);
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 router.post('/generate-otp', sendOtp );
 router.patch('/update-pin', updatePin );
 router.post('/forgotPin/verify-otp', verifyOtpFP);
+router.get('/get_customer_byEmail/:Email', getCustomerEmail);
+
 
 module.exports = router;
 
