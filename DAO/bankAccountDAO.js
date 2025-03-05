@@ -15,6 +15,7 @@ const BankAccountDAO = {
   },
 
   getById: (accountID, callback) => {
+   
     const sql = 'SELECT * FROM bankaccount WHERE AccountID = ?';
     db.query(sql, [accountID], (err, result) => {
       if (err) {
@@ -36,6 +37,7 @@ const BankAccountDAO = {
         );
         return callback(null, bankAccount);
       }
+      
       callback(null, null);
     });
   },

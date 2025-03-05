@@ -55,8 +55,7 @@ const TransactionDAO = {
         return callback({ status: 500, message: 'Database error' });
       }
 
-      console.log("Transaction status updated successfully:", result);
-      callback(null, result.affectedRows); // Return the number of affected rows
+      console.log("Transaction status updated successfully:", result); // Return the number of affected rows
     });
   },
 

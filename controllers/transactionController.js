@@ -5,23 +5,27 @@ const emailService = require('../service/emailService');
 
 const createTransaction = (req, res) => {
   const { transactionType, transactionAmount, accountID } = req.body;
+  
   try {
     const status = "pending";
     const dateNow = new Date();
+    console.log('its here')
     TransactionService.createTransaction(transactionType, transactionAmount, status, dateNow, accountID, (transacResult) => {
-      if (transacResult) {
+      
+      if (transacResult!=null) {
         NotificationService.createNotification({
-          TransactionID: transacResult.transactionID,
+          TransactionID: transacResult,
           NotificationType: transactionType,
           SentDate: dateNow,
           status: status
         }, (err, result) => {
           if (err) {
-            console.log(transacResult);
+            console.log(err);
           }
         });
       }
-      res.status(200).send(transacResult);
+      res.status(201).json(transacResult);
+      
     });
   } catch (err) {
     console.log(err);
